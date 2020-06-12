@@ -1,0 +1,125 @@
+ext {
+    mvvmConfig = new ConfigSlurper().parse(new File("./mvvm-config.groovy").toURI().toURL())
+
+    SysConfig = [
+            compileSdkVersion: mvvmConfig.SDKVersion.compileSdkVersion,
+            minSdkVersion    : mvvmConfig.SDKVersion.minSdkVersion,
+            targetSdkVersion : mvvmConfig.SDKVersion.targetSdkVersion
+    ]
+
+    Versions = [
+            glideVersion  : "4.11.0",
+            room          : "2.2.5",
+            retrofit2     : "2.9.0",
+            kotlinVersion : '1.3.72',
+            bindingAdapter: '4.0.0'
+    ]
+
+    Deps = [
+
+            // 官方支持库
+            appcompat                 : "androidx.appcompat:appcompat:1.1.0",
+            recyclerView              : "androidx.recyclerview:recyclerview:1.1.0",
+            material                  : "com.google.android.material:material:1.1.0",
+            swiperefreshlayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01",
+
+            constraintLayout          : "androidx.constraintlayout:constraintlayout:2.0.0-beta6",
+
+            paging                    : "androidx.paging:paging-runtime:2.1.2",
+            viewPager2                : "androidx.viewpager2:viewpager2:1.0.0",
+
+            lifecycleCompiler         : "androidx.lifecycle:lifecycle-compiler:2.2.0",
+            lifecycleProcess          : "androidx.lifecycle:lifecycle-process:2.2.0",
+
+            // 数据库
+            roomRuntime               : "androidx.room:room-runtime:$Versions.room",
+            roomCompiler              : "androidx.room:room-compiler:$Versions.room",
+            roomRxJava                : "androidx.room:room-rxjava2:$Versions.room",
+
+            // debugImplementation，可以在debug阶段通过浏览器看到数据库
+            debugDB                   : "com.amitshekhar.android:debug-db:1.0.6",
+
+            // 网络
+            retrofit2                 : "com.squareup.retrofit2:retrofit:$Versions.retrofit2",
+            retrofit2RxJava2          : "com.squareup.retrofit2:adapter-rxjava2:$Versions.retrofit2",
+
+            // 图片加载
+            glide                     : "com.github.bumptech.glide:glide:$Versions.glideVersion",
+            glideCompiler             : "com.github.bumptech.glide:compiler:$Versions.glideVersion",
+
+            gson                      : "com.google.code.gson:gson:2.8.6",
+            gsonConverter             : "com.squareup.retrofit2:converter-gson:2.7.2",
+
+            // Rx
+            rxAndroid2                : "io.reactivex.rxjava2:rxandroid:2.1.1",
+            rxJava2                   : "io.reactivex.rxjava2:rxjava:2.2.10",
+            rxKotlin                  : "io.reactivex.rxjava2:rxkotlin:2.3.0",
+
+            // 内存泄露
+            leakCanary2               : 'com.squareup.leakcanary:leakcanary-android:2.2',
+
+            // kotlin
+            kotlinStdLib              : "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}",
+            kotlinPlugin              : "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}",
+            kotlinKTX                 : "androidx.core:core-ktx:1.3.0",
+
+            // 绑定库
+            bindingAdapter            : "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:${Versions.bindingAdapter}",
+            bindingAdapterKTX         : "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-ktx:${Versions.bindingAdapter}",
+            bindingAdapterRv          : "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:${Versions.bindingAdapter}",
+            bindingAdapterVp2         : "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-viewpager2:${Versions.bindingAdapter}",
+
+            // 权限申请
+            livePermissions           :'com.ftd.livepermissions:livepermissions:1.0.2',
+
+            // ktx
+            fragmentKTX               : "androidx.fragment:fragment-ktx:1.2.4",
+            // 在 LiveData 中使用协程
+            lifecycleLiveDataKTX      : "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0",
+            // 在 Lifecycles 中使用协程，视图销毁则自动取消
+            lifecycleRuntimeKTX       : "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0",
+            // 创建可监测的 LiveData 流
+            reactiveStreamsKTX        : "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.2.0",
+
+            // viewModelScope，会在 view 消失时取消协程
+            viewModelKTX              : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0",
+
+            natigationUiKTX           : "androidx.navigation:navigation-ui-ktx:2.3.0-beta01",
+            natigationRuntimeKTX      : "androidx.navigation:navigation-runtime-ktx:2.3.0-beta01",
+            natigationFragmentKTX     : "androidx.navigation:navigation-fragment-ktx:2.3.0-beta01",
+
+            // 可在 room 中使用协程
+            roomKTX                   : "androidx.room:room-ktx:2.2.5",
+            sqliteKTX                 : "androidx.sqlite:sqlite-ktx:2.1.0",
+            workKTX                   : "androidx.work:work-runtime-ktx:2.3.4",
+            paletteKTX                : "androidx.palette:palette-ktx:1.0.0",
+            collectionKTX             : "androidx.collection:collection-ktx:1.1.0",
+    ]
+}
+
+/**
+ * 添加依赖库的源
+ * @param handler repositories
+ */
+static def addRepository(RepositoryHandler handler) {
+    handler.google()
+    handler.maven { url 'https://maven.aliyun.com/repository/google' }
+    handler.maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    handler.maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+    handler.maven { url "https://www.jitpack.io" }
+    handler.maven { url "https://dl.bintray.com/tencentqcloudterminal/maven" }
+    handler.mavenCentral()
+}
+
+static def curDate() {
+    return new Date().format("yyyy-MM-dd")
+}
+
+static def curDateTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm")
+}
+
+// 添加到全局的变量中
+ext.addRepository = this.&addRepository
+ext.curDate = this.&curDate
+ext.curDateTime = this.&curDateTime

@@ -1,0 +1,250 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion SysConfig.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion SysConfig.minSdkVersion
+        targetSdkVersion SysConfig.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "${JavaVersion.VERSION_1_8}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                /*
+                 TODO 这里似乎无法根据配置来排除某些类，而是取决于是否使用了某类来自动排除
+                 */
+            }
+        }
+    }
+}
+
+/**
+ * TODO
+ * 根据配置文件，决定是否引入某些库。
+ * 如果框架中有用到某库，那么在排除该库的时候需要 compileOnly，以便编译通过，比如 room
+ * kapt 可能需要单独在 module 中声明
+ */
+dependencies {
+    api fileTree(dir: "libs", include: ["*.jar"])
+    // 必备的 4 个库
+    api Deps.kotlinStdLib
+    api Deps.kotlinKTX
+    api Deps.appcompat
+    api Deps.constraintLayout
+
+    api Deps.lifecycleRuntimeKTX
+    /**
+     * 生成生命周期注解相关的代码，否则将反射调用，影响性能
+     */
+    kapt Deps.lifecycleCompiler
+
+    /**
+     * 监控应用的生命周期
+     */
+    if (mvvmConfig.include.lifecycleProcess) {
+        api Deps.lifecycleProcess
+    } else {
+        compileOnly Deps.lifecycleProcess
+    }
+
+    // RecyclerView
+    if (mvvmConfig.include.recyclerView) {
+        api Deps.recyclerView
+    } else {
+        compileOnly Deps.recyclerView
+    }
+    // 数据库
+    if (mvvmConfig.include.room) {
+        api Deps.roomRuntime
+        api Deps.roomRxJava
+        kapt Deps.roomCompiler
+    } else {
+        compileOnly Deps.roomRuntime
+        compileOnly Deps.roomRxJava
+    }
+    // md
+    if (mvvmConfig.include.material) {
+        api Deps.material
+    }
+    // 下拉刷新
+    if (mvvmConfig.include.swiperefreshlayout) {
+        api Deps.swiperefreshlayout
+    } else {
+        compileOnly Deps.swiperefreshlayout
+    }
+    // vp2
+    if (mvvmConfig.include.viewPager2) {
+        api Deps.viewPager2
+    }
+    // 网络
+    if (mvvmConfig.include.retrofit2) {
+        api Deps.retrofit2
+        if (!mvvmConfig.include.gson) {
+            api Deps.gson
+        }
+        api Deps.gsonConverter
+    } else {
+        compileOnly Deps.retrofit2
+        compileOnly Deps.gsonConverter
+    }
+    // gson
+    if (mvvmConfig.include.gson) {
+        api Deps.gson
+    }
+
+    // 图片
+    if (mvvmConfig.include.glide) {
+        api Deps.glide
+        kapt Deps.glideCompiler
+    } else {
+        compileOnly Deps.glide
+    }
+    // 绑定库
+    if (mvvmConfig.include.bindingCollection.bindingAdapterVp2 || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
+        api (Deps.bindingAdapterKTX) {
+            exclude group: 'androidx.swiperefreshlayout'
+        }
+        api (Deps.bindingAdapter) {
+            // 上面的 swiperefreshlayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
+            exclude group: 'androidx.swiperefreshlayout'
+        }
+        if (mvvmConfig.include.bindingCollection.bindingAdapterRv) {
+            api Deps.bindingAdapterRv
+        }
+        if (mvvmConfig.include.bindingCollection.bindingAdapterVp2) {
+            api Deps.bindingAdapterVp2
+        }
+    } else {
+        compileOnly Deps.bindingAdapter
+        compileOnly Deps.bindingAdapterVp2
+        compileOnly Deps.bindingAdapterRv
+    }
+    // 权限申请
+    if (mvvmConfig.include.livePermissions) {
+        api Deps.livePermissions
+    }
+
+    // paging
+    if (mvvmConfig.include.paging) {
+        api Deps.paging
+    }
+
+    // debugDB
+    if (mvvmConfig.include.debugDB) {
+        api Deps.debugDB
+    }
+
+    // rx 系列
+    if (mvvmConfig.include.rxJava2 || mvvmConfig.include.rxKotlin) {
+        api Deps.rxAndroid2
+        if (mvvmConfig.include.rxKotlin) {
+            api Deps.rxKotlin
+        }
+        if (mvvmConfig.include.rxJava2) {
+            api Deps.rxJava2
+        }
+    }
+    //
+//    if (mvvmConfig.include.) {
+//        api Deps.
+//    }
+    //
+//    if (mvvmConfig.include.) {
+//        api Deps.
+//    }
+
+    /**
+     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
+     */
+    if (mvvmConfig.include.fragmentKTX) {
+        api Deps.fragmentKTX
+    }
+
+    if (mvvmConfig.include.lifecycleLiveDataKTX) {
+        api Deps.lifecycleLiveDataKTX
+    }
+
+    if (mvvmConfig.include.reactiveStreamsKTX) {
+        api Deps.reactiveStreamsKTX
+    }
+
+    /**
+     * 在 vm 中使用协程，视图销毁自动取消
+     */
+    if (mvvmConfig.include.viewModelKTX) {
+        api Deps.viewModelKTX
+    }
+
+    if (mvvmConfig.include.natigationUiKTX) {
+        api Deps.natigationUiKTX
+    }
+
+    if (mvvmConfig.include.natigationRuntimeKTX) {
+        api Deps.natigationRuntimeKTX
+    }
+
+    if (mvvmConfig.include.natigationFragmentKTX) {
+        api Deps.natigationFragmentKTX
+    }
+
+    if (mvvmConfig.include.roomKTX) {
+        api Deps.roomKTX
+    }
+
+    if (mvvmConfig.include.sqliteKTX) {
+        api Deps.sqliteKTX
+    }
+
+    if (mvvmConfig.include.workKTX) {
+        api Deps.workKTX
+    }
+
+    if (mvvmConfig.include.paletteKTX) {
+        api Deps.paletteKTX
+    }
+
+    if (mvvmConfig.include.collectionKTX) {
+        api Deps.collectionKTX
+    }
+
+    /**
+     * debug 阶段内存泄露检测
+     */
+    if (mvvmConfig.include.leakCanary2) {
+        debugImplementation Deps.leakCanary2
+    }
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+}
