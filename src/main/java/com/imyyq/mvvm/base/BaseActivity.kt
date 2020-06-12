@@ -59,26 +59,32 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     }
 
     final override fun initUiChangeLiveData() {
-        // vm 可以结束界面
-        mViewModel.mUiChangeLiveData.finishEvent.observe(this, Observer { finish() })
-        // 显示对话框
-        mViewModel.mUiChangeLiveData.showDialogEvent.observe(this, Observer {
-            showDialog(it)
-        })
-        // 隐藏对话框
-        mViewModel.mUiChangeLiveData.dismissDialogEvent.observe(this, Observer {
-            dismissDialog()
-        })
-        // vm 可以启动界面
-        mViewModel.mUiChangeLiveData.startActivityEvent.observe(this, Observer {
-            val intent = Intent(this, it)
-            startActivity(intent)
-        })
-        mViewModel.mUiChangeLiveData.startActivityEventWithBundle.observe(this, Observer {
-            val intent = Intent(this, it?.first)
-            intent.putExtra(BaseViewModel.extraBundle, it?.second)
-            startActivity(intent)
-        })
+        if (isViewModelNeedStartAndFinish()) {
+            // vm 可以结束界面
+            mViewModel.mUiChangeLiveData.finishEvent.observe(this, Observer { finish() })
+            // vm 可以启动界面
+            mViewModel.mUiChangeLiveData.startActivityEvent.observe(this, Observer {
+                val intent = Intent(this, it)
+                startActivity(intent)
+            })
+            // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
+            mViewModel.mUiChangeLiveData.startActivityEventWithBundle.observe(this, Observer {
+                val intent = Intent(this, it?.first)
+                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                startActivity(intent)
+            })
+        }
+
+        if (isNeedDialog()) {
+            // 显示对话框
+            mViewModel.mUiChangeLiveData.showDialogEvent.observe(this, Observer {
+                showDialog(it)
+            })
+            // 隐藏对话框
+            mViewModel.mUiChangeLiveData.dismissDialogEvent.observe(this, Observer {
+                dismissDialog()
+            })
+        }
     }
 
     /**

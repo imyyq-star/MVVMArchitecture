@@ -2,6 +2,9 @@ package com.imyyq.mvvm.app
 
 import android.app.Activity
 
+/**
+ * App 全局 Activity 管理器，采用 registerActivityLifecycleCallbacks 监听所有的 Activity 的创建和销毁
+ */
 object AppActivityManager {
     private val mActivityList = mutableListOf<Activity>()
 

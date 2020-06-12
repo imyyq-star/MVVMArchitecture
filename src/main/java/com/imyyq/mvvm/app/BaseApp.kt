@@ -18,6 +18,7 @@ open class BaseApp : Application() {
         fun initApp(app: Application) {
             Companion.app = app
 
+            // 监听所有 Activity 的创建和销毁
             app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
                 override fun onActivityPaused(activity: Activity) {
                 }

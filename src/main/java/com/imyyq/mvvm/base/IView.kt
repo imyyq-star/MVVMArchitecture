@@ -56,7 +56,16 @@ interface IView<VM : BaseViewModel<*>> {
         ).get(modelClass)
     }
 
+    /**
+     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
+     */
     fun getBundle(activity: Activity): Bundle? {
         return activity.intent.getBundleExtra(BaseViewModel.extraBundle)
     }
+
+    /**
+     * ViewModel 是否需要启动或结束对应的 Activity，即是否有调用 [BaseViewModel.startActivity] 和 [BaseViewModel.finish]
+     * 不需要的话可以设置为 false，避免创建不必要的对象
+     */
+    fun isViewModelNeedStartAndFinish() = true
 }
