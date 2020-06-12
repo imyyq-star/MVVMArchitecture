@@ -76,6 +76,16 @@ dependencies {
         compileOnly Deps.lifecycleProcess
     }
 
+    /**
+     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
+     */
+    api Deps.fragmentKTX
+    api Deps.lifecycleLiveDataKTX
+    /**
+     * 在 vm 中使用协程，视图销毁自动取消
+     */
+    api Deps.viewModelKTX
+
     // RecyclerView
     if (mvvmConfig.include.recyclerView) {
         api Deps.recyclerView
@@ -96,10 +106,10 @@ dependencies {
         api Deps.material
     }
     // 下拉刷新
-    if (mvvmConfig.include.swiperefreshlayout) {
-        api Deps.swiperefreshlayout
+    if (mvvmConfig.include.swipeRefreshLayout) {
+        api Deps.swipeRefreshLayout
     } else {
-        compileOnly Deps.swiperefreshlayout
+        compileOnly Deps.swipeRefreshLayout
     }
     // vp2
     if (mvvmConfig.include.viewPager2) {
@@ -177,31 +187,9 @@ dependencies {
 //    if (mvvmConfig.include.) {
 //        api Deps.
 //    }
-    //
-//    if (mvvmConfig.include.) {
-//        api Deps.
-//    }
-
-    /**
-     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
-     */
-    if (mvvmConfig.include.fragmentKTX) {
-        api Deps.fragmentKTX
-    }
-
-    if (mvvmConfig.include.lifecycleLiveDataKTX) {
-        api Deps.lifecycleLiveDataKTX
-    }
 
     if (mvvmConfig.include.reactiveStreamsKTX) {
         api Deps.reactiveStreamsKTX
-    }
-
-    /**
-     * 在 vm 中使用协程，视图销毁自动取消
-     */
-    if (mvvmConfig.include.viewModelKTX) {
-        api Deps.viewModelKTX
     }
 
     if (mvvmConfig.include.natigationUiKTX) {
@@ -246,5 +234,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
 }

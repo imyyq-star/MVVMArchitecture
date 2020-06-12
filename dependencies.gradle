@@ -21,7 +21,7 @@ ext {
             appcompat                 : "androidx.appcompat:appcompat:1.1.0",
             recyclerView              : "androidx.recyclerview:recyclerview:1.1.0",
             material                  : "com.google.android.material:material:1.1.0",
-            swiperefreshlayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01",
+            swipeRefreshLayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01",
 
             constraintLayout          : "androidx.constraintlayout:constraintlayout:2.0.0-beta6",
 

@@ -16,6 +16,8 @@
 /.idea/vcs.xml
 
 .DS_Store
+.project
+.settings
 
 build
 app/build
