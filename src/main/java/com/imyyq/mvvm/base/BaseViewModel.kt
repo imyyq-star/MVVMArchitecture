@@ -45,7 +45,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @CallSuper
     override fun onCleared() {
-        mModel?.onCleared()
+        // 可能 mModel 是未初始化的
+        if (this::mModel.isInitialized) {
+            mModel.onCleared()
+        }
     }
 
     @MainThread

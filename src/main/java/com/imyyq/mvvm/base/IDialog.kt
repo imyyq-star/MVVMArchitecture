@@ -1,5 +1,8 @@
 package com.imyyq.mvvm.base
 
+/**
+ * 对话框接口
+ */
 interface IDialog {
     fun showDialog(msg: String?) {}
 
