@@ -1,15 +1,16 @@
 package com.imyyq.mvvm.http
 
 import android.util.ArrayMap
-import com.imyyq.mvvm.utils.FileUtil
-import com.imyyq.mvvm.utils.NetworkUtil
-import okhttp3.Cache
-import okhttp3.CacheControl
+import com.imyyq.mvvm.BuildConfig
+import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
+import com.imyyq.mvvm.http.interceptor.logging.Level
+import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.internal.platform.Platform
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -25,100 +26,95 @@ import java.util.concurrent.TimeUnit
  */
 object HttpRequest {
 
+    // 缓存 service
     private val mServiceMap = ArrayMap<String, Any>()
 
-    private var mHost: String? = null
+    // 默认的 baseUrl
+    lateinit var mDefaultBaseUrl: String
 
-    var staticHeader: ArrayMap<String, String>? = null
+    // 默认的请求头
+    private lateinit var mDefaultHeader: ArrayMap<String, String>
 
     /**
-     * 请求超时时间
+     * 请求超时时间，秒为单位
      */
-    private val DEFAULT_TIMEOUT = 10
+    var mDefaultTimeout = 10
 
-    fun setHost(mHost: String) {
-        HttpRequest.mHost = mHost
-    }
-
-    fun addHeader(name: String, value: String) {
-        if (staticHeader == null) {
-            staticHeader = ArrayMap()
+    /**
+     * 添加默认的请求头
+     */
+    fun addDefaultHeader(name: String, value: String) {
+        if (!this::mDefaultHeader.isInitialized) {
+            mDefaultHeader = ArrayMap()
         }
-        staticHeader!![name] = value
+        mDefaultHeader[name] = value
     }
 
-    @Synchronized
-    fun <T> getService(cls: Class<T>, host: String): T {
+    /**
+     * 如果有不同的 baseURL，那么可以相同 baseURL 的接口都放在一个 Service 钟，通过此方法来获取
+     */
+    fun <T> getService(cls: Class<T>, host: String, vararg interceptors: Interceptor?): T {
         val name = cls.name
 
         var obj: Any? = mServiceMap[name]
         if (obj == null) {
             val httpClientBuilder = OkHttpClient.Builder()
+
             // 超时时间
-            httpClientBuilder.connectTimeout(DEFAULT_TIMEOUT.toLong(), TimeUnit.SECONDS)
+            httpClientBuilder.connectTimeout(mDefaultTimeout.toLong(), TimeUnit.SECONDS)
 
-            // 设置缓存目录
-            val cache = Cache(
-                File(FileUtil.cacheDir, "httpCache"),
-                (1024 * 1024 * 100).toLong()
-            )
-            httpClientBuilder.cache(cache)
-
-            /*
-             *  拦截器，有没有网络都会响应，这里必须设置没网则访问缓存，不然不生效
-             */
-            httpClientBuilder.addInterceptor { chain ->
-                var request = chain.request()
-
-                // 设置请求头，需要请求头的基本每个接口都需要
-                if (staticHeader != null && !staticHeader!!.isEmpty()) {
-                    val builder = request.newBuilder()
-                    for ((key, value) in staticHeader!!) {
-                        builder.header(key, value)
-                    }
-                    builder.method(request.method(), request.body())
-                    request = builder.build()
+            // 拦截器
+            interceptors.forEach { interceptor ->
+                interceptor?.let {
+                    httpClientBuilder.addInterceptor(it)
                 }
-
-                // 判断网络   没网读取缓存
-                if (!NetworkUtil.isConnected()) {
-                    request = request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build()
-                }
-                chain.proceed(request)
             }
 
-            // 有网络才会调用
-            //            httpClientBuilder.addNetworkInterceptor(chain -> {
-            //                Request request = chain.request();
-            //                okhttp3.Response response = chain.proceed(request);
-            //
-            //                Log.i("HttpRequest", "addNetworkInterceptor: ");
-            //                if (NetworkUtil.isConnected())
-            //                {
-            //                    int maxAge = 10;
-            //                    // 有网络时 设置缓存超时时间
-            //                    response.newBuilder().removeHeader("Pragma").header("Cache-Control",
-            //                            "public, max-age=" + maxAge).build();
-            //                }
-            //                return response;
-            //            });
+            // 日志拦截器
+            httpClientBuilder
+                .addInterceptor(
+                    LoggingInterceptor
+                        .Builder()
+                        // 是否开启日志打印
+                        .loggable(BuildConfig.DEBUG)
+                        // 打印的等级
+                        .setLevel(Level.BASIC)
+                        // 打印类型
+                        .log(Platform.INFO)
+                        // request 的 Tag
+                        .request("Request")
+                        // Response 的 Tag
+                        .response("Response")
+                        .build()
+                )
 
-            obj = Retrofit.Builder().client(httpClientBuilder.build()).baseUrl(host) // 基础url
-                .addConverterFactory(GsonConverterFactory.create()) // JSON解析
+            obj = Retrofit.Builder().client(httpClientBuilder.build())
+                // 基础url
+                .baseUrl(host)
+                // JSON解析
+                .addConverterFactory(GsonConverterFactory.create())
                 // 使用协程，不使用 rx
                 //.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
-                .build() // 构建
+                .build()
                 .create(cls)
             mServiceMap[name] = obj
         }
+        @Suppress("UNCHECKED_CAST")
         return obj as T
     }
 
+    /**
+     * 设置了 [mDefaultBaseUrl] 后，可通过此方法获取 Service
+     */
     fun <T> getService(cls: Class<T>): T {
-        if (mHost == null) {
-            throw RuntimeException("必须初始化mHost")
+        if (!this::mDefaultBaseUrl.isInitialized) {
+            throw RuntimeException("必须初始化 mBaseUrl")
         }
-        return getService(cls, mHost ?: "")
+        if (this::mDefaultHeader.isInitialized) {
+            val headers = HeaderInterceptor(mDefaultHeader)
+            return getService(cls, mDefaultBaseUrl, headers)
+        }
+        return getService(cls, mDefaultBaseUrl, null)
     }
 
     /**

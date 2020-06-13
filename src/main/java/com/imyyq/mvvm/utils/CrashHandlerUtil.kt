@@ -5,6 +5,9 @@ import com.imyyq.mvvm.app.AppActivityManager
 import java.io.*
 import java.lang.Thread.UncaughtExceptionHandler
 
+/**
+ * 崩溃信息捕获，存储在 /sdcard/Android/data/xxx.xxx.xxx/cache/Log/crash/日期.log
+ */
 object CrashHandlerUtil : UncaughtExceptionHandler {
     private val CRASH_LOG_PATH = FileUtil.appLogDir + "crash/"
 

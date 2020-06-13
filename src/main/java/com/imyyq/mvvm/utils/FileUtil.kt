@@ -41,7 +41,7 @@ object FileUtil {
         get() {
             val s = "/Log/"
             val path = if (isSDCardMounted)
-                BaseApp.getInstance().externalCacheDir?.absolutePath + s
+                cacheDir.absolutePath + s
             else
                 BaseApp.getInstance().filesDir.absolutePath + s
             val file = File(path)
