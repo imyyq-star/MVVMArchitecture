@@ -14,11 +14,15 @@ import com.imyyq.mvvm.app.BaseApp
 object AppUtil {
     private val TAG = "AppUtil"
 
+    /**
+     * 获取当前进程的名称，默认进程名称是包名
+     */
     val currentProcessName: String?
         get() {
             val pid = android.os.Process.myPid()
             val mActivityManager = BaseApp.getInstance().getSystemService(
-                    Context.ACTIVITY_SERVICE) as ActivityManager
+                Context.ACTIVITY_SERVICE
+            ) as ActivityManager
             for (appProcess in mActivityManager.runningAppProcesses) {
                 if (appProcess.pid == pid) {
                     return appProcess.processName
@@ -30,7 +34,7 @@ object AppUtil {
     /**
      * @return 获取所有的带启动图标的App
      */
-    val launchableResolveInfos: List<ResolveInfo>
+    val launcherResolveInfoList: List<ResolveInfo>
         get() {
             val intent = Intent()
             intent.action = Intent.ACTION_MAIN
@@ -39,22 +43,20 @@ object AppUtil {
         }
 
     /**
-     * 取得版本名称，对应 AndroidManifest.xml 文件 <manifest> 标签下的 versionName 属性
-     *
-     * @return 返回版本字符串，比如：1.0
-    </manifest> */
+     * 取得版本名称
+     */
     val versionName: String
         get() = defPackageInfo!!.versionName
 
     /**
-     * 取得版本号，对应 AndroidManifest.xml 文件 <manifest> 标签下的 versionCode 属性
-     *
-     * @return 返回版本，比如：1
-    </manifest> */
+     * 取得版本号
+     */
     val versionCode: Int
         get() = defPackageInfo!!.versionCode
 
-    // getPackageName()是你当前类的包名，0代表是获取版本信息
+    /**
+     * 获取应用的信息，0代表是获取版本信息
+      */
     val defPackageInfo: PackageInfo?
         get() {
             val packageManager = BaseApp.getInstance().packageManager
@@ -68,26 +70,19 @@ object AppUtil {
             return packInfo
         }
 
-    val curProcessName: String?
-        get() {
-            val pid = android.os.Process.myPid()
-            val mActivityManager = BaseApp.getInstance().getSystemService(
-                    Context.ACTIVITY_SERVICE) as ActivityManager
-            for (appProcess in mActivityManager.runningAppProcesses) {
-                if (appProcess.pid == pid) {
-                    return appProcess.processName
-                }
-            }
-            return null
-        }
-
+    /**
+     * App 的名称
+     */
     val appLabel: String?
         get() {
             val packageManager = BaseApp.getInstance().packageManager
             try {
                 return packageManager.getApplicationLabel(
-                        packageManager.getApplicationInfo(BaseApp.getInstance().packageName,
-                                0)).toString()
+                    packageManager.getApplicationInfo(
+                        BaseApp.getInstance().packageName,
+                        0
+                    )
+                ).toString()
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
                 LogUtil.e(TAG, "getDefPackageInfo: " + e.message)
@@ -96,6 +91,9 @@ object AppUtil {
             return null
         }
 
+    /**
+     * 系统分享文本的 Intent
+     */
     fun shareTextIntent(text: String): Intent {
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
@@ -105,36 +103,37 @@ object AppUtil {
         return sendIntent
     }
 
-    fun getTextReceivers(pm: PackageManager): List<ResolveInfo> {
-        val intent = Intent()
-        intent.action = Intent.ACTION_SEND
-        intent.type = "text/plain"
 
-        return pm.queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY)
-    }
-
+    /**
+     * 指定包名[packageName]的 App 是否已安装到设备上
+     */
     fun isAppExist(packageName: String): Boolean {
         val packageManager = BaseApp.getInstance().packageManager
         // 获取所有已安装程序的包信息
-        val pinfo = packageManager.getInstalledPackages(0)
-        for (i in pinfo.indices) {
-            if (pinfo[i].packageName.equals(packageName, ignoreCase = true)) {
+        val list = packageManager.getInstalledPackages(0)
+        for (i in list.indices) {
+            if (list[i].packageName.equals(packageName, ignoreCase = true)) {
                 return true
             }
         }
         return false
     }
 
-    fun gotoAppDetailsSettings(context: Context, requestCode: Int) {
+    /**
+     * 打开应用的详细信息设置
+     */
+    fun gotoAppDetailsSettings(context: Context, packageName: String = context.packageName, requestCode: Int) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        intent.data = Uri.fromParts("package", context.packageName, null)
+        intent.data = Uri.fromParts("package", packageName, null)
         if (context is Activity) {
             context.startActivityForResult(intent, requestCode)
         }
     }
 
-    fun startActivityForPackage(context: Context, packageName: String): Boolean {
+    /**
+     * 打开指定包名的应用
+     */
+    fun startActivityByPackage(context: Context, packageName: String): Boolean {
         val pm = context.packageManager
         val intent = pm.getLaunchIntentForPackage(packageName)
         if (null != intent) {
@@ -156,31 +155,6 @@ object AppUtil {
         context.startActivity(Intent(context, cls))
     }
 
-    /**
-     * 打开其他的Activity，并附带Object
-     *
-     * @param cls   要打开的Activity
-     * @param value 要附带的Object
-     */
-    //    public static void startActivity(Context context, Class<?> cls, String name, Object value)
-    //    {
-    //        Intent intent = new Intent(context, cls);
-    //        intent.putExtra(name, PG.convertParcelable(value));
-    //        context.startActivity(intent);
-    //    }
-    //
-    //    public static void startActivity(Context context, Class<?> cls, Object value)
-    //    {
-    //        Intent intent = new Intent(context, cls);
-    //        intent.putExtra(Constants.EXTRA_PARCELABLE, PG.convertParcelable(value));
-    //        context.startActivity(intent);
-    //    }
-    //
-    //    public static void startActivity(Context context, Intent intent, String name, Object value)
-    //    {
-    //        intent.putExtra(name, PG.convertParcelable(value));
-    //        context.startActivity(intent);
-    //    }
     fun startActivity(context: Context, cls: Class<*>, name: String, value: Int) {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
@@ -206,8 +180,10 @@ object AppUtil {
         context.startActivity(intent)
     }
 
-    fun startActivityForResult(context: Activity, cls: Class<*>, requestCode: Int,
-                               name: String, value: String) {
+    fun startActivityForResult(
+        context: Activity, cls: Class<*>, requestCode: Int,
+        name: String, value: String
+    ) {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
         context.startActivityForResult(intent, requestCode)

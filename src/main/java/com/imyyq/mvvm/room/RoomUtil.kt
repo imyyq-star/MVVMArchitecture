@@ -6,16 +6,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.imyyq.mvvm.app.BaseApp
 
+/**
+ * 便捷创建 room 实例的工具，通常来说只需要实例化一次即可，数据库也应该只有一个
+ */
 object RoomUtil {
-    private val mDBEntityMap = ArrayMap<String, AbstractAppDatabase>()
+    private val mDBEntityMap = ArrayMap<String, RoomDatabase>()
 
     @Synchronized
-    fun <T : AbstractAppDatabase> getDB(
+    fun <T : RoomDatabase> getDB(
         cls: Class<T>, dbName: String,
         callback: RoomDatabase.Callback?
     ): T {
         val name = cls.name
-        var database: AbstractAppDatabase? = mDBEntityMap[name]
+        var database: RoomDatabase? = mDBEntityMap[name]
         if (database == null) {
             val builder = Room.databaseBuilder(
                 BaseApp.getInstance(), cls,
@@ -30,11 +33,11 @@ object RoomUtil {
         return database as T
     }
 
-    fun <T : AbstractAppDatabase> getDB(cls: Class<T>, callback: RoomDatabase.Callback?): T {
+    fun <T : RoomDatabase> getDB(cls: Class<T>, callback: RoomDatabase.Callback?): T {
         return getDB(cls, "default.db", callback)
     }
 
-    fun <T : AbstractAppDatabase> getDB(cls: Class<T>): T {
+    fun <T : RoomDatabase> getDB(cls: Class<T>): T {
         return getDB(cls, null)
     }
 }
