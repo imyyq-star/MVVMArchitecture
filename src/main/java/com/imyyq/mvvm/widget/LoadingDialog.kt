@@ -7,12 +7,13 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.R
+import com.imyyq.mvvm.app.GlobalConfig
 
 class LoadingDialog(
     context: Context,
     @LayoutRes private val mLayoutRes: Int,
-    cancelable: Boolean = false,
-    canceledOnTouchOutside: Boolean = false
+    cancelable: Boolean = GlobalConfig.loadingDialogCancelable,
+    canceledOnTouchOutside: Boolean = GlobalConfig.loadingDialogCanceledOnTouchOutside
 ) : Dialog(context, R.style.BaseDialogStyle) {
 
     init {

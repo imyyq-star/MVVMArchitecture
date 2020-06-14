@@ -19,13 +19,13 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     private val varViewModelId: Int? = null
 ) :
     AppCompatActivity(),
-    IView<VM>, IDialog {
+    IView<VM>, ILoadingDialog {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
 
     private val mLoadingDialog: Dialog by lazy {
-        LoadingDialog(this, dialogLayout())
+        LoadingDialog(this, loadingDialogLayout())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,14 +81,14 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
             })
         }
 
-        if (isNeedDialog()) {
+        if (isNeedLoadingDialog()) {
             // 显示对话框
-            mViewModel.mUiChangeLiveData.showDialogEvent.observe(this, Observer {
-                showDialog(it)
+            mViewModel.mUiChangeLiveData.showLoadingDialogEvent.observe(this, Observer {
+                showLoadingDialog(it)
             })
             // 隐藏对话框
-            mViewModel.mUiChangeLiveData.dismissDialogEvent.observe(this, Observer {
-                dismissDialog()
+            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
+                dismissLoadingDialog()
             })
         }
     }
@@ -98,11 +98,17 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
      */
     protected open fun isKeepScreenOn() = false
 
-    override fun showDialog(msg: String?) {
+    override fun showLoadingDialog(msg: String?) {
+        isLoadingDialogCancelable()?.apply {
+            mLoadingDialog.setCancelable(this)
+        }
+        isLoadingDialogCanceledOnTouchOutside()?.apply {
+            mLoadingDialog.setCanceledOnTouchOutside(this)
+        }
         mLoadingDialog.show()
     }
 
-    override fun dismissDialog() {
+    override fun dismissLoadingDialog() {
         mLoadingDialog.dismiss()
     }
 }

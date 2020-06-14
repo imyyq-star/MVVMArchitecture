@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.utils.SingleLiveEvent
-import java.lang.RuntimeException
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel {
     constructor(app: Application, model: M) : this(app) {
@@ -52,24 +51,24 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun showDialog() {
-        showDialog("请稍后...")
+    protected fun showLoadingDialog() {
+        showLoadingDialog("请稍后...")
     }
 
     @MainThread
-    protected fun showDialog(title: String?) {
-        if (!mUiChangeLiveData.showDialogEvent.hasObservers()) {
-            throw RuntimeException("Activity 或 Fragment 复写了 isNeedDialog() 方法并返回 false 时，无法使用 Dialog")
+    protected fun showLoadingDialog(title: String?) {
+        if (!mUiChangeLiveData.showLoadingDialogEvent.hasObservers()) {
+            throw RuntimeException("Activity 或 Fragment 复写了 isNeedLoadingDialog() 方法并返回 false 时，无法使用 Dialog")
         }
-        mUiChangeLiveData.showDialogEvent.value = title
+        mUiChangeLiveData.showLoadingDialogEvent.value = title
     }
 
     @MainThread
     protected fun dismissDialog() {
-        if (!mUiChangeLiveData.dismissDialogEvent.hasObservers()) {
-            throw RuntimeException("Activity 或 Fragment 复写了 isNeedDialog() 方法并返回 false 时，无法使用 Dialog")
+        if (!mUiChangeLiveData.dismissLoadingDialogEvent.hasObservers()) {
+            throw RuntimeException("Activity 或 Fragment 复写了 isNeedLoadingDialog() 方法并返回 false 时，无法使用 Dialog")
         }
-        mUiChangeLiveData.dismissDialogEvent.call()
+        mUiChangeLiveData.dismissLoadingDialogEvent.call()
     }
 
     @MainThread
@@ -99,10 +98,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     class UiChangeLiveData() {
         // 这里奇怪的是 lazy 中的泛型不能忽略
 
-        val showDialogEvent: SingleLiveEvent<String?> by lazy {
+        val showLoadingDialogEvent: SingleLiveEvent<String?> by lazy {
             SingleLiveEvent<String?>()
         }
-        val dismissDialogEvent: SingleLiveEvent<Any?> by lazy {
+        val dismissLoadingDialogEvent: SingleLiveEvent<Any?> by lazy {
             SingleLiveEvent<Any?>()
         }
 

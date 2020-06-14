@@ -280,8 +280,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(
     }
 
     // 是否需要对话框
-    override fun isNeedDialog(): Boolean {
-        return super.isNeedDialog()
+    override fun isNeedLoadingDialog(): Boolean {
+        return super.isNeedLoadingDialog()
     }
 
     // vm 是否需要启动和结束界面
@@ -330,7 +330,7 @@ View 层会持有 ViewModel 层的实例 mViewModel，xml 中也持有了 VM 层
 
 也会持有 View 层的实例 mBinding。mBinding 就完全可以消灭掉 findViewById 了，虽然 kotlin-android-extensions 也有这样的功能，但是 mBinding 可读性更好。
 
-像 isNeedDialog 这类的方法，是功能的开关，默认是开启的，但是当你的界面不需要对话框时，可以复写并返回 false，那么框架将不会实例化相关变量，减少内存占用，其他类似方法也是一样的。
+像 isNeedLoadingDialog 这类的方法，是功能的开关，默认是开启的，但是当你的界面不需要对话框时，可以复写并返回 false，那么框架将不会实例化相关变量，减少内存占用，其他类似方法也是一样的。
 
 其他说明都在注释里了。
 

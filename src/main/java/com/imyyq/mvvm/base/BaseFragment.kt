@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.base
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,16 +11,21 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.imyyq.mvvm.widget.LoadingDialog
 
 abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     @LayoutRes val layoutId: Int,
     private val varViewModelId: Int? = null
 ) :
     Fragment(),
-    IView<VM>, IDialog {
+    IView<VM>, ILoadingDialog {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
+
+    private val mLoadingDialog: Dialog by lazy {
+        LoadingDialog(requireActivity(), loadingDialogLayout())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,25 +99,30 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
             })
         }
 
-        if (isNeedDialog()) {
+        if (isNeedLoadingDialog()) {
             // 显示对话框
-            mViewModel.mUiChangeLiveData.showDialogEvent.observe(this, Observer {
-                showDialog(it)
+            mViewModel.mUiChangeLiveData.showLoadingDialogEvent.observe(this, Observer {
+                showLoadingDialog(it)
             })
             // 隐藏对话框
-            mViewModel.mUiChangeLiveData.dismissDialogEvent.observe(this, Observer {
-                dismissDialog()
+            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
+                dismissLoadingDialog()
             })
         }
     }
 
-    override fun showDialog(msg: String?) {
-        val a = activity as? BaseActivity<*, *>?
-        a?.showDialog(msg)
+    override fun showLoadingDialog(msg: String?) {
+        isLoadingDialogCancelable()?.apply {
+            mLoadingDialog.setCancelable(this)
+        }
+        isLoadingDialogCanceledOnTouchOutside()?.apply {
+            mLoadingDialog.setCanceledOnTouchOutside(this)
+        }
+        mLoadingDialog.show()
     }
 
-    override fun dismissDialog() {
-        val a = activity as? BaseActivity<*, *>?
-        a?.dismissDialog()
+    override fun dismissLoadingDialog() {
+        mLoadingDialog.dismiss()
     }
+
 }
