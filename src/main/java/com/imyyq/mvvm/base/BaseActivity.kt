@@ -99,12 +99,8 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     protected open fun isKeepScreenOn() = false
 
     override fun showLoadingDialog(msg: String?) {
-        isLoadingDialogCancelable()?.apply {
-            mLoadingDialog.setCancelable(this)
-        }
-        isLoadingDialogCanceledOnTouchOutside()?.apply {
-            mLoadingDialog.setCanceledOnTouchOutside(this)
-        }
+        mLoadingDialog.setCancelable(isLoadingDialogCancelable())
+        mLoadingDialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
         mLoadingDialog.show()
     }
 

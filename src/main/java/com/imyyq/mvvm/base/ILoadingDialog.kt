@@ -1,6 +1,6 @@
 package com.imyyq.mvvm.base
 
-import com.imyyq.mvvm.R
+import com.imyyq.mvvm.app.GlobalConfig
 
 /**
  * 对话框接口
@@ -10,20 +10,23 @@ interface ILoadingDialog {
 
     fun dismissLoadingDialog()
 
-    fun loadingDialogLayout() = R.layout.dlg_loading
+    /**
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogLayout]
+     */
+    fun loadingDialogLayout() = GlobalConfig.loadingDialogLayout
 
     /**
-     * 页面在显示数据时需要时间，因此显示对话框，如果不需要，可以设置为 false，以免创建不必要的对象
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.isNeedLoadingDialog]
      */
-    fun isNeedLoadingDialog() = true
+    fun isNeedLoadingDialog() = GlobalConfig.isNeedLoadingDialog
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogCancelable]
      */
-    fun isLoadingDialogCancelable(): Boolean? = null
+    fun isLoadingDialogCancelable(): Boolean = GlobalConfig.loadingDialogCancelable
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogCanceledOnTouchOutside]
      */
-    fun isLoadingDialogCanceledOnTouchOutside(): Boolean? = null
+    fun isLoadingDialogCanceledOnTouchOutside(): Boolean = GlobalConfig.loadingDialogCanceledOnTouchOutside
 }

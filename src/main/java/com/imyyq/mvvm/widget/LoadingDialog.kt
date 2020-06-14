@@ -7,19 +7,11 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.R
-import com.imyyq.mvvm.app.GlobalConfig
 
 class LoadingDialog(
     context: Context,
-    @LayoutRes private val mLayoutRes: Int,
-    cancelable: Boolean = GlobalConfig.loadingDialogCancelable,
-    canceledOnTouchOutside: Boolean = GlobalConfig.loadingDialogCanceledOnTouchOutside
+    @LayoutRes private val mLayoutRes: Int
 ) : Dialog(context, R.style.BaseDialogStyle) {
-
-    init {
-        setCancelable(cancelable)
-        setCanceledOnTouchOutside(canceledOnTouchOutside)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

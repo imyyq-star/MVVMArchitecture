@@ -112,12 +112,8 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     }
 
     override fun showLoadingDialog(msg: String?) {
-        isLoadingDialogCancelable()?.apply {
-            mLoadingDialog.setCancelable(this)
-        }
-        isLoadingDialogCanceledOnTouchOutside()?.apply {
-            mLoadingDialog.setCanceledOnTouchOutside(this)
-        }
+        mLoadingDialog.setCancelable(isLoadingDialogCancelable())
+        mLoadingDialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
         mLoadingDialog.show()
     }
 
