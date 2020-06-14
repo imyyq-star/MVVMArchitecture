@@ -1,7 +1,6 @@
 package com.imyyq.mvvm.utils
 
 import android.util.Log
-import com.imyyq.mvvm.BuildConfig
 
 /**
  * Created by 杨永青 on 16/9/13.
@@ -16,7 +15,7 @@ object LogUtil {
     var mIsForceLog = false
 
     // 不是release，没有强制输出log，就不输出
-    private const val mIsLog: Boolean = "release" == BuildConfig.BUILD_TYPE
+    private const val mIsLog: Boolean = !Utils.isRelease
 
     fun init() {
         CrashHandlerUtil.init()

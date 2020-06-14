@@ -1,4 +1,4 @@
-package lib.common.app
+package com.imyyq.mvvm.utils
 
 import android.Manifest
 import android.content.Intent
@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -14,10 +13,6 @@ import androidx.lifecycle.Observer
 import com.ftd.livepermissions.LivePermissions
 import com.ftd.livepermissions.PermissionResult
 import com.imyyq.mvvm.app.BaseApp
-import com.imyyq.mvvm.utils.AppUtil
-import com.imyyq.mvvm.utils.FileUtil
-import com.imyyq.mvvm.utils.ToastUtil
-import com.imyyq.mvvm.utils.Utils
 import java.io.File
 
 object CaptureAndCropManager {
