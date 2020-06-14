@@ -122,7 +122,7 @@ object AppUtil {
     /**
      * 打开应用的详细信息设置
      */
-    fun gotoAppDetailsSettings(context: Context, packageName: String = context.packageName, requestCode: Int) {
+    fun gotoAppDetailsSettings(context: Context, requestCode: Int, packageName: String = context.packageName) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         intent.data = Uri.fromParts("package", packageName, null)
         if (context is Activity) {

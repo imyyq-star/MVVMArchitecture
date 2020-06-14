@@ -173,6 +173,8 @@ dependencies {
     // 权限申请
     if (mvvmConfig.include.livePermissions) {
         api Deps.livePermissions
+    } else {
+        compileOnly Deps.livePermissions
     }
 
     // paging

@@ -3,7 +3,7 @@ package com.imyyq.mvvm.base
 import com.imyyq.mvvm.app.GlobalConfig
 
 /**
- * 对话框接口
+ * 加载中对话框接口
  */
 interface ILoadingDialog {
     fun showLoadingDialog(msg: String?)

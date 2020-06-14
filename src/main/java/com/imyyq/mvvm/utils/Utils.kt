@@ -1,8 +1,12 @@
 package com.imyyq.mvvm.utils
 
+import android.os.Build
 import com.imyyq.mvvm.app.BaseApp
 
 object Utils {
+    val isNeedCheckPermission: Boolean
+        get() = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
+
     /**
      * dp转px
      *
