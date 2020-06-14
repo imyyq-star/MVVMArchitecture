@@ -17,6 +17,8 @@ public final class ViewAdapter {
                     .load(url)
                     .apply(new RequestOptions().placeholder(placeholderRes))
                     .into(imageView);
+        } else {
+            imageView.setImageResource(0);
         }
     }
 }

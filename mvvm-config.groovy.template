@@ -5,7 +5,7 @@
  * 禁用掉的库，就不能使用该库的内容，正常来说在 release 打包的时候会从包中移除
  */
 include {
-    // 内存泄露
+    // 内存泄露，默认只在 debug 期间生效
     leakCanary2=true
     // 应用前后台监听
     lifecycleProcess=true
@@ -13,6 +13,8 @@ include {
     // 通常来说以上都需要为 true
 
     bindingCollection {
+        // ViewPager 和 ListView 等
+        bindingAdapter=false
         bindingAdapterRv=false
         bindingAdapterVp2=false
     }
@@ -25,11 +27,15 @@ include {
     retrofit2=false
     gson=false
     glide=false
+
+    // 权限申请
     livePermissions=false
+
     paging=false
     rxJava2=false
     rxKotlin=false
 
+    // 各种 KTX，详见 https://developer.android.google.cn/kotlin/ktx
     reactiveStreamsKTX=false
 
     natigationUiKTX=false

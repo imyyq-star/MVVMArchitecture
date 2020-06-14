@@ -144,19 +144,26 @@ dependencies {
         compileOnly Deps.glide
     }
     // 绑定库
-    if (mvvmConfig.include.bindingCollection.bindingAdapterVp2 || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-        api(Deps.bindingAdapterKTX) {
-            exclude group: 'androidx.swiperefreshlayout'
-        }
-        api(Deps.bindingAdapter) {
-            // 上面的 swiperefreshlayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
-            exclude group: 'androidx.swiperefreshlayout'
+    if (mvvmConfig.include.bindingCollection.bindingAdapter || mvvmConfig.include.bindingCollection.bindingAdapterVp2
+            || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
+        if (mvvmConfig.include.bindingCollection.bindingAdapter) {
+            api(Deps.bindingAdapterKTX) {
+                exclude group: 'androidx.swiperefreshlayout'
+            }
+            api(Deps.bindingAdapter) {
+                // 上面的 swipeRefreshLayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
+                exclude group: 'androidx.swiperefreshlayout'
+            }
         }
         if (mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-            api Deps.bindingAdapterRv
+            api(Deps.bindingAdapterRv) {
+                exclude group: 'androidx.swiperefreshlayout'
+            }
         }
         if (mvvmConfig.include.bindingCollection.bindingAdapterVp2) {
-            api Deps.bindingAdapterVp2
+            api (Deps.bindingAdapterVp2) {
+                exclude group: 'androidx.swiperefreshlayout'
+            }
         }
     } else {
         compileOnly Deps.bindingAdapter

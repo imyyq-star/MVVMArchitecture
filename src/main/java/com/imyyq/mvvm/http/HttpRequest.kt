@@ -70,23 +70,25 @@ object HttpRequest {
                 }
             }
 
-            // 日志拦截器
-            httpClientBuilder
-                .addInterceptor(
-                    LoggingInterceptor
-                        .Builder()
-                        // 是否开启日志打印
-                        .loggable(BuildConfig.DEBUG)
-                        // 打印的等级
-                        .setLevel(Level.BASIC)
-                        // 打印类型
-                        .log(Platform.INFO)
-                        // request 的 Tag
-                        .request("Request")
-                        // Response 的 Tag
-                        .response("Response")
-                        .build()
-                )
+            // 日志拦截器，只在 debug 期间生效
+            if (BuildConfig.DEBUG) {
+                httpClientBuilder
+                    .addInterceptor(
+                        LoggingInterceptor
+                            .Builder()
+                            // 是否开启日志打印
+                            .loggable(BuildConfig.DEBUG)
+                            // 打印的等级
+                            .setLevel(Level.BASIC)
+                            // 打印类型
+                            .log(Platform.INFO)
+                            // request 的 Tag
+                            .request("Request")
+                            // Response 的 Tag
+                            .response("Response")
+                            .build()
+                    )
+            }
 
             obj = Retrofit.Builder().client(httpClientBuilder.build())
                 // 基础url
