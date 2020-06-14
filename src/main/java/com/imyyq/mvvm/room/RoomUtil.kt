@@ -30,6 +30,7 @@ object RoomUtil {
             database = builder.build()
             mDBEntityMap[name] = database
         }
+        @Suppress("UNCHECKED_CAST")
         return database as T
     }
 

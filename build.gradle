@@ -61,7 +61,22 @@ dependencies {
     api Deps.appcompat
     api Deps.constraintLayout
 
+    /**
+     * 在 Lifecycles 中使用协程，视图销毁则自动取消
+     */
     api Deps.lifecycleRuntimeKTX
+    /**
+     * 在 LiveData 中使用协程
+     */
+    api Deps.lifecycleLiveDataKTX
+    /**
+     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
+     */
+    api Deps.fragmentKTX
+    /**
+     * 在 vm 中使用协程，视图销毁自动取消
+     */
+    api Deps.viewModelKTX
     /**
      * 生成生命周期注解相关的代码，否则将反射调用，影响性能
      */
@@ -75,16 +90,6 @@ dependencies {
     } else {
         compileOnly Deps.lifecycleProcess
     }
-
-    /**
-     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
-     */
-    api Deps.fragmentKTX
-    api Deps.lifecycleLiveDataKTX
-    /**
-     * 在 vm 中使用协程，视图销毁自动取消
-     */
-    api Deps.viewModelKTX
 
     // RecyclerView
     if (mvvmConfig.include.recyclerView) {
@@ -140,10 +145,10 @@ dependencies {
     }
     // 绑定库
     if (mvvmConfig.include.bindingCollection.bindingAdapterVp2 || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-        api (Deps.bindingAdapterKTX) {
+        api(Deps.bindingAdapterKTX) {
             exclude group: 'androidx.swiperefreshlayout'
         }
-        api (Deps.bindingAdapter) {
+        api(Deps.bindingAdapter) {
             // 上面的 swiperefreshlayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
             exclude group: 'androidx.swiperefreshlayout'
         }

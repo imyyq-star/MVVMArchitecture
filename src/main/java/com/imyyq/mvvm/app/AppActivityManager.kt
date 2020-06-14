@@ -14,9 +14,7 @@ object AppActivityManager {
 
     fun remove(activity: Activity) {
         if (mActivityList.isNotEmpty()) {
-            mActivityList.removeAt(
-                mActivityList.size - 1
-            )
+            mActivityList.remove(activity)
         }
     }
 
