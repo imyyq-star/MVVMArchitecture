@@ -104,4 +104,14 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
             })
         }
     }
+
+    override fun showDialog(msg: String?) {
+        val a = activity as? BaseActivity<*, *>?
+        a?.showDialog(msg)
+    }
+
+    override fun dismissDialog() {
+        val a = activity as? BaseActivity<*, *>?
+        a?.dismissDialog()
+    }
 }

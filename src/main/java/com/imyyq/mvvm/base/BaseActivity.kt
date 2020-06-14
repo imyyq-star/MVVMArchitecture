@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.base
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
+import com.imyyq.mvvm.widget.LoadingDialog
 
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
@@ -21,6 +23,10 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
+
+    private val mLoadingDialog: Dialog by lazy {
+        LoadingDialog(this, dialogLayout())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,4 +97,12 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
      * true 则当前界面常亮
      */
     protected open fun isKeepScreenOn() = false
+
+    override fun showDialog(msg: String?) {
+        mLoadingDialog.show()
+    }
+
+    override fun dismissDialog() {
+        mLoadingDialog.dismiss()
+    }
 }
