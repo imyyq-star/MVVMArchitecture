@@ -17,11 +17,11 @@ class Printer {
 
     private static final int JSON_INDENT = 3;
 
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-    private static final String DOUBLE_SEPARATOR = LINE_SEPARATOR + LINE_SEPARATOR;
+    private static final String LINE_SEPARATOR;
+    private static final String DOUBLE_SEPARATOR;
 
-    private static final String[] OMITTED_RESPONSE = {LINE_SEPARATOR, "Omitted response body"};
-    private static final String[] OMITTED_REQUEST = {LINE_SEPARATOR, "Omitted request body"};
+    private static final String[] OMITTED_RESPONSE;
+    private static final String[] OMITTED_REQUEST;
 
     private static final String N = "\n";
     private static final String T = "\t";
@@ -39,6 +39,17 @@ class Printer {
     private static final String CENTER_LINE = "├ ";
     private static final String DEFAULT_LINE = "│ ";
 
+    static {
+        String line = System.getProperty("line.separator");
+        if (line == null) {
+            line = "\n";
+        }
+        LINE_SEPARATOR = line;
+        DOUBLE_SEPARATOR = LINE_SEPARATOR + LINE_SEPARATOR;
+        OMITTED_RESPONSE = new String[]{LINE_SEPARATOR, "Omitted response body"};
+        OMITTED_REQUEST = new String[]{LINE_SEPARATOR, "Omitted request body"};
+    }
+
     protected Printer() {
         throw new UnsupportedOperationException();
     }
@@ -50,8 +61,9 @@ class Printer {
     static void printJsonRequest(LoggingInterceptor.Builder builder, Request request) {
         String requestBody = LINE_SEPARATOR + BODY_TAG + LINE_SEPARATOR + bodyToString(request);
         String tag = builder.getTag(true);
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, REQUEST_UP_LINE);
+        }
         logLines(builder.getType(), tag, new String[]{URL_TAG + request.url()}, builder.getLogger(), false);
         logLines(builder.getType(), tag, getRequest(request, builder.getLevel()), builder.getLogger(), true);
         if (request.body() instanceof FormBody) {
@@ -59,7 +71,7 @@ class Printer {
             FormBody body = (FormBody) request.body();
             if (body != null && body.size() != 0) {
                 for (int i = 0; i < body.size(); i++) {
-                    formBody.append(body.encodedName(i) + "=" + body.encodedValue(i) + "&");
+                    formBody.append(body.encodedName(i)).append("=").append(body.encodedValue(i)).append("&");
                 }
                 formBody.delete(formBody.length() - 1, formBody.length());
                 logLines(builder.getType(), tag, new String[]{formBody.toString()}, builder.getLogger(), true);
@@ -68,30 +80,34 @@ class Printer {
         if (builder.getLevel() == Level.BASIC || builder.getLevel() == Level.BODY) {
             logLines(builder.getType(), tag, requestBody.split(LINE_SEPARATOR), builder.getLogger(), true);
         }
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, END_LINE);
+        }
     }
 
     static void printJsonResponse(LoggingInterceptor.Builder builder, long chainMs, boolean isSuccessful,
                                   int code, String headers, String bodyString, List<String> segments) {
         String responseBody = LINE_SEPARATOR + BODY_TAG + LINE_SEPARATOR + getJsonString(bodyString);
         String tag = builder.getTag(false);
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, RESPONSE_UP_LINE);
+        }
 
         logLines(builder.getType(), tag, getResponse(headers, chainMs, code, isSuccessful,
                 builder.getLevel(), segments), builder.getLogger(), true);
         if (builder.getLevel() == Level.BASIC || builder.getLevel() == Level.BODY) {
             logLines(builder.getType(), tag, responseBody.split(LINE_SEPARATOR), builder.getLogger(), true);
         }
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, END_LINE);
+        }
     }
 
     static void printFileRequest(LoggingInterceptor.Builder builder, Request request) {
         String tag = builder.getTag(true);
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, REQUEST_UP_LINE);
+        }
         logLines(builder.getType(), tag, new String[]{URL_TAG + request.url()}, builder.getLogger(), false);
         logLines(builder.getType(), tag, getRequest(request, builder.getLevel()), builder.getLogger(), true);
         if (request.body() instanceof FormBody) {
@@ -99,7 +115,7 @@ class Printer {
             FormBody body = (FormBody) request.body();
             if (body != null && body.size() != 0) {
                 for (int i = 0; i < body.size(); i++) {
-                    formBody.append(body.encodedName(i) + "=" + body.encodedValue(i) + "&");
+                    formBody.append(body.encodedName(i)).append("=").append(body.encodedValue(i)).append("&");
                 }
                 formBody.delete(formBody.length() - 1, formBody.length());
                 logLines(builder.getType(), tag, new String[]{formBody.toString()}, builder.getLogger(), true);
@@ -108,24 +124,27 @@ class Printer {
         if (builder.getLevel() == Level.BASIC || builder.getLevel() == Level.BODY) {
             logLines(builder.getType(), tag, OMITTED_REQUEST, builder.getLogger(), true);
         }
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, END_LINE);
+        }
     }
 
     static void printFileResponse(LoggingInterceptor.Builder builder, long chainMs, boolean isSuccessful,
                                   int code, String headers, List<String> segments) {
         String tag = builder.getTag(false);
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, RESPONSE_UP_LINE);
+        }
 
         logLines(builder.getType(), tag, getResponse(headers, chainMs, code, isSuccessful,
                 builder.getLevel(), segments), builder.getLogger(), true);
         logLines(builder.getType(), tag, OMITTED_RESPONSE, builder.getLogger(), true);
-        if (builder.getLogger() == null)
+        if (builder.getLogger() == null) {
             I.log(builder.getType(), tag, END_LINE);
+        }
     }
 
-    private static String[] getRequest(Request request, Level level) {
+    private static String[] getRequest(Request request, Integer level) {
         String message;
         String header = request.headers().toString();
         boolean loggableHeader = level == Level.HEADERS || level == Level.BASIC;
@@ -135,7 +154,7 @@ class Printer {
     }
 
     private static String[] getResponse(String header, long tookMs, int code, boolean isSuccessful,
-                                        Level level, List<String> segments) {
+                                        Integer level, List<String> segments) {
         String message;
         boolean loggableHeader = level == Level.HEADERS || level == Level.BASIC;
         String segmentString = slashSegments(segments);
@@ -180,11 +199,11 @@ class Printer {
     private static void logLines(int type, String tag, String[] lines, Logger logger, boolean withLineSize) {
         for (String line : lines) {
             int lineLength = line.length();
-            int MAX_LONG_SIZE = withLineSize ? 110 : lineLength;
-            for (int i = 0; i <= lineLength / MAX_LONG_SIZE; i++) {
-                int start = i * MAX_LONG_SIZE;
-                int end = (i + 1) * MAX_LONG_SIZE;
-                end = end > line.length() ? line.length() : end;
+            int maxLongSize = withLineSize ? 110 : lineLength;
+            for (int i = 0; i <= lineLength / maxLongSize; i++) {
+                int start = i * maxLongSize;
+                int end = (i + 1) * maxLongSize;
+                end = Math.min(end, line.length());
                 if (logger == null) {
                     I.log(type, tag, DEFAULT_LINE + line.substring(start, end));
                 } else {
@@ -198,8 +217,9 @@ class Printer {
         try {
             final Request copy = request.newBuilder().build();
             final Buffer buffer = new Buffer();
-            if (copy.body() == null)
+            if (copy.body() == null) {
                 return "";
+            }
             copy.body().writeTo(buffer);
             return getJsonString(buffer.readUtf8());
         } catch (final IOException e) {

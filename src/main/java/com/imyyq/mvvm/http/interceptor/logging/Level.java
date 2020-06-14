@@ -1,10 +1,10 @@
 package com.imyyq.mvvm.http.interceptor.logging;
 
-public enum Level {
+public interface Level {
     /**
      * No logs.
      */
-    NONE,
+    int NONE = 0;
     /**
      * <p>Example:
      * <pre>{@code
@@ -14,7 +14,7 @@ public enum Level {
      *  - Body
      * }</pre>
      */
-    BASIC,
+    int BASIC = 1;
     /**
      * <p>Example:
      * <pre>{@code
@@ -23,7 +23,7 @@ public enum Level {
      *  - Headers
      * }</pre>
      */
-    HEADERS,
+    int HEADERS = 2;
     /**
      * <p>Example:
      * <pre>{@code
@@ -32,5 +32,5 @@ public enum Level {
      *  - Body
      * }</pre>
      */
-    BODY
+    int BODY = 3;
 }

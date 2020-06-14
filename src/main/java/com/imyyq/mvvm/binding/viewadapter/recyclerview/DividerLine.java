@@ -10,6 +10,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * 分隔线
+ */
 public class DividerLine extends RecyclerView.ItemDecoration {
     private static final String TAG = DividerLine.class.getCanonicalName();
     //默认分隔线厚度为2dp
@@ -21,13 +24,15 @@ public class DividerLine extends RecyclerView.ItemDecoration {
     private Context mContext;
     private int dividerSize;
     //默认为null
-    private LineDrawMode mMode = null;
+    private Integer mMode = null;
 
     /**
      * 分隔线绘制模式,水平，垂直，两者都绘制
      */
-    public enum LineDrawMode {
-        HORIZONTAL, VERTICAL, BOTH
+    public interface LineDrawMode {
+        int HORIZONTAL = 0;
+        int VERTICAL = 1;
+        int BOTH = 2;
     }
 
     public DividerLine(Context context) {
@@ -38,12 +43,12 @@ public class DividerLine extends RecyclerView.ItemDecoration {
         attrArray.recycle();
     }
 
-    public DividerLine(Context context, LineDrawMode mode) {
+    public DividerLine(Context context, Integer mode) {
         this(context);
         mMode = mode;
     }
 
-    public DividerLine(Context context, int dividerSize, LineDrawMode mode) {
+    public DividerLine(Context context, int dividerSize, Integer mode) {
         this(context, mode);
         this.dividerSize = dividerSize;
     }
@@ -56,11 +61,11 @@ public class DividerLine extends RecyclerView.ItemDecoration {
         this.dividerSize = dividerSize;
     }
 
-    public LineDrawMode getMode() {
+    public Integer getMode() {
         return mMode;
     }
 
-    public void setMode(LineDrawMode mode) {
+    public void setMode(Integer mode) {
         mMode = mode;
     }
 
@@ -75,16 +80,18 @@ public class DividerLine extends RecyclerView.ItemDecoration {
             throw new IllegalStateException("assign LineDrawMode,please!");
         }
         switch (getMode()) {
-            case VERTICAL:
+            case LineDrawMode.VERTICAL:
                 drawVertical(c, parent, state);
                 break;
-            case HORIZONTAL:
+            case LineDrawMode.HORIZONTAL:
                 drawHorizontal(c, parent, state);
                 break;
-            case BOTH:
+            case LineDrawMode.BOTH:
                 drawHorizontal(c, parent, state);
                 drawVertical(c, parent, state);
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + getMode());
         }
     }
 

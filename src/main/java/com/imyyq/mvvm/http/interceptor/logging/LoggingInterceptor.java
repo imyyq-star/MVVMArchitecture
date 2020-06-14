@@ -114,7 +114,7 @@ public class LoggingInterceptor implements Interceptor {
         private int type = Platform.INFO;
         private String requestTag;
         private String responseTag;
-        private Level level = Level.BASIC;
+        private Integer level = Level.BASIC;
         private Headers.Builder builder;
         private Logger logger;
 
@@ -126,7 +126,7 @@ public class LoggingInterceptor implements Interceptor {
             return type;
         }
 
-        Level getLevel() {
+        Integer getLevel() {
             return level;
         }
 
@@ -162,7 +162,7 @@ public class LoggingInterceptor implements Interceptor {
          * @return Builder
          * @see Level
          */
-        public Builder setLevel(Level level) {
+        public Builder setLevel(Integer level) {
             this.level = level;
             return this;
         }
