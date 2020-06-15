@@ -6,19 +6,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.imyyq.mvvm.widget.LoadingDialog
+import com.kingja.loadsir.core.LoadService
+import com.kingja.loadsir.core.LoadSir
 
 abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     @LayoutRes val layoutId: Int,
     private val varViewModelId: Int? = null
 ) :
     Fragment(),
-    IView<VM>, ILoadingDialog {
+    IView<VM>, ILoadingDialog, ILoading {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
@@ -26,6 +29,8 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     private val mLoadingDialog: Dialog by lazy {
         LoadingDialog(requireActivity(), loadingDialogLayout())
     }
+
+    private lateinit var mLoadService: LoadService<*>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,4 +126,26 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         mLoadingDialog.dismiss()
     }
 
+    /**
+     * CallSuper 要求子类必须调用 super
+     */
+    @CallSuper
+    override fun initData() {
+        // 只有目标不为空的情况才有实例化的必要
+        if (getLoadSirTarget() != null) {
+            mLoadService = LoadSir.getDefault().register(
+                getLoadSirTarget()
+            ) { v: View? -> onLoadSirReload() }
+
+            mViewModel.mUiChangeLiveData.loadSirEvent.observe(this, Observer {
+                if (it == null) {
+                    mLoadService.showSuccess()
+                    onLoadSirSuccess()
+                } else {
+                    mLoadService.showCallback(it)
+                    onLoadSirShowed(it)
+                }
+            })
+        }
+    }
 }

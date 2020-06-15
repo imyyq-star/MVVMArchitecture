@@ -3,13 +3,17 @@ package com.imyyq.mvvm.base
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
+import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import com.imyyq.mvvm.widget.LoadingDialog
+import com.kingja.loadsir.core.LoadService
+import com.kingja.loadsir.core.LoadSir
 
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
@@ -19,7 +23,7 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     private val varViewModelId: Int? = null
 ) :
     AppCompatActivity(),
-    IView<VM>, ILoadingDialog {
+    IView<VM>, ILoadingDialog, ILoading {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
@@ -27,6 +31,8 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     private val mLoadingDialog: Dialog by lazy {
         LoadingDialog(this, loadingDialogLayout())
     }
+
+    private lateinit var mLoadService: LoadService<*>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,5 +112,28 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
 
     override fun dismissLoadingDialog() {
         mLoadingDialog.dismiss()
+    }
+
+    /**
+     * CallSuper 要求之类必须调用 super
+     */
+    @CallSuper
+    override fun initData() {
+        // 只有目标不为空的情况才有实例化的必要
+        if (getLoadSirTarget() != null) {
+            mLoadService = LoadSir.getDefault().register(
+                getLoadSirTarget()
+            ) { v: View? -> onLoadSirReload() }
+
+            mViewModel.mUiChangeLiveData.loadSirEvent.observe(this, Observer {
+                if (it == null) {
+                    mLoadService.showSuccess()
+                    onLoadSirSuccess()
+                } else {
+                    mLoadService.showCallback(it)
+                    onLoadSirShowed(it)
+                }
+            })
+        }
     }
 }

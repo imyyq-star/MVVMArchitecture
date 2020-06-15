@@ -6,8 +6,14 @@ import com.imyyq.mvvm.app.GlobalConfig
  * 加载中对话框接口
  */
 interface ILoadingDialog {
+    /**
+     * 显示加载中对话框
+     */
     fun showLoadingDialog(msg: String?)
 
+    /**
+     * 隐藏加载中对话框
+     */
     fun dismissLoadingDialog()
 
     /**

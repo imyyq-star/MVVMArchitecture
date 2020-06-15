@@ -70,7 +70,10 @@ ext {
             bindingAdapterVp2         : "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-viewpager2:${Versions.bindingAdapter}",
 
             // 权限申请
-            livePermissions           :'com.ftd.livepermissions:livepermissions:1.0.2',
+            livePermissions           : 'com.ftd.livepermissions:livepermissions:1.0.2',
+
+            // 内部加载中
+            loadSir                   : 'com.kingja.loadsir:loadsir:1.3.8',
 
             // ktx
             fragmentKTX               : "androidx.fragment:fragment-ktx:1.2.4",

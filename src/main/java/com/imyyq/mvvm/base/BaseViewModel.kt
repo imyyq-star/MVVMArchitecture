@@ -72,6 +72,16 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
+    protected fun showLoadSirSuccess() {
+        mUiChangeLiveData.loadSirEvent.value = null
+    }
+
+    @MainThread
+    protected fun showLoadSir(clz: Class<*>) {
+        mUiChangeLiveData.loadSirEvent.value = clz
+    }
+
+    @MainThread
     protected fun finish() {
         if (!mUiChangeLiveData.finishEvent.hasObservers()) {
             throw RuntimeException("Activity 或 Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 finish() 方法")
@@ -113,6 +123,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
         val finishEvent: SingleLiveEvent<Any?> by lazy {
             SingleLiveEvent<Any?>()
+        }
+
+        val loadSirEvent: SingleLiveEvent<Class<*>?> by lazy {
+            SingleLiveEvent<Class<*>?>()
         }
     }
 

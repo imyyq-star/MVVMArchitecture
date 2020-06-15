@@ -91,6 +91,12 @@ dependencies {
         compileOnly Deps.lifecycleProcess
     }
 
+    if (mvvmConfig.include.loadSir) {
+        api Deps.loadSir
+    } else {
+        compileOnly Deps.loadSir
+    }
+
     // RecyclerView
     if (mvvmConfig.include.recyclerView) {
         api Deps.recyclerView

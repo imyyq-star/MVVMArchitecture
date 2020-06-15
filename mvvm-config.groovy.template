@@ -31,6 +31,8 @@ include {
     // 权限申请
     livePermissions=false
 
+    loadSir=false
+
     paging=false
     rxJava2=false
     rxKotlin=false
