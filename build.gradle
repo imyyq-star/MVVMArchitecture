@@ -97,6 +97,12 @@ dependencies {
         compileOnly Deps.loadSir
     }
 
+    if (mvvmConfig.include.slidingPaneLayout) {
+        api Deps.slidingPaneLayout
+    } else {
+        compileOnly Deps.slidingPaneLayout
+    }
+
     // RecyclerView
     if (mvvmConfig.include.recyclerView) {
         api Deps.recyclerView

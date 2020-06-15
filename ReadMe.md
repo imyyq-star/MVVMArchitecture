@@ -149,22 +149,7 @@ include {
     // 权限申请
     livePermissions=false
 
-    paging=false
-    rxJava2=false
-    rxKotlin=false
-
-    // 各种 KTX，详见 https://developer.android.google.cn/kotlin/ktx
-    reactiveStreamsKTX=false
-
-    natigationUiKTX=false
-    natigationRuntimeKTX=false
-    natigationFragmentKTX=false
-
-    roomKTX=false
-    sqliteKTX=false
-    workKTX=false
-    paletteKTX=false
-    collectionKTX=false
+    ... 其他的详见文件
 }
 
 SDKVersion {
@@ -413,6 +398,19 @@ viewModelScope.launch {
 ```
 
 具体详见 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)
+
+# 加载中对话框 LoadingDialog
+
+
+# 加载中第三方库 LoadSir
+
+
+# 侧滑返回
+1. 全局配置：GlobalConfig.isSupportSwipe，默认为 false，可全局设置为 true，那么所有继承自 BaseActivity 的都会拥有侧滑返回的功能。
+2. 必须给开启了侧滑返回的 Activity 的 Theme 配置 android:windowIsTranslucent 为 true，框架会自动设置 android:windowBackground 为透明。必须为透明，否则侧滑显示的底色默认是白色
+3. 如果有部分 Activity 不想开启侧滑，比如主页，那么可以复写 isSupportSwipe 返回 false 即可，或者全局设置为 false，只给部分 Activity 开启侧滑。
+4. 受影响的生命周期：开启了 windowIsTranslucent 后，Activity 相当于透明了，那么如果有其他的 Activity 覆盖在上面，底下的 Activity 将不会回调 onStop。
+比如 A 是开启侧滑的，打开了 B，B 全屏覆盖在了 A 上，那么 A 不会回调 onStop，其他的生命周期没影响。
 
 
 # 工具类

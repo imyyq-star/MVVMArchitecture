@@ -7,7 +7,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
@@ -22,7 +21,7 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     @LayoutRes private val layoutId: Int,
     private val varViewModelId: Int? = null
 ) :
-    AppCompatActivity(),
+    ParallaxSwipeBackActivity(),
     IView<VM>, ILoadingDialog, ILoading {
 
     protected lateinit var mBinding: V
@@ -48,7 +47,8 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     }
 
     final override fun initViewDataBinding() {
-        mBinding = DataBindingUtil.setContentView(this, layoutId)
+        mBinding = DataBindingUtil.inflate(layoutInflater, layoutId, mFrameLayout, false)
+        setContentView(mBinding.getRoot())
         mViewModel = initViewModel(this)
         // 绑定 v 和 vm
         if (varViewModelId != null) {

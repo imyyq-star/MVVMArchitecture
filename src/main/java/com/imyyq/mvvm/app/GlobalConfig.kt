@@ -29,7 +29,16 @@ object GlobalConfig {
      * 加载中对话框的 layout
      */
     @LayoutRes
-    var loadingDialogLayout = R.layout.dlg_loading
+    var loadingDialogLayout = R.layout.mvvm_dlg_loading
+
+    /**
+     * activity 是否支持侧滑返回。
+     * 若支持，则 theme 必须实现以下属性：
+     * <item name="android:windowIsTranslucent">true</item>
+     *
+     * 并且框架会自动把 windowBackground 设置为透明
+     */
+    var isSupportSwipe = false
 
     /**
      * 初始化 LoadSir 的相关界面。

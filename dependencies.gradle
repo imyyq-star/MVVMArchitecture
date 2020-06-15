@@ -24,6 +24,7 @@ ext {
             swipeRefreshLayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01",
 
             constraintLayout          : "androidx.constraintlayout:constraintlayout:2.0.0-beta6",
+            slidingPaneLayout         : "androidx.slidingpanelayout:slidingpanelayout:1.1.0-rc01",
 
             paging                    : "androidx.paging:paging-runtime:2.1.2",
             viewPager2                : "androidx.viewpager2:viewpager2:1.0.0",
