@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.imyyq.mvvm.app.BaseApp
+import com.imyyq.mvvm.app.GlobalConfig
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -67,5 +68,5 @@ interface IView<VM : BaseViewModel<*>> {
      * ViewModel 是否需要启动或结束对应的 Activity，即是否有调用 [BaseViewModel.startActivity] 和 [BaseViewModel.finish]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartAndFinish() = true
+    fun isViewModelNeedStartAndFinish() = GlobalConfig.isViewModelNeedStartAndFinish
 }

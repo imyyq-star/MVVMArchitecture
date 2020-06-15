@@ -14,6 +14,12 @@ git submodule add https://xxxxx
 git submodule update --remote
 ```
 
+或者进入到 MVVMArchitecture 目录，执行正常的仓库更新：
+
+```shell script
+git pull origin master
+```
+
 克隆完成后，你的项目仓库会出现两个文件：.gitmodules，MVVMArchitecture，这两个文件是要被纳入仓库中管理起来的，每次更新了框架的代码，MVVMArchitecture 文件将会变化，该变化需要被仓库管理起来。
 
 具体这两个文件是什么作用，请自行查阅 git 子模块是如何使用的。
@@ -244,6 +250,8 @@ BaseApp.initApp(this)
 
 ![图1](https://imyyq.coding.net/p/MyMarkdownImg/d/MyMarkdownImg/git/raw/master/20200614/86482a4137bf467381c5eeb8a3a60b4903a1ec42318dbbc3880635ab2576fcf8.png)  
 
+因为几乎每个页面都会有个 vm，所以可以把变量放到 Live Template 中，这样就可以快速生成了。
+
 
 ## 创建 View 层
 ```kotlin
@@ -348,11 +356,11 @@ vm 的数据流向 v 层，只能通过 DataBinding 或 LiveData。
 这块请查看 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)
 
 
-## 列表绑定
+# 列表绑定
 这部分采用第三方库 [binding-collection-adapter](https://github.com/evant/binding-collection-adapter)，在配置文件中开启 bindingCollection 相关的配置即可，具体用法详见此库的用法。
 框架了提供了 ItemViewModel 和 MultiItemViewModel 这两个列表子项的基类，沿用了 MVVMHabit 。
 
-## 图片加载
+# 图片加载
 图片加载使用 Glide，使用 DataBinding 可以很方便的绑定图片地址和占位图：
 
 ```xml
@@ -376,7 +384,7 @@ vm 的数据流向 v 层，只能通过 DataBinding 或 LiveData。
 ```
 
 
-## 网络请求
+# 网络请求
 以前我们还是用的是 RxJava 配合 Retrofit，现在，我们可以直接使用协程了，不得不说节省了很多代码，而且加上 viewModel 的 ktx，可让请求和生命周期相关联，在生命周期结束时，取消掉请求，以免造成资源浪费。
 
 ```kotlin
@@ -413,10 +421,24 @@ viewModelScope.launch {
 需要在配置文件中开启 lifecycleProcess 属性，即可使用该类了。
 
 
+# VM 可以启动和结束界面
+ViewModel 可以调用 finish 和 startActivity 方法来启动和结束界面，如果不需要这个功能，可全局设置 GlobalConfig.isViewModelNeedStartAndFinish 或局部复写 isViewModelNeedStartAndFinish 方法来禁用功能，避免多余实例的创建。
+
+
 # 各种 BindingAdapter
 以点击事件为例，加入了防止过快点击的功能，默认两次点击的间隔时间为 800 毫秒，详见 com.imyyq.mvvm.binding.viewadapter.view.ViewAdapter 类。
 
-可通过配置 isInterval 属性为 false，禁用此功能，那么就和普通的 setOnClickListener 没区别了。
+可通过配置 isInterval 属性为 false，禁用此功能，那么就和普通的 setOnClickListener 没区别了。如下：
+
+```xml
+<Button
+    onClickCommand="@{viewModel.onNetwork}"
+    isInterval="@{false}"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="网络请求"
+    />
+```
 
 
 # 加载中对话框 LoadingDialog

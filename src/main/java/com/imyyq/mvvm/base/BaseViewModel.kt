@@ -7,6 +7,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.utils.SingleLiveEvent
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel {
@@ -83,24 +84,24 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun finish() {
-        if (!mUiChangeLiveData.finishEvent.hasObservers()) {
-            throw RuntimeException("Activity 或 Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 finish() 方法")
+        if (!mUiChangeLiveData.finishEvent.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+            throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 finish() 方法")
         }
         mUiChangeLiveData.finishEvent.call()
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<*>) {
-        if (!mUiChangeLiveData.startActivityEvent.hasObservers()) {
-            throw RuntimeException("Activity 或 Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
+        if (!mUiChangeLiveData.startActivityEvent.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+            throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
         }
         mUiChangeLiveData.startActivityEvent.value = clazz
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<*>, bundle: Bundle?) {
-        if (!mUiChangeLiveData.startActivityEventWithBundle.hasObservers()) {
-            throw RuntimeException("Activity 或 Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
+        if (!mUiChangeLiveData.startActivityEventWithBundle.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+            throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
         }
         mUiChangeLiveData.startActivityEventWithBundle.value = Pair(clazz, bundle)
     }
