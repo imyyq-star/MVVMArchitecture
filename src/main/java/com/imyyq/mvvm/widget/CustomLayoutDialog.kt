@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.R
 
-class LoadingDialog(
+class CustomLayoutDialog(
     context: Context,
     @LayoutRes private val mLayoutRes: Int
 ) : Dialog(context, R.style.BaseDialogStyle) {

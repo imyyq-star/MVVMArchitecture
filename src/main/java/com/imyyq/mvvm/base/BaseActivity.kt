@@ -10,7 +10,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
-import com.imyyq.mvvm.widget.LoadingDialog
+import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
 
@@ -28,7 +28,7 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
     protected lateinit var mViewModel: VM
 
     private val mLoadingDialog: Dialog by lazy {
-        LoadingDialog(this, loadingDialogLayout())
+        CustomLayoutDialog(this, loadingDialogLayout())
     }
 
     private lateinit var mLoadService: LoadService<*>

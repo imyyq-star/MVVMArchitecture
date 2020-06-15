@@ -77,3 +77,7 @@
 }
 
 ##---------------End: proguard configuration for Gson  ----------
+
+# ====================================================== LoadSir
+-dontwarn com.kingja.loadsir.**
+-keep class com.kingja.loadsir.** {*;}

@@ -350,7 +350,7 @@ vm 的数据流向 v 层，只能通过 DataBinding 或 LiveData。
 
 ## 列表绑定
 这部分采用第三方库 [binding-collection-adapter](https://github.com/evant/binding-collection-adapter)，在配置文件中开启 bindingCollection 相关的配置即可，具体用法详见此库的用法。
-
+框架了提供了 ItemViewModel 和 MultiItemViewModel 这两个列表子项的基类，沿用了 MVVMHabit 。
 
 ## 图片加载
 图片加载使用 Glide，使用 DataBinding 可以很方便的绑定图片地址和占位图：
@@ -397,20 +397,56 @@ viewModelScope.launch {
 }
 ```
 
-具体详见 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)
+以上只是简单的列了下用法，让大家看看方便程度，具体详见 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)。
+
+获取 Service，添加请求头等都在 HttpRequest 类中，如果是 debug 阶段，那么会增加日志拦截器，把请求和响应都打在 Logcat 上
+
+# 全局配置类：GlobalConfig
+很多开关都在这里，功能都会尽量做成可配置的，详见注释。
+
+
+# 全局 Activity 管理器：AppActivityManager
+通过 Application.registerActivityLifecycleCallbacks 监听所有的 Activity 生命周期，此类目的是可在任意位置操作所有的 activity
+
+
+# 应用前后台监听 AppStateTracker
+需要在配置文件中开启 lifecycleProcess 属性，即可使用该类了。
+
+
+# 各种 BindingAdapter
+以点击事件为例，加入了防止过快点击的功能，默认两次点击的间隔时间为 800 毫秒，详见 com.imyyq.mvvm.binding.viewadapter.view.ViewAdapter 类。
+
+可通过配置 isInterval 属性为 false，禁用此功能，那么就和普通的 setOnClickListener 没区别了。
+
 
 # 加载中对话框 LoadingDialog
+配置 GlobalConfig 中包含 loadingDialog 字样的属性，详见注释。
+
+在 ViewModel 中调用 xxxLoadingDialogXXX 方法即可。
 
 
-# 加载中第三方库 LoadSir
+# 加载中第三方库 [LoadSir](https://github.com/KingJA/LoadSir)
+如果你不喜欢弹出式的加载中对话框的方式，可以使用非对话框的加载中，这里使用到了 LoadSir 第三方库
 
+需要在配置文件中开启 loadSir 属性。
+
+1. 定义你自己的 callback，调用 GlobalConfig.initLoadSir 进行初始化。
+2. 根据自己的业务需要，在 ViewModel 中调用 showLoadSirXXX 等方法
+3. 复写 Activity/Fragment 中的 LoadSir 相关方法，详见注释
 
 # 侧滑返回
+需要在配置文件中开启 slidingPaneLayout 属性
+
 1. 全局配置：GlobalConfig.isSupportSwipe，默认为 false，可全局设置为 true，那么所有继承自 BaseActivity 的都会拥有侧滑返回的功能。
 2. 必须给开启了侧滑返回的 Activity 的 Theme 配置 android:windowIsTranslucent 为 true，框架会自动设置 android:windowBackground 为透明。必须为透明，否则侧滑显示的底色默认是白色
 3. 如果有部分 Activity 不想开启侧滑，比如主页，那么可以复写 isSupportSwipe 返回 false 即可，或者全局设置为 false，只给部分 Activity 开启侧滑。
 4. 受影响的生命周期：开启了 windowIsTranslucent 后，Activity 相当于透明了，那么如果有其他的 Activity 覆盖在上面，底下的 Activity 将不会回调 onStop。
 比如 A 是开启侧滑的，打开了 B，B 全屏覆盖在了 A 上，那么 A 不会回调 onStop，其他的生命周期没影响。
+
+# 数据库 Room
+史上最好用的 ORM 数据库框架，没有之一，配合 LiveData，Rx，协程等，用起来真的非常爽。
+
+需要在配置文件中开启 room 属性，框架只提供了一个工具类 RoomUtil，用来获取数据库实例的，其他的 DAO，Entity 等自行根据业务进行设计。
 
 
 # 工具类
