@@ -4,6 +4,7 @@ import android.os.Build
 import com.imyyq.mvvm.app.AppActivityManager
 import java.io.*
 import java.lang.Thread.UncaughtExceptionHandler
+import kotlin.system.exitProcess
 
 /**
  * 崩溃信息捕获，存储在 /sdcard/Android/data/xxx.xxx.xxx/cache/Log/crash/日期.log
@@ -25,7 +26,7 @@ object CrashHandlerUtil : UncaughtExceptionHandler {
         ex.printStackTrace()
 
         AppActivityManager.finishAllActivity()
-        System.exit(0)
+        exitProcess(0)
     }
 
     private fun formatLogInfo(ex: Throwable): String {

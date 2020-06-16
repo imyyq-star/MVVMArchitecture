@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -164,6 +165,7 @@ public final class ScreenUtils {
      *
      * @param activity The activity.
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     public static void setLandscape(@NonNull final Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
@@ -173,6 +175,7 @@ public final class ScreenUtils {
      *
      * @param activity The activity.
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     public static void setPortrait(@NonNull final Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -213,9 +216,8 @@ public final class ScreenUtils {
                 return 180;
             case Surface.ROTATION_270:
                 return 270;
-            default:
-                return 0;
         }
+        return 0;
     }
 
     /**

@@ -27,7 +27,7 @@ object AppStateTracker {
         }
         mIsTract = true
         mChangeListener = appStateChangeListener
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(LifecycleChecker())
+        ProcessLifecycleOwner.get().lifecycle.addObserver(LifecycleChecker())
     }
 
     interface AppStateChangeListener {

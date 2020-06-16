@@ -47,7 +47,7 @@ open class BaseApp : Application() {
         }
 
         fun getInstance(): Application {
-            return app;
+            return app
         }
     }
 }

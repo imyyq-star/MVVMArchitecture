@@ -106,7 +106,8 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         mUiChangeLiveData.startActivityEventWithBundle.value = Pair(clazz, bundle)
     }
 
-    class UiChangeLiveData() {
+    @Suppress("RemoveExplicitTypeArguments")
+    class UiChangeLiveData {
         // 这里奇怪的是 lazy 中的泛型不能忽略
 
         val showLoadingDialogEvent: SingleLiveEvent<String?> by lazy {

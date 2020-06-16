@@ -13,13 +13,10 @@ class I {
 
     static void log(int type, String tag, String msg) {
         java.util.logging.Logger logger = java.util.logging.Logger.getLogger(tag);
-        switch (type) {
-            case Platform.INFO:
-                logger.log(Level.INFO, msg);
-                break;
-            default:
-                logger.log(Level.WARNING, msg);
-                break;
+        if (type == Platform.INFO) {
+            logger.log(Level.INFO, msg);
+        } else {
+            logger.log(Level.WARNING, msg);
         }
     }
 }

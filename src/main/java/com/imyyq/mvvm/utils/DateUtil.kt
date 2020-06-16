@@ -9,10 +9,10 @@ import java.util.*
  * Created by 杨永青 on 16/9/14.
  */
 object DateUtil {
-    private val YMDHM_ = "yyyy-MM-dd HH:mm"
-    val HM = "HH:mm"
-    val YMDHMS_ = "yyyy-MM-dd HH:mm:ss"
-    val YMD_ = "yyyy-MM-dd"
+    private const val YMDHM_ = "yyyy-MM-dd HH:mm"
+    const val HM = "HH:mm"
+    const val YMDHMS_ = "yyyy-MM-dd HH:mm:ss"
+    const val YMD_ = "yyyy-MM-dd"
 
     fun formatYMDHMS_(): String {
         return SimpleDateFormat(YMDHMS_, Locale.getDefault()).format(Date())
@@ -25,7 +25,7 @@ object DateUtil {
     fun parseYMD(date: String, addDay: Int): String? {
         try {
             val cal = Calendar.getInstance()
-            cal.time = SimpleDateFormat(YMD_).parse(date)
+            cal.time = SimpleDateFormat(YMD_, Locale.getDefault()).parse(date)!!
             cal.add(Calendar.DAY_OF_MONTH, addDay)
             return formatYMD_(cal.time)
         } catch (e: ParseException) {
@@ -41,10 +41,10 @@ object DateUtil {
      * @return [28,0,6]
      */
     fun parseYMDHMS_ToDHM(dateStart: String, dateEnd: String): IntArray? {
-        val df = SimpleDateFormat(YMDHMS_)
+        val df = SimpleDateFormat(YMDHMS_, Locale.getDefault())
         try {
-            val start = df.parse(dateStart)
-            val end = df.parse(dateEnd)
+            val start = df.parse(dateStart)!!
+            val end = df.parse(dateEnd)!!
             val diff = end.time - start.time//这样得到的差值是微秒级别
             val days = (diff / (1000 * 60 * 60 * 24)).toInt()
 
@@ -67,10 +67,10 @@ object DateUtil {
     }
 
     fun parseYMDHMS_ToMilliseconds(dateStart: String, dateEnd: String): Long {
-        val df = SimpleDateFormat(YMDHMS_)
+        val df = SimpleDateFormat(YMDHMS_, Locale.getDefault())
         try {
-            val start = df.parse(dateStart)
-            val end = df.parse(dateEnd)
+            val start = df.parse(dateStart)!!
+            val end = df.parse(dateEnd)!!
             return end.time - start.time//这样得到的差值是微秒级别
         } catch (ignored: Exception) {
         }
@@ -116,7 +116,7 @@ object DateUtil {
         Log.i("DateUtil", "parseYMDHMS_FrontZero: $source")
         try {
             val calendar = Calendar.getInstance()
-            calendar.time = SimpleDateFormat(YMDHM_, Locale.getDefault()).parse(source)
+            calendar.time = SimpleDateFormat(YMDHM_, Locale.getDefault()).parse(source)!!
             val a = calendar.get(field)
             val str = a.toString()
             val len = str.length

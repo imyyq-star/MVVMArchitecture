@@ -12,7 +12,7 @@ import android.provider.Settings
 import com.imyyq.mvvm.app.BaseApp
 
 object AppUtil {
-    private val TAG = "AppUtil"
+    private const val TAG = "AppUtil"
 
     /**
      * 获取当前进程的名称，默认进程名称是包名

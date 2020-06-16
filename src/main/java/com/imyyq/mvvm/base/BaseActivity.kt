@@ -48,7 +48,7 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
 
     final override fun initViewDataBinding() {
         mBinding = DataBindingUtil.inflate(layoutInflater, layoutId, mFrameLayout, false)
-        setContentView(mBinding.getRoot())
+        setContentView(mBinding.root)
         mViewModel = initViewModel(this)
         // 绑定 v 和 vm
         if (varViewModelId != null) {

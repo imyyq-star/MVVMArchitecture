@@ -16,9 +16,9 @@ import com.imyyq.mvvm.app.BaseApp
 import java.io.File
 
 object CaptureAndCropManager {
-    val REQUEST_CODE_CAPTURE = 200
-    val REQUEST_CODE_CROP = 300
-    val REQUEST_CODE_ALBUM = 400
+    const val REQUEST_CODE_CAPTURE = 200
+    const val REQUEST_CODE_CROP = 300
+    const val REQUEST_CODE_ALBUM = 400
 
     val AUTHORITY = BaseApp.getInstance().packageName + ".genericFile.provider"
 

@@ -35,7 +35,7 @@ object InputMethodUtil {
      */
     fun showInputMethod(editText: EditText) {
         // 弹出键盘
-        editText.postDelayed(Runnable {
+        editText.postDelayed({
             val methodManager = BaseApp.getInstance().getSystemService(
                 Context.INPUT_METHOD_SERVICE
             ) as? InputMethodManager
@@ -44,7 +44,7 @@ object InputMethodUtil {
     }
 
     fun focusable(editText: EditText) {
-        editText.postDelayed(Runnable {
+        editText.postDelayed({
             editText.isFocusable = true
             editText.isFocusableInTouchMode = true
             editText.requestFocus()

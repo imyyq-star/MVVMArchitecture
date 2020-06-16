@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import androidx.core.view.MotionEventCompat
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import kotlin.math.roundToInt
 
 class PagerEnabledSlidingPaneLayout constructor(
     context: Context,
@@ -27,9 +28,9 @@ class PagerEnabledSlidingPaneLayout constructor(
                 if (mInitialMotionX > mEdgeSlop && !isOpen && canScroll(
                         this,
                         false,
-                        Math.round(x - mInitialMotionX),
-                        Math.round(x),
-                        Math.round(y)
+                        (x - mInitialMotionX).roundToInt(),
+                        x.roundToInt(),
+                        y.roundToInt()
                     )
                 ) {
 

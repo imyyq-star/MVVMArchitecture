@@ -10,6 +10,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.imyyq.mvvm.utils.DensityUtil;
+
 /**
  * 分隔线
  */
@@ -21,7 +23,6 @@ public class DividerLine extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = {android.R.attr.listDivider};
     //divider对应的drawable
     private Drawable dividerDrawable;
-    private Context mContext;
     private int dividerSize;
     //默认为null
     private Integer mMode = null;
@@ -36,7 +37,6 @@ public class DividerLine extends RecyclerView.ItemDecoration {
     }
 
     public DividerLine(Context context) {
-        mContext = context;
         //获取样式中对应的属性值
         TypedArray attrArray = context.obtainStyledAttributes(ATTRS);
         dividerDrawable = attrArray.getDrawable(0);
@@ -107,7 +107,7 @@ public class DividerLine extends RecyclerView.ItemDecoration {
             final int top = child.getTop() - params.topMargin;
             final int bottom = child.getBottom() + params.bottomMargin;
             final int left = child.getRight() + params.rightMargin;
-            final int right = getDividerSize() == 0 ? left + dip2px(mContext, DEFAULT_DIVIDER_SIZE) : left + getDividerSize();
+            final int right = getDividerSize() == 0 ? left + DensityUtil.INSTANCE.dp2px(DEFAULT_DIVIDER_SIZE) : left + getDividerSize();
             dividerDrawable.setBounds(left, top, right, bottom);
             dividerDrawable.draw(c);
         }
@@ -130,7 +130,7 @@ public class DividerLine extends RecyclerView.ItemDecoration {
             //child的右边(也是分隔线的右边)
             final int right = child.getRight() - params.rightMargin;
             //分隔线的底边所在的位置(那就是分隔线的顶边加上分隔线的高度)
-            final int bottom = getDividerSize() == 0 ? top + dip2px(mContext, DEFAULT_DIVIDER_SIZE) : top + getDividerSize();
+            final int bottom = getDividerSize() == 0 ? top + DensityUtil.INSTANCE.dp2px(DEFAULT_DIVIDER_SIZE) : top + getDividerSize();
             dividerDrawable.setBounds(left, top, right, bottom);
             //画上去
             dividerDrawable.draw(c);
@@ -141,15 +141,5 @@ public class DividerLine extends RecyclerView.ItemDecoration {
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
 //        outRect.bottom = getDividerSize() == 0 ? dip2px(mContext, DEFAULT_DIVIDER_SIZE) : getDividerSize();
-    }
-
-    /**
-     * 将dip或dp值转换为px值，保证尺寸大小不变
-     *
-     * @param context（DisplayMetrics类中属性density）
-     */
-    public static int dip2px(Context context, float dipValue) {
-        float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
     }
 }
