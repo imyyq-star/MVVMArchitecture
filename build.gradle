@@ -60,6 +60,7 @@ dependencies {
     api Deps.kotlinKTX
     api Deps.appcompat
     api Deps.constraintLayout
+    api Deps.slidingPaneLayout
 
     /**
      * 在 Lifecycles 中使用协程，视图销毁则自动取消
@@ -95,12 +96,6 @@ dependencies {
         api Deps.loadSir
     } else {
         compileOnly Deps.loadSir
-    }
-
-    if (mvvmConfig.include.slidingPaneLayout) {
-        api Deps.slidingPaneLayout
-    } else {
-        compileOnly Deps.slidingPaneLayout
     }
 
     // RecyclerView

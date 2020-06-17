@@ -24,7 +24,6 @@ include {
 
     room=false
     swipeRefreshLayout=false
-    slidingPaneLayout=false
     retrofit2=false
     gson=false
     glide=false

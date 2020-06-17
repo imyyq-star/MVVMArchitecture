@@ -457,8 +457,6 @@ ViewModel 可以调用 finish 和 startActivity 方法来启动和结束界面�
 3. 复写 Activity/Fragment 中的 LoadSir 相关方法，详见注释
 
 # 侧滑返回
-需要在配置文件中开启 slidingPaneLayout 属性
-
 1. 全局配置：GlobalConfig.isSupportSwipe，默认为 false，可全局设置为 true，那么所有继承自 BaseActivity 的都会拥有侧滑返回的功能。
 2. 必须给开启了侧滑返回的 Activity 的 Theme 配置 android:windowIsTranslucent 为 true，框架会自动设置 android:windowBackground 为透明。必须为透明，否则侧滑显示的底色默认是白色
 3. 如果有部分 Activity 不想开启侧滑，比如主页，那么可以复写 isSupportSwipe 返回 false 即可，或者全局设置为 false，只给部分 Activity 开启侧滑。
