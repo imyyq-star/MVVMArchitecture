@@ -504,3 +504,45 @@ dependencies {
     kapt Deps.roomCompiler
 }
 ```
+
+## 3. 引用冲突
+```
+Unable to resolve dependency for ':MVVMArchitecture@debug/compileClasspath': Could not resolve xx.xxx.xxx:xxx:x.x.x.
+```
+
+发生上述冲突的原因是因为框架有库以 api 和 compileOnly 两种方式引用了。
+举个例子做个假设，roomRxJava 会引入 RxJava，而 retrofit2RxJava2 也会引入 RxJava，如果框架中的 build.gradle 文件按照以下来引用：
+
+```groovy
+dependencies {
+    if (false) {
+        api Deps.roomRuntime
+        api Deps.roomRxJava
+        kapt Deps.roomCompiler
+    } else {
+        compileOnly Deps.roomRuntime
+        compileOnly Deps.roomRxJava
+    }
+
+    if (true) {
+        api Deps.retrofit2RxJava2
+    }
+}
+```
+
+compileOnly 是为了框架中有用到 room 的代码不要编译报错。以上是没有开启 room，只开启了 retrofit2RxJava2，那么就会报错，因为 RxJava 在上面的 else 中已经是 compileOnly 的了，下面的 if 却是 api 的。
+
+解决方法是：
+1. 因为框架没有代码用到 roomRxJava，所以可以不用 compileOnly。
+2. 如果用到了，就得想办法根据实际情况进行 exclude 了。
+
+## 4. MVVMArchitecture/mvvm-config.groovy.template 和项目目录下的 mvvm-config.groovy 的冲突
+```
+Caused by: java.io.NotSerializableException: groovy.util.ConfigObject
+```
+
+两个文件的属性没有同步，比如根目录下的文件少了某个属性。
+
+
+# 关于定制化的声明
+本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请联系我。QQ/微信：315303586
