@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -187,5 +188,19 @@ object AppUtil {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
         context.startActivityForResult(intent, requestCode)
+    }
+
+    /**
+     * true，则说明引入了 retrofit2RxJava2
+     */
+    fun isRetrofitUseRx(): Boolean {
+        var applicationInfo: ApplicationInfo? = null
+        try {
+            applicationInfo = BaseApp.getInstance().packageManager.getApplicationInfo(BaseApp.getInstance().packageName, PackageManager.GET_META_DATA)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        if (applicationInfo == null) return false
+        return applicationInfo.metaData.getBoolean("isRetrofitUseRx")
     }
 }

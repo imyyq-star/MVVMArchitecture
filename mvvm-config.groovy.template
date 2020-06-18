@@ -23,10 +23,12 @@ include {
     viewPager2=false
 
     room=false
+    roomRxJava=false
     swipeRefreshLayout=false
     retrofit2=false
     gson=false
     glide=false
+    retrofit2RxJava2=false
 
     // 权限申请
     livePermissions=false

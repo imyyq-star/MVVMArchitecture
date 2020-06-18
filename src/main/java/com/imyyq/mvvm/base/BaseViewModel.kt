@@ -9,6 +9,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.utils.SingleLiveEvent
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel {
     constructor(app: Application, model: M) : this(app) {
@@ -17,6 +19,8 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     // 可能存在没有仓库的 vm，但我们这里也不要是可 null 的
     protected lateinit var mModel: M
+
+    private lateinit var mCompositeDisposable: Any
 
     val mUiChangeLiveData: UiChangeLiveData by lazy {
         UiChangeLiveData()
@@ -49,6 +53,18 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         if (this::mModel.isInitialized) {
             mModel.onCleared()
         }
+
+        // ViewModel销毁时会执行，同时取消所有异步任务
+        if (this::mCompositeDisposable.isInitialized) {
+            (mCompositeDisposable as CompositeDisposable).clear()
+        }
+    }
+
+    protected fun addSubscribe(disposable: Any) {
+        if (!this::mCompositeDisposable.isInitialized) {
+            mCompositeDisposable = CompositeDisposable()
+        }
+        (mCompositeDisposable as CompositeDisposable).add(disposable as Disposable)
     }
 
     @MainThread

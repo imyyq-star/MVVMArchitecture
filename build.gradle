@@ -14,6 +14,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        manifestPlaceholders = [
+                "isRetrofitUseRx": mvvmConfig.include.retrofit2RxJava2
+        ]
     }
 
     buildTypes {
@@ -107,11 +111,9 @@ dependencies {
     // 数据库
     if (mvvmConfig.include.room) {
         api Deps.roomRuntime
-        api Deps.roomRxJava
         kapt Deps.roomCompiler
     } else {
         compileOnly Deps.roomRuntime
-        compileOnly Deps.roomRxJava
     }
     // md
     if (mvvmConfig.include.material) {
@@ -198,6 +200,22 @@ dependencies {
         }
         if (mvvmConfig.include.rxJava2) {
             api Deps.rxJava2
+        }
+    }
+    if (mvvmConfig.include.roomRxJava) {
+        api Deps.roomRxJava
+    }
+    if (mvvmConfig.include.retrofit2RxJava2) {
+        api Deps.rxAndroid2
+        api Deps.retrofit2RxJava2
+    } else {
+        if (mvvmConfig.include.roomRxJava || mvvmConfig.include.rxJava2 || mvvmConfig.include.rxKotlin) {
+            compileOnly(Deps.retrofit2RxJava2) {
+                exclude group: 'io.reactivex.rxjava2'
+                exclude group: 'org.reactivestreams'
+            }
+        } else {
+            compileOnly Deps.retrofit2RxJava2
         }
     }
     //
