@@ -57,11 +57,11 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun showLoadingDialog(title: String?) {
+    protected fun showLoadingDialog(msg: String?) {
         if (!mUiChangeLiveData.showLoadingDialogEvent.hasObservers()) {
             throw RuntimeException("Activity 或 Fragment 复写了 isNeedLoadingDialog() 方法并返回 false 时，无法使用 Dialog")
         }
-        mUiChangeLiveData.showLoadingDialogEvent.value = title
+        mUiChangeLiveData.showLoadingDialogEvent.value = msg
     }
 
     @MainThread

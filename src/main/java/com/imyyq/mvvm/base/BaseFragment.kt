@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
@@ -120,6 +121,7 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         mLoadingDialog.setCancelable(isLoadingDialogCancelable())
         mLoadingDialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
         mLoadingDialog.show()
+        mLoadingDialog.findViewById<TextView>(loadingDialogLayoutMsgId())?.text = msg
     }
 
     override fun dismissLoadingDialog() {

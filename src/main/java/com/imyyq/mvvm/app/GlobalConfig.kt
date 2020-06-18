@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.app
 
+import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.R
 import com.kingja.loadsir.callback.Callback
@@ -30,6 +31,12 @@ object GlobalConfig {
      */
     @LayoutRes
     var loadingDialogLayout = R.layout.mvvm_dlg_loading
+
+    /**
+     * 加载中对话框的 layout 消息id
+     */
+    @IdRes
+    var loadingDialogLayoutMsgId = R.id.tv_msg
 
     /**
      * activity 是否支持侧滑返回。

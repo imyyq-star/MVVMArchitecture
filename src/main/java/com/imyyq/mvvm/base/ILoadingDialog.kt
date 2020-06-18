@@ -22,6 +22,11 @@ interface ILoadingDialog {
     fun loadingDialogLayout() = GlobalConfig.loadingDialogLayout
 
     /**
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogLayoutMsgId]
+     */
+    fun loadingDialogLayoutMsgId() = GlobalConfig.loadingDialogLayoutMsgId
+
+    /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.isNeedLoadingDialog]
      */
     fun isNeedLoadingDialog() = GlobalConfig.isNeedLoadingDialog

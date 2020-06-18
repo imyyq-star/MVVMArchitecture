@@ -172,10 +172,6 @@ dependencies {
                 exclude group: 'androidx.swiperefreshlayout'
             }
         }
-    } else {
-        compileOnly Deps.bindingAdapter
-        compileOnly Deps.bindingAdapterVp2
-        compileOnly Deps.bindingAdapterRv
     }
     // 权限申请
     if (mvvmConfig.include.livePermissions) {
