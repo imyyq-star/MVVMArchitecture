@@ -5,11 +5,13 @@ import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
 import com.imyyq.mvvm.http.interceptor.logging.Level
 import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
+import com.imyyq.mvvm.utils.AppUtil
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.internal.platform.Platform
 import retrofit2.Call
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -90,15 +92,16 @@ object HttpRequest {
                     )
             }
 
-            obj = Retrofit.Builder().client(httpClientBuilder.build())
+            val builder = Retrofit.Builder().client(httpClientBuilder.build())
                 // 基础url
                 .baseUrl(host)
                 // JSON解析
                 .addConverterFactory(GsonConverterFactory.create())
-                // 使用协程，不使用 rx
-                //.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
-                .build()
-                .create(cls)
+            if (AppUtil.isRetrofitUseRx()) {
+                // Kotlin 使用协程，Java 使用 rx
+                builder.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
+            }
+            obj = builder.build().create(cls)
             mServiceMap[name] = obj
         }
         @Suppress("UNCHECKED_CAST")
