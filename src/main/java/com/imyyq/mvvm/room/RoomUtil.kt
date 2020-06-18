@@ -4,6 +4,7 @@ import android.util.ArrayMap
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import com.imyyq.mvvm.app.BaseApp
 
 /**
@@ -14,8 +15,9 @@ object RoomUtil {
 
     @Synchronized
     fun <T : RoomDatabase> getDB(
-        cls: Class<T>, dbName: String,
-        callback: RoomDatabase.Callback?
+        cls: Class<T>, dbName: String = "default.db",
+        callback: RoomDatabase.Callback? = null,
+        migrations: Array<Migration> ? = null
     ): T {
         val name = cls.name
         var database: RoomDatabase? = mDBEntityMap[name]
@@ -24,6 +26,9 @@ object RoomUtil {
                 BaseApp.getInstance(), cls,
                 dbName
             )
+            migrations?.forEach {
+                builder.addMigrations(it)
+            }
             if (callback != null) {
                 builder.addCallback(callback)
             }
@@ -32,13 +37,5 @@ object RoomUtil {
         }
         @Suppress("UNCHECKED_CAST")
         return database as T
-    }
-
-    fun <T : RoomDatabase> getDB(cls: Class<T>, callback: RoomDatabase.Callback?): T {
-        return getDB(cls, "default.db", callback)
-    }
-
-    fun <T : RoomDatabase> getDB(cls: Class<T>): T {
-        return getDB(cls, null)
     }
 }

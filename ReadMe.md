@@ -477,3 +477,30 @@ binding-collection-adapter 对于 vp 和 vp2，只支持 view，不支持 fragme
 
 # 混淆
 框架已配置了相关的混淆规则，使用者只需要配置自己的规则即可。
+
+
+# 可能遇到的问题
+
+## 1. BR 的问题
+有些时候 BR 类不会自动导入，需要你手动 import，甚至是导入后还是报红色，但其实已经可以运行了，这是 AS 的锅。
+
+## 2. Room 数据库
+```
+Caused by: java.lang.RuntimeException: cannot find implementation for com.xxx.xxx.xx.Xxxx Xxxx_Impl does not exist
+```
+
+就是说没有生成 Impl 类。解决方案如下：
+
+Java 需要开启：
+```groovy
+dependencies {
+    annotationProcessor Deps.roomCompiler
+}
+```
+
+Kotlin 需要开启 kapt，并在 build.gradle 中加入：
+```groovy
+dependencies {
+    kapt Deps.roomCompiler
+}
+```
