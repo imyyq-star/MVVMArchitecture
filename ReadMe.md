@@ -440,6 +440,9 @@ ViewModel 可以调用 finish 和 startActivity 方法来启动和结束界面�
     />
 ```
 
+# ViewPager/ViewPager2
+binding-collection-adapter 对于 vp 和 vp2，只支持 view，不支持 fragment 绑定。
+
 
 # 加载中对话框 LoadingDialog
 配置 GlobalConfig 中包含 loadingDialog 字样的属性，详见注释。
