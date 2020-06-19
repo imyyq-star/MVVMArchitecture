@@ -43,6 +43,7 @@ ext {
             // 网络
             retrofit2                 : "com.squareup.retrofit2:retrofit:$Versions.retrofit2",
             retrofit2RxJava2          : "com.squareup.retrofit2:adapter-rxjava2:$Versions.retrofit2",
+            networkResponseAdapter    : "com.github.haroldadmin:NetworkResponseAdapter:4.0.1",
 
             // 图片加载
             glide                     : "com.github.bumptech.glide:glide:$Versions.glideVersion",
