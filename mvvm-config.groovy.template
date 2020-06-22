@@ -42,6 +42,7 @@ include {
     // 各种 KTX，详见 https://developer.android.google.cn/kotlin/ktx
     reactiveStreamsKTX=false
 
+    natigation=false
     natigationUiKTX=false
     natigationRuntimeKTX=false
     natigationFragmentKTX=false

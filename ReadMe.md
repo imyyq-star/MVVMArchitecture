@@ -668,4 +668,4 @@ Caused by: java.io.NotSerializableException: groovy.util.ConfigObject
 
 
 # 关于定制化的声明
-本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请联系我。QQ/微信：315303586
+本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请提 Issue

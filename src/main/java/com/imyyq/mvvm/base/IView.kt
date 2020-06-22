@@ -43,14 +43,16 @@ interface IView<VM : BaseViewModel<*>> {
      */
     @Suppress("UNCHECKED_CAST")
     fun initViewModel(viewModelStoreOwner: ViewModelStoreOwner): VM {
-        val modelClass: Class<VM>
+        var modelClass: Class<VM>?
         val type: Type? = javaClass.genericSuperclass
-        modelClass = (if (type is ParameterizedType) {
-            type.actualTypeArguments[1] as Class<VM>
-        } else {
-            //如果没有指定泛型参数，则默认使用BaseViewModel
-            BaseViewModel::class.java
-        }) as Class<VM>
+        modelClass = if (type is ParameterizedType) {
+            type.actualTypeArguments[1] as? Class<VM>
+        } else null
+        if (modelClass == null) {
+            modelClass = BaseViewModel::class.java as Class<VM>
+        }
+        //如果没有指定泛型参数，则默认使用BaseViewModel
+        BaseViewModel::class.java
         return ViewModelProvider(
             viewModelStoreOwner,
             ViewModelProvider.AndroidViewModelFactory(BaseApp.getInstance())
