@@ -93,6 +93,7 @@ ext {
             // Java language implementation
             natigationFragment        : "androidx.navigation:navigation-fragment:${Versions.navigation}",
             natigationUi              : "androidx.navigation:navigation-ui:${Versions.navigation}",
+            natigationSafeArgsPlugin  : "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}",
 
             // Dynamic Feature Module Support
             natigationDynamicFeatures : "androidx.navigation:navigation-dynamic-features-fragment:${Versions.navigation}",

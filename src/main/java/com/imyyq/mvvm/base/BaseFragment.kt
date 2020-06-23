@@ -24,7 +24,7 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     Fragment(),
     IView<VM>, ILoadingDialog, ILoading {
 
-    protected lateinit var mBinding: V
+    protected var mBinding: V? = null
     protected lateinit var mViewModel: VM
 
     private val mLoadingDialog: Dialog by lazy {
@@ -50,7 +50,7 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
             container,
             false
         )
-        return mBinding.root
+        return mBinding?.root
     }
 
 
@@ -66,11 +66,11 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         mViewModel = initViewModel(this)
         // 绑定 v 和 vm
         if (varViewModelId != null) {
-            mBinding.setVariable(varViewModelId, mViewModel)
+            mBinding?.setVariable(varViewModelId, mViewModel)
         }
 
         // 让 LiveData 和 xml 可以双向绑定
-        mBinding.lifecycleOwner = this
+        mBinding?.lifecycleOwner = this
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -85,7 +85,8 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mBinding.unbind()
+        mBinding?.unbind()
+        mBinding = null
     }
 
     final override fun initUiChangeLiveData() {
