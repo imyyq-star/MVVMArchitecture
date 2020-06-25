@@ -1,6 +1,7 @@
 package com.imyyq.mvvm.http
 
 import android.util.ArrayMap
+import com.haroldadmin.cnradapter.NetworkResponseAdapterFactory
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
 import com.imyyq.mvvm.http.interceptor.logging.Level
@@ -101,6 +102,7 @@ object HttpRequest {
                 // Kotlin 使用协程，Java 使用 rx
                 builder.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
             }
+            builder.addCallAdapterFactory(NetworkResponseAdapterFactory())
             obj = builder.build().create(cls)
             mServiceMap[name] = obj
         }

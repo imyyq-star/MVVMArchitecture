@@ -409,6 +409,129 @@ viewModelScope.launch {
 
 获取 Service，添加请求头等都在 HttpRequest 类中，如果是 debug 阶段，那么会增加日志拦截器，把请求和响应都打在 Logcat 上
 
+# 关于请求结果处理的问题
+通常来说，服务端返回的数据格式都是 JSON，有些很老的接口可能还是 XML，有追求的团队还可能采用 ProtocolBuffer，解析的工作 Retrofit 已经帮我们做好了。
+我们要做的就是处理解析后的实体对象，一般来说，正常的后端接口都有统一格式的，比如如下：
+
+```json
+{
+  "errorCode": 0,
+  "errorMsg": "",
+  "data": []
+}
+```
+
+至少会有以上最基本的字段，因此我们会将它封装成一个基类：
+
+```kotlin
+data class BaseEntity<T>(
+    var data: T?,
+    var errorCode: Int?,
+    var errorMsg: String?
+)
+```
+
+**以上字段名称其实极大可能不同团队是不一样的，因此我并没有提供实体基类的封装，只是把它放进了 sample 里，而且甚至一个应用中接口的格式不统一我也是遇到过的**
+
+**！！！！绝对要注意的是，Kotlin 的实体类，属性一定要都是可 null 的，千万不要预想服务端不可能返回 null，否则坑你没商量**
+
+具体的 data 是什么类型再创建不同的实体类，如果是使用 Rx + Retrofit 请求网络，还得对状态码和异常进行统一的处理，这里不详细展开，我们要说的是如果你是使用协程去请求网络，**那么该如何统一处理状态码和异常呢**？
+
+我目前只是提供两个方法：
+
+```kotlin
+data class BaseEntity<T>(
+    var data: T?,
+    var errorCode: Int?,
+    var errorMsg: String?
+)
+
+/**
+ * 处理请求结果
+ *
+ * [entity] 实体
+ * [onSuccess] 状态码对了就回调
+ * [onResult] 状态码对了，且实体不是 null 才回调
+ * [onFailed] 有错误发生，可能是服务端错误，可能是数据错误，详见 code 错误码和 msg 错误信息
+ */
+fun <T> handleResult(
+    entity: BaseEntity<T?>?,
+    onSuccess: (() -> Unit)? = null,
+    onResult: ((t: T) -> Unit),
+    onFailed: ((code: Int, msg: String?) -> Unit)? = null
+) {
+    // 防止实体为 null
+    if (entity == null) {
+        onFailed?.invoke(entityNullable, msgEntityNullable)
+        return
+    }
+    val code = entity.errorCode
+    val msg = entity.errorMsg
+    // 防止状态码为 null
+    if (code == null) {
+        onFailed?.invoke(entityCodeNullable, msgEntityCodeNullable)
+        return
+    }
+    // 请求成功
+    if (entity.errorCode == 0) {
+        // 回调成功
+        onSuccess?.invoke()
+        // 实体不为 null 才有价值
+        entity.data?.let { onResult.invoke(it) }
+    } else {
+        // 失败了
+        onFailed?.invoke(code, msg)
+    }
+}
+
+fun <T> handleException(e: Exception): BaseEntity<T> {
+    return if (e is HttpException) {
+        BaseEntity(null, e.code(), e.message())
+    } else {
+        BaseEntity(
+            null,
+            notHttpException,
+            "$msgNotHttpException, 具体错误是\n${Log.getStackTraceString(e)}"
+        )
+    }
+}
+```
+
+```kotlin
+override suspend fun login(userName: String, pwd: String): BaseEntity<List<FriendWebSiteEntity?>?>? {
+    return try {
+        wanAndroidApiService.login(userName, pwd)
+    } catch (e: Exception) {
+        handleException(e)
+    }
+}
+```
+
+调用处如下：
+
+```kotlin
+val entity = mModel.login("userName", "pwd")
+handleResult(entity,
+    onSuccess = {
+        Log.i("NetworkViewModel", "commonLog - onResume: success")
+    },
+    onResult = {
+        Log.i("NetworkViewModel", "commonLog - onResult: ${it.size}")
+    },
+    onFailed = { code, msg ->
+        Log.i("NetworkViewModel", "commonLog - onFailed: $code, $msg")
+    }
+)
+```
+
+协程是直接返回实体的，如果发生了异常，比如：
+1. 网络问题。
+2. 服务端问题，404 等。
+3. 其他未知的错误。
+
+那么程序将会崩溃，因此必须 try-catch，那么问题来了，只能 try-catch 吗？那岂不是每一个调用都需要？这里我推荐一个第三方库：[NetworkResponseAdapter](https://github.com/haroldadmin/NetworkResponseAdapter) 可以很好的解决错误的问题。
+框架已经集成了该库，自行封装或修改 handleResult 方法，就可以应对所有的情况并放心的使用协程了。
+
 # 全局配置类：GlobalConfig
 很多开关都在这里，功能都会尽量做成可配置的，详见注释。
 
@@ -545,4 +668,4 @@ Caused by: java.io.NotSerializableException: groovy.util.ConfigObject
 
 
 # 关于定制化的声明
-本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请联系我。QQ/微信：315303586
+本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请提 Issue

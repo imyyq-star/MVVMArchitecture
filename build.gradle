@@ -70,6 +70,8 @@ dependencies {
     api Deps.activityKTX
     api Deps.fragment
 
+    api Deps.networkResponseAdapter
+
     /**
      * 在 Lifecycles 中使用协程，视图销毁则自动取消
      */
@@ -160,22 +162,35 @@ dependencies {
     if (mvvmConfig.include.bindingCollection.bindingAdapter || mvvmConfig.include.bindingCollection.bindingAdapterVp2
             || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
         if (mvvmConfig.include.bindingCollection.bindingAdapter) {
-            api(Deps.bindingAdapterKTX) {
-                exclude group: 'androidx.swiperefreshlayout'
-            }
-            api(Deps.bindingAdapter) {
-                // 上面的 swipeRefreshLayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
-                exclude group: 'androidx.swiperefreshlayout'
+            if (mvvmConfig.include.swipeRefreshLayout) {
+                api Deps.bindingAdapterKTX
+                api Deps.bindingAdapter
+            } else {
+                api(Deps.bindingAdapterKTX) {
+                    exclude group: 'androidx.swiperefreshlayout'
+                }
+                api(Deps.bindingAdapter) {
+                    // 上面的 swipeRefreshLayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
+                    exclude group: 'androidx.swiperefreshlayout'
+                }
             }
         }
         if (mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-            api(Deps.bindingAdapterRv) {
-                exclude group: 'androidx.swiperefreshlayout'
+            if (mvvmConfig.include.swipeRefreshLayout) {
+                api Deps.bindingAdapterRv
+            } else {
+                api(Deps.bindingAdapterRv) {
+                    exclude group: 'androidx.swiperefreshlayout'
+                }
             }
         }
         if (mvvmConfig.include.bindingCollection.bindingAdapterVp2) {
-            api (Deps.bindingAdapterVp2) {
-                exclude group: 'androidx.swiperefreshlayout'
+            if (mvvmConfig.include.swipeRefreshLayout) {
+                api Deps.bindingAdapterVp2
+            } else {
+                api(Deps.bindingAdapterVp2) {
+                    exclude group: 'androidx.swiperefreshlayout'
+                }
             }
         }
     }
@@ -229,6 +244,20 @@ dependencies {
 
     if (mvvmConfig.include.reactiveStreamsKTX) {
         api Deps.reactiveStreamsKTX
+    }
+
+    if (mvvmConfig.include.natigation) {
+        if (mvvmConfig.include.swipeRefreshLayout) {
+            api Deps.natigationFragment
+            api Deps.natigationUi
+        } else {
+            api(Deps.natigationFragment) {
+                exclude group: 'androidx.swiperefreshlayout'
+            }
+            api(Deps.natigationUi) {
+                exclude group: 'androidx.swiperefreshlayout'
+            }
+        }
     }
 
     if (mvvmConfig.include.natigationUiKTX) {
