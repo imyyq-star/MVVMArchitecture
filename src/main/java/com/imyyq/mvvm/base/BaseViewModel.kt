@@ -7,12 +7,11 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel {
+open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel, IActivityResult {
     constructor(app: Application, model: M) : this(app) {
         mModel = model
     }
@@ -100,7 +99,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun finish() {
-        if (!mUiChangeLiveData.finishEvent.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+        if (!mUiChangeLiveData.finishEvent.hasObservers()) {
             throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 finish() 方法")
         }
         mUiChangeLiveData.finishEvent.call()
@@ -108,7 +107,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun startActivity(clazz: Class<*>) {
-        if (!mUiChangeLiveData.startActivityEvent.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+        if (!mUiChangeLiveData.startActivityEvent.hasObservers()) {
             throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
         }
         mUiChangeLiveData.startActivityEvent.value = clazz
@@ -116,10 +115,26 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun startActivity(clazz: Class<*>, bundle: Bundle?) {
-        if (!mUiChangeLiveData.startActivityEventWithBundle.hasObservers() || !GlobalConfig.isViewModelNeedStartAndFinish) {
+        if (!mUiChangeLiveData.startActivityEventWithBundle.hasObservers()) {
             throw RuntimeException("GlobalConfig.isViewModelNeedStartAndFinish 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartAndFinish() 方法并返回 false 时，无法使用 startActivity() 方法")
         }
         mUiChangeLiveData.startActivityEventWithBundle.value = Pair(clazz, bundle)
+    }
+
+    @MainThread
+    protected fun startActivityForResult(clazz: Class<*>) {
+        if (!mUiChangeLiveData.startActivityForResultEvent.hasObservers()) {
+            throw RuntimeException("GlobalConfig.isViewModelNeedStartForResult 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartForResult() 方法并返回 false 时，无法使用 startActivityForResult() 方法")
+        }
+        mUiChangeLiveData.startActivityForResultEvent.value = clazz
+    }
+
+    @MainThread
+    protected fun startActivityForResult(clazz: Class<*>, bundle: Bundle?) {
+        if (!mUiChangeLiveData.startActivityForResultEventWithBundle.hasObservers()) {
+            throw RuntimeException("GlobalConfig.isViewModelNeedStartForResult 设置为 false，或者 Activity/Fragment 复写了 isViewModelNeedStartForResult() 方法并返回 false 时，无法使用 startActivityForResult() 方法")
+        }
+        mUiChangeLiveData.startActivityForResultEventWithBundle.value = Pair(clazz, bundle)
     }
 
     @Suppress("RemoveExplicitTypeArguments")
@@ -137,6 +152,12 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             SingleLiveEvent<Class<*>>()
         }
         val startActivityEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>> by lazy {
+            SingleLiveEvent<Pair<Class<*>, Bundle?>>()
+        }
+        val startActivityForResultEvent: SingleLiveEvent<Class<*>> by lazy {
+            SingleLiveEvent<Class<*>>()
+        }
+        val startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>> by lazy {
             SingleLiveEvent<Pair<Class<*>, Bundle?>>()
         }
         val finishEvent: SingleLiveEvent<Any?> by lazy {
