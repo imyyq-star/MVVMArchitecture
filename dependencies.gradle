@@ -35,7 +35,7 @@ ext {
             paging                    : "androidx.paging:paging-runtime:2.1.2",
             viewPager2                : "androidx.viewpager2:viewpager2:1.0.0",
 
-            lifecycleCompiler         : "androidx.lifecycle:lifecycle-compiler:2.2.0",
+            lifecycleJava8            : "androidx.lifecycle:lifecycle-common-java8:2.2.0",
             lifecycleProcess          : "androidx.lifecycle:lifecycle-process:2.2.0",
 
             // 数据库

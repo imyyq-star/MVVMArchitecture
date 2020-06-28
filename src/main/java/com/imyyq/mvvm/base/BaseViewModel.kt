@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -23,27 +21,6 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     val mUiChangeLiveData: UiChangeLiveData by lazy {
         UiChangeLiveData()
-    }
-
-    override fun onAny(owner: LifecycleOwner?, event: Lifecycle.Event?) {
-    }
-
-    override fun onCreate() {
-    }
-
-    override fun onDestroy() {
-    }
-
-    override fun onStart() {
-    }
-
-    override fun onStop() {
-    }
-
-    override fun onResume() {
-    }
-
-    override fun onPause() {
     }
 
     @CallSuper

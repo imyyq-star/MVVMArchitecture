@@ -12,21 +12,12 @@ include {
 
     // 通常来说以上都需要为 true
 
-    bindingCollection {
-        // ViewPager 和 ListView 等
-        bindingAdapter=false
-        bindingAdapterRv=false
-        bindingAdapterVp2=false
-    }
     recyclerView=false
-    material=false
-    viewPager2=false
 
     room=false
     roomRxJava=false
     swipeRefreshLayout=false
     retrofit2=false
-    gson=false
     glide=false
     retrofit2RxJava2=false
 
@@ -35,23 +26,8 @@ include {
 
     loadSir=false
 
-    paging=false
     rxJava2=false
     rxKotlin=false
-
-    // 各种 KTX，详见 https://developer.android.google.cn/kotlin/ktx
-    reactiveStreamsKTX=false
-
-    natigation=false
-    natigationUiKTX=false
-    natigationRuntimeKTX=false
-    natigationFragmentKTX=false
-
-    roomKTX=false
-    sqliteKTX=false
-    workKTX=false
-    paletteKTX=false
-    collectionKTX=false
 }
 
 SDKVersion {

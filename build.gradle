@@ -90,7 +90,7 @@ dependencies {
     /**
      * 生成生命周期注解相关的代码，否则将反射调用，影响性能
      */
-    kapt Deps.lifecycleCompiler
+    api Deps.lifecycleJava8
 
     /**
      * 监控应用的生命周期

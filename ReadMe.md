@@ -136,20 +136,11 @@ include {
 
     // 通常来说以上都需要为 true
 
-    bindingCollection {
-        // ViewPager 和 ListView 等
-        bindingAdapter=false
-        bindingAdapterRv=false
-        bindingAdapterVp2=false
-    }
     recyclerView=false
-    material=false
-    viewPager2=false
 
     room=false
     swipeRefreshLayout=false
     retrofit2=false
-    gson=false
     glide=false
 
     // 权限申请
@@ -344,7 +335,7 @@ class MainViewModel(app: Application) : BaseViewModel<BaseModel>(app) {
     /**
      * vm 可以感知 v 的生命周期
      */
-    override fun onResume() {
+    override fun onResume(owner: LifecycleOwner) {
         // 注意！！！！！ vm 层绝对不可以引用 v 层的实例，需要 context 要么通过 application，要么通过 AppActivityManager
         val app = getApplication<MyApp>()
         Log.i("MainViewModel", "commonLog - onResume: $app")
