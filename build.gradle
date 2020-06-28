@@ -65,6 +65,10 @@ dependencies {
     api Deps.constraintLayout
     api Deps.slidingPaneLayout
 
+    api Deps.activity
+    api Deps.activityKTX
+    api Deps.fragment
+
     api Deps.networkResponseAdapter
 
     /**

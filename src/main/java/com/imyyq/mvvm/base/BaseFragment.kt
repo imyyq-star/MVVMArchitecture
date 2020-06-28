@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
@@ -22,10 +24,12 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
     private val varViewModelId: Int? = null
 ) :
     Fragment(),
-    IView<VM>, ILoadingDialog, ILoading {
+    IView<VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected var mBinding: V? = null
     protected lateinit var mViewModel: VM
+
+    private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
 
     private val mLoadingDialog: Dialog by lazy {
         CustomLayoutDialog(requireActivity(), loadingDialogLayout())
@@ -105,6 +109,21 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
                 startActivity(intent)
             })
         }
+        if (isViewModelNeedStartForResult()) {
+            // vm 可以启动界面
+            mViewModel.mUiChangeLiveData.startActivityForResultEvent.observe(this, Observer {
+                initStartActivityForResult()
+                val intent = Intent(activity, it)
+                mStartActivityForResult.launch(intent)
+            })
+            // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
+            mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle.observe(this, Observer {
+                initStartActivityForResult()
+                val intent = Intent(activity, it?.first)
+                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                mStartActivityForResult.launch(intent)
+            })
+        }
 
         if (isNeedLoadingDialog()) {
             // 显示对话框
@@ -115,6 +134,22 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
             mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
                 dismissLoadingDialog()
             })
+        }
+    }
+
+    private fun initStartActivityForResult() {
+        if (!this::mStartActivityForResult.isInitialized) {
+            mStartActivityForResult =
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    val data = it.data
+                    if (data != null) {
+                        onActivityResult(it.resultCode, data)
+                        mViewModel.onActivityResult(it.resultCode, data)
+                    } else {
+                        onActivityResult(it.resultCode)
+                        mViewModel.onActivityResult(it.resultCode)
+                    }
+                }
         }
     }
 
