@@ -12,7 +12,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
 
         manifestPlaceholders = [
@@ -117,34 +116,20 @@ dependencies {
     } else {
         compileOnly Deps.roomRuntime
     }
-    // md
-    if (mvvmConfig.include.material) {
-        api Deps.material
-    }
     // 下拉刷新
     if (mvvmConfig.include.swipeRefreshLayout) {
         api Deps.swipeRefreshLayout
     } else {
         compileOnly Deps.swipeRefreshLayout
     }
-    // vp2
-    if (mvvmConfig.include.viewPager2) {
-        api Deps.viewPager2
-    }
     // 网络
     if (mvvmConfig.include.retrofit2) {
         api Deps.retrofit2
-        if (!mvvmConfig.include.gson) {
-            api Deps.gson
-        }
+        api Deps.gson
         api Deps.gsonConverter
     } else {
         compileOnly Deps.retrofit2
         compileOnly Deps.gsonConverter
-    }
-    // gson
-    if (mvvmConfig.include.gson) {
-        api Deps.gson
     }
 
     // 图片
@@ -154,57 +139,11 @@ dependencies {
     } else {
         compileOnly Deps.glide
     }
-    // 绑定库
-    if (mvvmConfig.include.bindingCollection.bindingAdapter || mvvmConfig.include.bindingCollection.bindingAdapterVp2
-            || mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-        if (mvvmConfig.include.bindingCollection.bindingAdapter) {
-            if (mvvmConfig.include.swipeRefreshLayout) {
-                api Deps.bindingAdapterKTX
-                api Deps.bindingAdapter
-            } else {
-                api(Deps.bindingAdapterKTX) {
-                    exclude group: 'androidx.swiperefreshlayout'
-                }
-                api(Deps.bindingAdapter) {
-                    // 上面的 swipeRefreshLayout 如果是 compileOnly 的，那么这里需要把重复 api 的库给移除了，否则 sync 失败
-                    exclude group: 'androidx.swiperefreshlayout'
-                }
-            }
-        }
-        if (mvvmConfig.include.bindingCollection.bindingAdapterRv) {
-            if (mvvmConfig.include.swipeRefreshLayout) {
-                api Deps.bindingAdapterRv
-            } else {
-                api(Deps.bindingAdapterRv) {
-                    exclude group: 'androidx.swiperefreshlayout'
-                }
-            }
-        }
-        if (mvvmConfig.include.bindingCollection.bindingAdapterVp2) {
-            if (mvvmConfig.include.swipeRefreshLayout) {
-                api Deps.bindingAdapterVp2
-            } else {
-                api(Deps.bindingAdapterVp2) {
-                    exclude group: 'androidx.swiperefreshlayout'
-                }
-            }
-        }
-    }
     // 权限申请
     if (mvvmConfig.include.livePermissions) {
         api Deps.livePermissions
     } else {
         compileOnly Deps.livePermissions
-    }
-
-    // paging
-    if (mvvmConfig.include.paging) {
-        api Deps.paging
-    }
-
-    // debugDB
-    if (mvvmConfig.include.debugDB) {
-        api Deps.debugDB
     }
 
     // rx 系列
@@ -233,60 +172,6 @@ dependencies {
             compileOnly Deps.retrofit2RxJava2
         }
     }
-    //
-//    if (mvvmConfig.include.) {
-//        api Deps.
-//    }
-
-    if (mvvmConfig.include.reactiveStreamsKTX) {
-        api Deps.reactiveStreamsKTX
-    }
-
-    if (mvvmConfig.include.natigation) {
-        if (mvvmConfig.include.swipeRefreshLayout) {
-            api Deps.natigationFragment
-            api Deps.natigationUi
-        } else {
-            api(Deps.natigationFragment) {
-                exclude group: 'androidx.swiperefreshlayout'
-            }
-            api(Deps.natigationUi) {
-                exclude group: 'androidx.swiperefreshlayout'
-            }
-        }
-    }
-
-    if (mvvmConfig.include.natigationUiKTX) {
-        api Deps.natigationUiKTX
-    }
-
-    if (mvvmConfig.include.natigationRuntimeKTX) {
-        api Deps.natigationRuntimeKTX
-    }
-
-    if (mvvmConfig.include.natigationFragmentKTX) {
-        api Deps.natigationFragmentKTX
-    }
-
-    if (mvvmConfig.include.roomKTX) {
-        api Deps.roomKTX
-    }
-
-    if (mvvmConfig.include.sqliteKTX) {
-        api Deps.sqliteKTX
-    }
-
-    if (mvvmConfig.include.workKTX) {
-        api Deps.workKTX
-    }
-
-    if (mvvmConfig.include.paletteKTX) {
-        api Deps.paletteKTX
-    }
-
-    if (mvvmConfig.include.collectionKTX) {
-        api Deps.collectionKTX
-    }
 
     /**
      * debug 阶段内存泄露检测
@@ -294,8 +179,4 @@ dependencies {
     if (mvvmConfig.include.leakCanary2) {
         debugImplementation Deps.leakCanary2
     }
-
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

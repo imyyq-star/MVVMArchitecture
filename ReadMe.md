@@ -201,6 +201,12 @@ kapt Deps.lifecycleCompiler
 
 其他的库，**根据自己的需要自行开启和关闭，这是框架的一个亮点，可以有效减少使用不到的库**。比如你不需要使用到数据库，那么可以将 room 属性配置为 false，打包时将不会引入 room 的相关内容，你也不能使用相关的 API，否则运行时将找不到类。
 
+* 6、其他的库
+在配置文件中的库，都是有经过框架二次封装的，没有配置的库，可在 dependencies.gradle 中查看，根据需要自行引入，比如各种 ktx：
+```groovy
+implementation Deps.natigationFragmentKTX
+```
+
 # 基本使用
 
 ## 配置 Application
@@ -666,6 +672,50 @@ Caused by: java.io.NotSerializableException: groovy.util.ConfigObject
 
 两个文件的属性没有同步，比如根目录下的文件少了某个属性。
 
+
+# 文件模板
+为了减少样板代码，可以使用 AS 提供的 File Template 和 Live Template。
+
+## 1. Activity 文件模板
+```text
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
+
+#end
+class ${NAME} : BaseActivity<Activity${Xml_binding}Binding, ${Xml_vm}ViewModel> (
+    R.layout.activity_${activity_xml}, BR.viewModel
+) {
+}
+```
+
+## 2. Fragment 文件模板
+```text
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
+
+#end
+#parse("File Header.java")
+class ${NAME} : BaseFragment<Fragment${Xml_binding}Binding, ${Xml_vm}ViewModel> (
+    R.layout.fragment_${fragment_xml}, BR.viewModel
+) {
+}
+```
+
+## 3. ViewModel 文件模板
+```text
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
+
+#end
+#parse("File Header.java")
+class ${NAME}(app: Application) : BaseViewModel<BaseModel>(app) {
+}
+```
+
+## 4. viewModel 变量代码模板
+```text
+<variable
+    name="viewModel"
+    type="$vm$"
+    />
+```
 
 # 关于定制化的声明
 本人测试能力有限，不可能对所有的库的冲突性进行测试，所以如果你在开发中，有遇到什么配置冲突的，请提 Issue
