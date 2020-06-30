@@ -58,6 +58,23 @@ object GlobalConfig {
     var isViewModelNeedStartForResult = false
 
     /**
+     * 在 xml 配置点击事件，可配置的属性如下：
+     * onClickCommand 点击事件
+     * isInterval 是否开启防止点击过快
+     * intervalMilliseconds 防止点击过快的间隔时间，毫秒为单位
+     *
+     * 这里可全局设置是否开启防止点击事件过快的功能，局部可单独开启或关闭。
+     *
+     * 如果关闭，那么和 setOnClickListener 没啥区别
+     */
+    var mIsClickInterval: Boolean = false
+
+    /**
+     * 点击事件时间间隔
+     */
+    var mClickIntervalMilliseconds = 800
+
+    /**
      * 初始化 LoadSir 的相关界面。
      * [defCallback] 默认的界面，通常是加载中页面，设置了后，默认打开开启了 LoadSir 的页面后就显示这里设置的页面。
      * [clazz] 其他的状态页，比如空页面，加载错误等。

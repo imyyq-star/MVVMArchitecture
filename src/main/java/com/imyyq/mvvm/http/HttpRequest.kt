@@ -98,7 +98,7 @@ object HttpRequest {
                 .baseUrl(host)
                 // JSON解析
                 .addConverterFactory(GsonConverterFactory.create())
-            if (AppUtil.isRetrofitUseRx()) {
+            if (AppUtil.isRetrofitUseRx) {
                 // Kotlin 使用协程，Java 使用 rx
                 builder.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
             }

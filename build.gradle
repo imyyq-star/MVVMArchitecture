@@ -14,6 +14,7 @@ android {
 
         consumerProguardFiles "consumer-rules.pro"
 
+        checkMVVMConfigProperty(mvvmConfig.include.retrofit2RxJava2)
         manifestPlaceholders = [
                 "isRetrofitUseRx": mvvmConfig.include.retrofit2RxJava2
         ]
@@ -95,12 +96,14 @@ dependencies {
     /**
      * 监控应用的生命周期
      */
+    checkMVVMConfigProperty(mvvmConfig.include.lifecycleProcess)
     if (mvvmConfig.include.lifecycleProcess) {
         api Deps.lifecycleProcess
     } else {
         compileOnly Deps.lifecycleProcess
     }
 
+    checkMVVMConfigProperty(mvvmConfig.include.loadSir)
     if (mvvmConfig.include.loadSir) {
         api Deps.loadSir
     } else {
@@ -108,12 +111,14 @@ dependencies {
     }
 
     // RecyclerView
+    checkMVVMConfigProperty(mvvmConfig.include.recyclerView)
     if (mvvmConfig.include.recyclerView) {
         api Deps.recyclerView
     } else {
         compileOnly Deps.recyclerView
     }
     // 数据库
+    checkMVVMConfigProperty(mvvmConfig.include.room)
     if (mvvmConfig.include.room) {
         api Deps.roomRuntime
         kapt Deps.roomCompiler
@@ -121,12 +126,14 @@ dependencies {
         compileOnly Deps.roomRuntime
     }
     // 下拉刷新
+    checkMVVMConfigProperty(mvvmConfig.include.swipeRefreshLayout)
     if (mvvmConfig.include.swipeRefreshLayout) {
         api Deps.swipeRefreshLayout
     } else {
         compileOnly Deps.swipeRefreshLayout
     }
     // 网络
+    checkMVVMConfigProperty(mvvmConfig.include.retrofit2)
     if (mvvmConfig.include.retrofit2) {
         api Deps.retrofit2
         api Deps.gson
@@ -137,6 +144,7 @@ dependencies {
     }
 
     // 图片
+    checkMVVMConfigProperty(mvvmConfig.include.glide)
     if (mvvmConfig.include.glide) {
         api Deps.glide
         kapt Deps.glideCompiler
@@ -144,6 +152,7 @@ dependencies {
         compileOnly Deps.glide
     }
     // 权限申请
+    checkMVVMConfigProperty(mvvmConfig.include.livePermissions)
     if (mvvmConfig.include.livePermissions) {
         api Deps.livePermissions
     } else {
@@ -151,6 +160,8 @@ dependencies {
     }
 
     // rx 系列
+    checkMVVMConfigProperty(mvvmConfig.include.rxKotlin)
+    checkMVVMConfigProperty(mvvmConfig.include.rxJava2)
     if (mvvmConfig.include.rxJava2 || mvvmConfig.include.rxKotlin) {
         api Deps.rxAndroid2
         if (mvvmConfig.include.rxKotlin) {
@@ -160,9 +171,11 @@ dependencies {
             api Deps.rxJava2
         }
     }
+    checkMVVMConfigProperty(mvvmConfig.include.roomRxJava)
     if (mvvmConfig.include.roomRxJava) {
         api Deps.roomRxJava
     }
+    checkMVVMConfigProperty(mvvmConfig.include.retrofit2RxJava2)
     if (mvvmConfig.include.retrofit2RxJava2) {
         api Deps.rxAndroid2
         api Deps.retrofit2RxJava2
@@ -180,6 +193,7 @@ dependencies {
     /**
      * debug 阶段内存泄露检测
      */
+    checkMVVMConfigProperty(mvvmConfig.include.leakCanary2)
     if (mvvmConfig.include.leakCanary2) {
         debugImplementation Deps.leakCanary2
     }

@@ -137,7 +137,14 @@ static def curDateTime() {
     return new Date().format("yyyy-MM-dd_HH-mm")
 }
 
+static void checkMVVMConfigProperty(Object o) {
+    if (!(o instanceof Boolean)) {
+        throw new RuntimeException("mvvm-config.groovy 配置文件是否缺少了某个属性？属性列表需要和 MVVMArchCode/mvvm-config.groovy.template 文件保持一致")
+    }
+}
+
 // 添加到全局的变量中
 ext.addRepository = this.&addRepository
 ext.curDate = this.&curDate
 ext.curDateTime = this.&curDateTime
+ext.checkMVVMConfigProperty = this.&checkMVVMConfigProperty
