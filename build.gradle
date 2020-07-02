@@ -14,9 +14,9 @@ android {
 
         consumerProguardFiles "consumer-rules.pro"
 
-        checkMVVMConfigProperty(mvvmConfig.include.retrofit2RxJava2)
+        checkMVVMConfigProperty(IncludeLib.retrofit2RxJava2)
         manifestPlaceholders = [
-                "isRetrofitUseRx": mvvmConfig.include.retrofit2RxJava2
+                "isRetrofitUseRx": IncludeLib.retrofit2RxJava2
         ]
     }
 
@@ -86,32 +86,32 @@ dependencies {
     api Deps.lifecycleJava8
 
     // 监控应用的生命周期
-    checkMVVMConfigProperty(mvvmConfig.include.lifecycleProcess)
-    if (mvvmConfig.include.lifecycleProcess) {
+    checkMVVMConfigProperty(IncludeLib.lifecycleProcess)
+    if (IncludeLib.lifecycleProcess) {
         api Deps.lifecycleProcess
     } else {
         compileOnly Deps.lifecycleProcess
     }
 
     // 内嵌的加载中库
-    checkMVVMConfigProperty(mvvmConfig.include.loadSir)
-    if (mvvmConfig.include.loadSir) {
+    checkMVVMConfigProperty(IncludeLib.loadSir)
+    if (IncludeLib.loadSir) {
         api Deps.loadSir
     } else {
         compileOnly Deps.loadSir
     }
 
     // RecyclerView
-    checkMVVMConfigProperty(mvvmConfig.include.recyclerView)
-    if (mvvmConfig.include.recyclerView) {
+    checkMVVMConfigProperty(IncludeLib.recyclerView)
+    if (IncludeLib.recyclerView) {
         api Deps.recyclerView
     } else {
         compileOnly Deps.recyclerView
     }
 
     // 数据库
-    checkMVVMConfigProperty(mvvmConfig.include.room)
-    if (mvvmConfig.include.room) {
+    checkMVVMConfigProperty(IncludeLib.room)
+    if (IncludeLib.room) {
         api Deps.roomRuntime
         kapt Deps.roomCompiler
     } else {
@@ -119,16 +119,16 @@ dependencies {
     }
 
     // Android 提供的下拉刷新，上拉加载可以使用第三方的 SmartRefreshLayout
-    checkMVVMConfigProperty(mvvmConfig.include.swipeRefreshLayout)
-    if (mvvmConfig.include.swipeRefreshLayout) {
+    checkMVVMConfigProperty(IncludeLib.swipeRefreshLayout)
+    if (IncludeLib.swipeRefreshLayout) {
         api Deps.swipeRefreshLayout
     } else {
         compileOnly Deps.swipeRefreshLayout
     }
 
     // 网络，默认使用 gson 解析 json
-    checkMVVMConfigProperty(mvvmConfig.include.retrofit2)
-    if (mvvmConfig.include.retrofit2) {
+    checkMVVMConfigProperty(IncludeLib.retrofit2)
+    if (IncludeLib.retrofit2) {
         api Deps.retrofit2
         api Deps.gson
         api Deps.gsonConverter
@@ -138,8 +138,8 @@ dependencies {
     }
 
     // 图片，使用 glide
-    checkMVVMConfigProperty(mvvmConfig.include.glide)
-    if (mvvmConfig.include.glide) {
+    checkMVVMConfigProperty(IncludeLib.glide)
+    if (IncludeLib.glide) {
         api Deps.glide
         kapt Deps.glideCompiler
     } else {
@@ -147,26 +147,26 @@ dependencies {
     }
 
     // 权限申请
-    checkMVVMConfigProperty(mvvmConfig.include.livePermissions)
-    if (mvvmConfig.include.livePermissions) {
+    checkMVVMConfigProperty(IncludeLib.livePermissions)
+    if (IncludeLib.livePermissions) {
         api Deps.livePermissions
     } else {
         compileOnly Deps.livePermissions
     }
 
     // rx 系列，Kotlin 最好使用 flow，不要使用 rx
-    checkMVVMConfigProperty(mvvmConfig.include.roomRxJava2)
-    checkMVVMConfigProperty(mvvmConfig.include.retrofit2RxJava2)
+    checkMVVMConfigProperty(IncludeLib.roomRxJava2)
+    checkMVVMConfigProperty(IncludeLib.retrofit2RxJava2)
 
-    if (mvvmConfig.include.roomRxJava2 || mvvmConfig.include.retrofit2RxJava2 || mvvmConfig.include.rxJava2) {
+    if (IncludeLib.roomRxJava2 || IncludeLib.retrofit2RxJava2 || IncludeLib.rxJava2) {
         // 上面三个任意一个开启了，都需要以下这两个
         api Deps.rxAndroid2
         api Deps.rxJava2
 
-        if (mvvmConfig.include.roomRxJava2) {
+        if (IncludeLib.roomRxJava2) {
             api Deps.roomRxJava2
         }
-        if (mvvmConfig.include.retrofit2RxJava2) {
+        if (IncludeLib.retrofit2RxJava2) {
             api Deps.retrofit2RxJava2
         } else {
             // 避免和上述的 api 引用冲突，需要去除相关库
@@ -181,8 +181,8 @@ dependencies {
     }
 
     // debug 阶段内存泄露检测
-    checkMVVMConfigProperty(mvvmConfig.include.leakCanary2)
-    if (mvvmConfig.include.leakCanary2) {
+    checkMVVMConfigProperty(IncludeLib.leakCanary2)
+    if (IncludeLib.leakCanary2) {
         debugImplementation Deps.leakCanary2
     }
 }

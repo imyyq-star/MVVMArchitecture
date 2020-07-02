@@ -1,0 +1,41 @@
+/**
+ * 决定需要开启哪些库的使用，有些库是有关联的，比如 bindingCollection 引用了 recyclerView。
+ * 因此即使禁用掉 recyclerView，开启 bindingCollection，也会导入 recyclerView
+ *
+ * 禁用掉的库，就不能使用该库的内容，正常来说在 release 打包的时候会从包中移除
+ */
+ext {
+    IncludeLib = [
+            // 内存泄露
+            leakCanary2       : true,
+            // 应用前后台监听
+            lifecycleProcess  : true,
+
+            // 通常来说以上都需要为 true
+
+            recyclerView      : false,
+
+            room              : false,
+            roomRxJava2       : false,
+
+            retrofit2         : false,
+            retrofit2RxJava2  : false,
+
+            swipeRefreshLayout: false,
+            glide             : false,
+
+            // 权限申请
+            livePermissions   : false,
+
+            // 内嵌加载中
+            loadSir           : false,
+
+            rxJava2           : false
+    ]
+
+    SDKVersion = [
+            compileSdkVersion: 29,
+            minSdkVersion    : 21,
+            targetSdkVersion : 29
+    ]
+}

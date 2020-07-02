@@ -5,10 +5,62 @@
 include ':MVVMArchitecture'
 ```
 
-* 2、项目根目录下的 build.gradle 引用 dependencies.gradle 文件（如下）
+* 2、生成配置文件，指定 SDK 版本，开启相关需要的库。
+拷贝 **MVVMArchitecture/mvvm-config.gradle.template** 到项目根目录，重命名为 **mvvm-config.gradle**。
+配置 SDKVersion，IncludeLib 指定你需要包含哪些库。
+
+```groovy
+/**
+ * 决定需要开启哪些库的使用，有些库是有关联的，比如 bindingCollection 引用了 recyclerView。
+ * 因此即使禁用掉 recyclerView，开启 bindingCollection，也会导入 recyclerView
+ *
+ * 禁用掉的库，就不能使用该库的内容，正常来说在 release 打包的时候会从包中移除
+ */
+ext {
+    IncludeLib = [
+        // 内存泄露
+        leakCanary2 : true,
+        // 应用前后台监听
+        lifecycleProcess : true,
+
+        // 通常来说以上都需要为 true
+
+        recyclerView : false,
+
+        room : false,
+        roomRxJava2 : false,
+
+        retrofit2 : false,
+        retrofit2RxJava2 : false,
+
+        swipeRefreshLayout : false,
+        glide : false,
+
+        // 权限申请
+        livePermissions : false,
+
+        // 内嵌加载中
+        loadSir : false,
+
+        rxJava2 : false
+    ]
+
+    SDKVersion = [
+        compileSdkVersion : 29,
+        minSdkVersion : 21,
+        targetSdkVersion : 29
+    ]
+}
+```
+
+都是 Google 官方的库居多，具体是什么库，大部分见名知意，如果还不懂是什么库，可查看 dependencies.gradle 文件。
+
+* 3、项目根目录下的 build.gradle 引用 dependencies.gradle 文件（如下）
 
 ```groovy
 buildscript {
+    // 注意：这两个文件的声明顺序不能乱
+    apply from: 'mvvm-config.gradle'
     apply from: 'MVVMArchitecture/dependencies.gradle'
 
     addRepository(repositories)
@@ -38,7 +90,7 @@ configurations.all {
 
 ```
 
-* 3、模块（比如 app）目录下的 build.gradle 必须启用如下功能，并引用 MVVMArchitecture 模块
+* 4、模块（比如 app）目录下的 build.gradle 必须启用如下功能，并引用 MVVMArchitecture 模块
 
 ```groovy
 // Kotlin 需要增加 kapt plugin 才可以使用 DataBinding
@@ -88,47 +140,6 @@ dependencies {
     ...
 }
 ```
-
-* 4、生成配置文件，指定 SDK 版本，开启相关需要的库。
-拷贝 MVVMArchitecture/MVVMArchitecture-config.groovy.template 到项目根目录，重命名为 mvvm-config.groovy。
-配置 SDKVersion，include 指定你需要包含哪些库。
-
-```groovy
-/**
- * 决定需要开启哪些库的使用，有些库是有关联的，比如 bindingCollection 引用了 recyclerView。
- * 因此即使禁用掉 recyclerView，开启 bindingCollection，也会导入 recyclerView
- *
- * 禁用掉的库，就不能使用该库的内容，正常来说在 release 打包的时候会从包中移除
- */
-include {
-    // 内存泄露，默认只在 debug 期间生效
-    leakCanary2=true
-    // 应用前后台监听
-    lifecycleProcess=true
-
-    // 通常来说以上都需要为 true
-
-    recyclerView=false
-
-    room=false
-    swipeRefreshLayout=false
-    retrofit2=false
-    glide=false
-
-    // 权限申请
-    livePermissions=false
-
-    ... 其他的详见文件
-}
-
-SDKVersion {
-    compileSdkVersion=29
-    minSdkVersion=21
-    targetSdkVersion=29
-}
-```
-
-都是 Google 官方的库居多，具体是什么库，大部分见名知意，如果还不懂是什么库，可查看 dependencies.gradle 文件。
 
 * 5、sync
 此时基本配置已经完成了，默认拥有的能力除了配置文件中值为 true 的属性，还有如下：
