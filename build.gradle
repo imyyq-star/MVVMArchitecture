@@ -70,8 +70,6 @@ dependencies {
     api Deps.activityKTX
     api Deps.fragment
 
-    api Deps.networkResponseAdapter
-
     /**
      * 在 Lifecycles 中使用协程，视图销毁则自动取消
      */

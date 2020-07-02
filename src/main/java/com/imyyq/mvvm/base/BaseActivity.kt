@@ -1,6 +1,5 @@
 package com.imyyq.mvvm.base
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -32,9 +31,7 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
 
     private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
 
-    private val mLoadingDialog: Dialog by lazy {
-        CustomLayoutDialog(this, loadingDialogLayout())
-    }
+    private val mLoadingDialog by lazy { CustomLayoutDialog(this, loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
 
