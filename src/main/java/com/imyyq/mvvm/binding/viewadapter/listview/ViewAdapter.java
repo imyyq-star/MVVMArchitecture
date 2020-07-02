@@ -1,16 +1,11 @@
 package com.imyyq.mvvm.binding.viewadapter.listview;
 
-import android.annotation.SuppressLint;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
 import androidx.databinding.BindingAdapter;
 
 import com.imyyq.mvvm.binding.command.BindingCommand;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.subjects.PublishSubject;
 
 public final class ViewAdapter {
 
@@ -47,45 +42,6 @@ public final class ViewAdapter {
                 onItemClickCommand.execute(position);
             }
         });
-    }
-
-
-    @BindingAdapter({"onLoadMoreCommand"})
-    public static void onLoadMoreCommand(final ListView listView, final BindingCommand<Integer> onLoadMoreCommand) {
-        listView.setOnScrollListener(new OnScrollListener(listView, onLoadMoreCommand));
-
-    }
-
-    public static class OnScrollListener implements AbsListView.OnScrollListener {
-        private PublishSubject<Integer> methodInvoke = PublishSubject.create();
-        private BindingCommand<Integer> onLoadMoreCommand;
-        private ListView listView;
-
-        @SuppressWarnings("ResultOfMethodCallIgnored")
-        @SuppressLint("CheckResult")
-        OnScrollListener(ListView listView, final BindingCommand<Integer> onLoadMoreCommand) {
-            this.onLoadMoreCommand = onLoadMoreCommand;
-            this.listView = listView;
-            methodInvoke.throttleFirst(1, TimeUnit.SECONDS)
-                    .subscribe(onLoadMoreCommand::execute);
-        }
-
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            if (firstVisibleItem + visibleItemCount >= totalItemCount
-                    && totalItemCount != 0
-                    && totalItemCount != listView.getHeaderViewsCount()
-                    + listView.getFooterViewsCount()) {
-                if (onLoadMoreCommand != null) {
-                    methodInvoke.onNext(totalItemCount);
-                }
-            }
-        }
     }
 
     public static class ListViewScrollDataWrapper {

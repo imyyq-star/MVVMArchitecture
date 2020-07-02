@@ -59,41 +59,33 @@ android {
  */
 dependencies {
     api fileTree(dir: "libs", include: ["*.jar"])
-    // 必备的 4 个库
+    // 这两个是创建项目默认就有的库
     api Deps.kotlinStdLib
     api Deps.kotlinKTX
+    // 兼容库
     api Deps.appcompat
+    // 约束布局
     api Deps.constraintLayout
+    // 侧滑布局，是用来界面侧滑退出的，因为只有一个类，就不做可配置去除了
     api Deps.slidingPaneLayout
 
+    // 以下三个是为了使用最新的特性
     api Deps.activity
     api Deps.activityKTX
     api Deps.fragment
 
-    /**
-     * 在 Lifecycles 中使用协程，视图销毁则自动取消
-     */
+    // 在 Lifecycles 中使用协程，视图销毁则自动取消
     api Deps.lifecycleRuntimeKTX
-    /**
-     * 在 LiveData 中使用协程
-     */
+    // 在 LiveData 中使用协程
     api Deps.lifecycleLiveDataKTX
-    /**
-     * 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
-     */
+    // 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
     api Deps.fragmentKTX
-    /**
-     * 在 vm 中使用协程，视图销毁自动取消
-     */
+    // 在 vm 中使用协程，视图销毁自动取消
     api Deps.viewModelKTX
-    /**
-     * 生成生命周期注解相关的代码，否则将反射调用，影响性能
-     */
+    // 使用 Java8 替换 lifecycleCompiler，让 vm 可以感知 v 生命周期
     api Deps.lifecycleJava8
 
-    /**
-     * 监控应用的生命周期
-     */
+    // 监控应用的生命周期
     checkMVVMConfigProperty(mvvmConfig.include.lifecycleProcess)
     if (mvvmConfig.include.lifecycleProcess) {
         api Deps.lifecycleProcess
@@ -101,6 +93,7 @@ dependencies {
         compileOnly Deps.lifecycleProcess
     }
 
+    // 内嵌的加载中库
     checkMVVMConfigProperty(mvvmConfig.include.loadSir)
     if (mvvmConfig.include.loadSir) {
         api Deps.loadSir
@@ -115,6 +108,7 @@ dependencies {
     } else {
         compileOnly Deps.recyclerView
     }
+
     // 数据库
     checkMVVMConfigProperty(mvvmConfig.include.room)
     if (mvvmConfig.include.room) {
@@ -123,14 +117,16 @@ dependencies {
     } else {
         compileOnly Deps.roomRuntime
     }
-    // 下拉刷新
+
+    // Android 提供的下拉刷新，上拉加载可以使用第三方的 SmartRefreshLayout
     checkMVVMConfigProperty(mvvmConfig.include.swipeRefreshLayout)
     if (mvvmConfig.include.swipeRefreshLayout) {
         api Deps.swipeRefreshLayout
     } else {
         compileOnly Deps.swipeRefreshLayout
     }
-    // 网络
+
+    // 网络，默认使用 gson 解析 json
     checkMVVMConfigProperty(mvvmConfig.include.retrofit2)
     if (mvvmConfig.include.retrofit2) {
         api Deps.retrofit2
@@ -141,7 +137,7 @@ dependencies {
         compileOnly Deps.gsonConverter
     }
 
-    // 图片
+    // 图片，使用 glide
     checkMVVMConfigProperty(mvvmConfig.include.glide)
     if (mvvmConfig.include.glide) {
         api Deps.glide
@@ -149,6 +145,7 @@ dependencies {
     } else {
         compileOnly Deps.glide
     }
+
     // 权限申请
     checkMVVMConfigProperty(mvvmConfig.include.livePermissions)
     if (mvvmConfig.include.livePermissions) {
@@ -157,40 +154,33 @@ dependencies {
         compileOnly Deps.livePermissions
     }
 
-    // rx 系列
-    checkMVVMConfigProperty(mvvmConfig.include.rxKotlin)
-    checkMVVMConfigProperty(mvvmConfig.include.rxJava2)
-    if (mvvmConfig.include.rxJava2 || mvvmConfig.include.rxKotlin) {
-        api Deps.rxAndroid2
-        if (mvvmConfig.include.rxKotlin) {
-            api Deps.rxKotlin
-        }
-        if (mvvmConfig.include.rxJava2) {
-            api Deps.rxJava2
-        }
-    }
-    checkMVVMConfigProperty(mvvmConfig.include.roomRxJava)
-    if (mvvmConfig.include.roomRxJava) {
-        api Deps.roomRxJava
-    }
+    // rx 系列，Kotlin 最好使用 flow，不要使用 rx
+    checkMVVMConfigProperty(mvvmConfig.include.roomRxJava2)
     checkMVVMConfigProperty(mvvmConfig.include.retrofit2RxJava2)
-    if (mvvmConfig.include.retrofit2RxJava2) {
+
+    if (mvvmConfig.include.roomRxJava2 || mvvmConfig.include.retrofit2RxJava2 || mvvmConfig.include.rxJava2) {
+        // 上面三个任意一个开启了，都需要以下这两个
         api Deps.rxAndroid2
-        api Deps.retrofit2RxJava2
-    } else {
-        if (mvvmConfig.include.roomRxJava || mvvmConfig.include.rxJava2 || mvvmConfig.include.rxKotlin) {
+        api Deps.rxJava2
+
+        if (mvvmConfig.include.roomRxJava2) {
+            api Deps.roomRxJava2
+        }
+        if (mvvmConfig.include.retrofit2RxJava2) {
+            api Deps.retrofit2RxJava2
+        } else {
+            // 避免和上述的 api 引用冲突，需要去除相关库
             compileOnly(Deps.retrofit2RxJava2) {
                 exclude group: 'io.reactivex.rxjava2'
                 exclude group: 'org.reactivestreams'
             }
-        } else {
-            compileOnly Deps.retrofit2RxJava2
         }
+    } else {
+        // 不使用 rx，以下是为了让封装的代码编译通过
+        compileOnly(Deps.retrofit2RxJava2)
     }
 
-    /**
-     * debug 阶段内存泄露检测
-     */
+    // debug 阶段内存泄露检测
     checkMVVMConfigProperty(mvvmConfig.include.leakCanary2)
     if (mvvmConfig.include.leakCanary2) {
         debugImplementation Deps.leakCanary2

@@ -15,19 +15,21 @@ include {
     recyclerView=false
 
     room=false
-    roomRxJava=false
-    swipeRefreshLayout=false
+    roomRxJava2=false
+
     retrofit2=false
-    glide=false
     retrofit2RxJava2=false
+
+    swipeRefreshLayout=false
+    glide=false
 
     // 权限申请
     livePermissions=false
 
+    // 内嵌加载中
     loadSir=false
 
     rxJava2=false
-    rxKotlin=false
 }
 
 SDKVersion {

@@ -41,7 +41,7 @@ ext {
             // 数据库
             roomRuntime               : "androidx.room:room-runtime:$Versions.room",
             roomCompiler              : "androidx.room:room-compiler:$Versions.room",
-            roomRxJava                : "androidx.room:room-rxjava2:$Versions.room",
+            roomRxJava2                : "androidx.room:room-rxjava2:$Versions.room",
 
             // debugImplementation，可以在debug阶段通过浏览器看到数据库
             debugDB                   : "com.amitshekhar.android:debug-db:1.0.6",

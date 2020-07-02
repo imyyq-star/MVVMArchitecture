@@ -1,17 +1,10 @@
 package com.imyyq.mvvm.binding.viewadapter.recyclerview;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.imyyq.mvvm.binding.command.BindingCommand;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.subjects.PublishSubject;
 
 public class ViewAdapter {
 
@@ -52,55 +45,9 @@ public class ViewAdapter {
 
     }
 
-    @BindingAdapter({"onLoadMoreCommand"})
-    public static void onLoadMoreCommand(final RecyclerView recyclerView, final BindingCommand<Integer> onLoadMoreCommand) {
-        RecyclerView.OnScrollListener listener = new OnScrollListener(onLoadMoreCommand);
-        recyclerView.addOnScrollListener(listener);
-
-    }
-
     @BindingAdapter("itemAnimator")
     public static void setItemAnimator(RecyclerView recyclerView, RecyclerView.ItemAnimator animator) {
         recyclerView.setItemAnimator(animator);
-    }
-
-    public static class OnScrollListener extends RecyclerView.OnScrollListener {
-
-        private PublishSubject<Integer> methodInvoke = PublishSubject.create();
-
-        private BindingCommand<Integer> onLoadMoreCommand;
-
-        @SuppressWarnings("ResultOfMethodCallIgnored")
-        @SuppressLint("CheckResult")
-        OnScrollListener(final BindingCommand<Integer> onLoadMoreCommand) {
-            this.onLoadMoreCommand = onLoadMoreCommand;
-            methodInvoke.throttleFirst(1, TimeUnit.SECONDS)
-                    .subscribe(onLoadMoreCommand::execute);
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-            if (layoutManager == null) return;
-            int visibleItemCount = layoutManager.getChildCount();
-            int totalItemCount = layoutManager.getItemCount();
-            int pastVisiblesItems = layoutManager.findFirstVisibleItemPosition();
-            if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-                if (onLoadMoreCommand != null) {
-                    RecyclerView.Adapter adapter = recyclerView.getAdapter();
-                    if (adapter != null) {
-                        methodInvoke.onNext(adapter.getItemCount());
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-        }
-
-
     }
 
     public static class ScrollDataWrapper {
