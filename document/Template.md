@@ -43,3 +43,28 @@ class ${NAME}(app: Application) : BaseViewModel<BaseModel>(app) {
 ```
 
 或者通过 File | Import Settings 导入 templates.zip
+
+# 快速创建项目通用结构
+在 Sample 里，目录结构如下：
+```
+app
+data
+    source
+        http
+            service
+                DemoApiService
+            HttpDataSourceImpl
+        local
+            LocalDataSourceImpl
+        HttpDataSource
+        LocalDataSource
+    DemoRepository
+entity
+    DemoEntity
+ui
+    MainActivity
+    MainViewModel
+utils
+```
+
+可通过 create_templates.groovy 自动生成如上目录，详见 create_templates.groovy 文件的注释

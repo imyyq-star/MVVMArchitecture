@@ -10,7 +10,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
  */
 object AppStateTracker {
     private var mIsTract = false
-    private var mChangeListener: AppStateChangeListener? = null
+    private var mChangeListener: MutableList<AppStateChangeListener> = mutableListOf()
     const val STATE_FOREGROUND = 0
     const val STATE_BACKGROUND = 1
     var currentState = STATE_BACKGROUND
@@ -21,13 +21,12 @@ object AppStateTracker {
             return field
         }
 
-    fun track(appStateChangeListener: AppStateChangeListener?) {
-        if (mIsTract) {
-            return
+    fun track(appStateChangeListener: AppStateChangeListener) {
+        if (!mIsTract) {
+            mIsTract = true
+            ProcessLifecycleOwner.get().lifecycle.addObserver(LifecycleChecker())
         }
-        mIsTract = true
-        mChangeListener = appStateChangeListener
-        ProcessLifecycleOwner.get().lifecycle.addObserver(LifecycleChecker())
+        mChangeListener.add(appStateChangeListener)
     }
 
     interface AppStateChangeListener {
@@ -39,13 +38,17 @@ object AppStateTracker {
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
         fun onResume() {
             currentState = STATE_FOREGROUND
-            mChangeListener?.appTurnIntoForeground()
+            mChangeListener.forEach {
+                it.appTurnIntoForeground()
+            }
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         fun onPause() {
             currentState = STATE_BACKGROUND
-            mChangeListener?.appTurnIntoBackground()
+            mChangeListener.forEach {
+                it.appTurnIntoBackground()
+            }
         }
     }
 }
