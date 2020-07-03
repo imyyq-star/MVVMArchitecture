@@ -8,29 +8,17 @@ import android.app.Activity
 object AppActivityManager {
     private val mActivityList = mutableListOf<Activity>()
 
-    fun add(activity: Activity) {
-        mActivityList.add(activity)
-    }
+    fun add(activity: Activity) = mActivityList.add(activity)
 
-    fun remove(activity: Activity) {
-        if (mActivityList.isNotEmpty()) {
-            mActivityList.remove(activity)
-        }
-    }
+    fun remove(activity: Activity) = mActivityList.remove(activity)
 
-    fun isEmpty(): Boolean {
-        return mActivityList.isEmpty()
-    }
+    fun isEmpty() = mActivityList.isEmpty()
 
-    fun get(clazz: Class<Activity>): Activity? {
-        return mActivityList.find {
-            it.javaClass == clazz
-        }
-    }
+    fun get(clazz: Class<Activity>): Activity? = mActivityList.find { it.javaClass == clazz }
 
     fun current(): Activity? {
         if (mActivityList.isNotEmpty()) {
-            return mActivityList[mActivityList.size - 1]
+            return mActivityList.last()
         }
         return null
     }

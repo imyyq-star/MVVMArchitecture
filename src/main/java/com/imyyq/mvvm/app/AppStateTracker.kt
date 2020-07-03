@@ -1,8 +1,7 @@
 package com.imyyq.mvvm.app
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 
 /**
@@ -34,17 +33,15 @@ object AppStateTracker {
         fun appTurnIntoBackground()
     }
 
-    class LifecycleChecker : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun onResume() {
+    class LifecycleChecker : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
             currentState = STATE_FOREGROUND
             mChangeListener.forEach {
                 it.appTurnIntoForeground()
             }
         }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        fun onPause() {
+        override fun onPause(owner: LifecycleOwner) {
             currentState = STATE_BACKGROUND
             mChangeListener.forEach {
                 it.appTurnIntoBackground()

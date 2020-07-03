@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
@@ -125,11 +124,11 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         if (isNeedLoadingDialog()) {
             // 显示对话框
             mViewModel.mUiChangeLiveData.showLoadingDialogEvent.observe(this, Observer {
-                showLoadingDialog(it)
+                showLoadingDialog(mLoadingDialog, it)
             })
             // 隐藏对话框
             mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
-                dismissLoadingDialog()
+                dismissLoadingDialog(mLoadingDialog)
             })
         }
     }
@@ -148,17 +147,6 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
                     }
                 }
         }
-    }
-
-    override fun showLoadingDialog(msg: String?) {
-        mLoadingDialog.setCancelable(isLoadingDialogCancelable())
-        mLoadingDialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
-        mLoadingDialog.show()
-        mLoadingDialog.findViewById<TextView>(loadingDialogLayoutMsgId())?.text = msg
-    }
-
-    override fun dismissLoadingDialog() {
-        mLoadingDialog.dismiss()
     }
 
     /**

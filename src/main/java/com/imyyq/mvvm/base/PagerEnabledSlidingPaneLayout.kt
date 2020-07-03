@@ -8,6 +8,9 @@ import androidx.core.view.MotionEventCompat
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import kotlin.math.roundToInt
 
+/**
+ * 界面的侧滑关键类，侧滑的效果就是用它实现的
+ */
 class PagerEnabledSlidingPaneLayout constructor(
     context: Context,
     attrs: AttributeSet? = null,

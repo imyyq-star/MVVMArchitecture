@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
@@ -107,11 +106,11 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
         if (isNeedLoadingDialog()) {
             // 显示对话框
             mViewModel.mUiChangeLiveData.showLoadingDialogEvent.observe(this, Observer {
-                showLoadingDialog(it)
+                showLoadingDialog(mLoadingDialog, it)
             })
             // 隐藏对话框
             mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
-                dismissLoadingDialog()
+                dismissLoadingDialog(mLoadingDialog)
             })
         }
     }
@@ -136,17 +135,6 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
      * true 则当前界面常亮
      */
     protected open fun isKeepScreenOn() = false
-
-    override fun showLoadingDialog(msg: String?) {
-        mLoadingDialog.setCancelable(isLoadingDialogCancelable())
-        mLoadingDialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
-        mLoadingDialog.show()
-        mLoadingDialog.findViewById<TextView>(loadingDialogLayoutMsgId())?.text = msg
-    }
-
-    override fun dismissLoadingDialog() {
-        mLoadingDialog.dismiss()
-    }
 
     /**
      * CallSuper 要求之类必须调用 super

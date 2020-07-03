@@ -8,6 +8,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.imyyq.mvvm.BuildConfig
+import com.imyyq.mvvm.R
 import com.imyyq.mvvm.http.*
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
@@ -25,7 +26,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         mModel = model
     }
 
-    // 可能存在没有仓库的 vm，但我们这里也不要是可 null 的
+    /**
+     * 可能存在没有仓库的 vm，但我们这里也不要是可 null 的。
+     * 如果 vm 没有提供仓库，说明此变量不可用，还去使用的话自然就报错。
+     */
     protected lateinit var mModel: M
 
     private lateinit var mCompositeDisposable: Any
@@ -51,10 +55,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
     }
 
+    /**
+     * 发起协程，让协程和 UI 相关
+     */
     fun launchUI(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch { block() }
 
     /**
-     * 用流的方式进行网络请求
+     * 发起流
      */
     fun <T> launchFlow(block: suspend () -> T): Flow<T> {
         return flow {
@@ -100,6 +107,9 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
     }
 
+    /**
+     * 处理异常
+     */
     private fun handleException(
         e: Exception,
         onFailed: (code: Int, msg: String?) -> Unit
@@ -131,6 +141,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
     }
 
+    /**
+     * 给 Rx 使用的，如果项目中有使用到 Rx 异步相关的，在订阅时需要把订阅管理起来。
+     * 通常异步操作都是在 vm 中进行的，管理起来的目的是让异步操作在界面销毁时也一起销毁，避免造成内存泄露
+     */
     protected fun addSubscribe(disposable: Any) {
         if (!this::mCompositeDisposable.isInitialized) {
             mCompositeDisposable = CompositeDisposable()
@@ -138,9 +152,11 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         (mCompositeDisposable as CompositeDisposable).add(disposable as Disposable)
     }
 
+    // 以下是加载中对话框相关的 =========================================================
+
     @MainThread
     protected fun showLoadingDialog() {
-        showLoadingDialog("请稍后...")
+        showLoadingDialog(getApplication<Application>().getString(R.string.please_wait))
     }
 
     @MainThread
@@ -149,9 +165,11 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun dismissDialog() {
+    protected fun dismissLoadingDialog() {
         mUiChangeLiveData.dismissLoadingDialogEvent.call()
     }
+
+    // 以下是内嵌加载中布局相关的 =========================================================
 
     @MainThread
     protected fun showLoadSirSuccess() {
@@ -162,6 +180,8 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     protected fun showLoadSir(clz: Class<*>) {
         mUiChangeLiveData.loadSirEvent.value = clz
     }
+
+    // 以下是界面开启和结束相关的 =========================================================
 
     @MainThread
     protected fun finish() {
@@ -188,6 +208,9 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         mUiChangeLiveData.startActivityForResultEventWithBundle.value = Pair(clazz, bundle)
     }
 
+    /**
+     * 通用的 Ui 改变变量
+     */
     class UiChangeLiveData {
         val showLoadingDialogEvent by lazy { SingleLiveEvent<String?>() }
         val dismissLoadingDialogEvent by lazy { SingleLiveEvent<Any?>() }

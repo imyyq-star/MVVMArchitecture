@@ -1,5 +1,7 @@
 package com.imyyq.mvvm.base
 
+import android.app.Dialog
+import android.widget.TextView
 import com.imyyq.mvvm.app.GlobalConfig
 
 /**
@@ -9,12 +11,17 @@ interface ILoadingDialog {
     /**
      * 显示加载中对话框
      */
-    fun showLoadingDialog(msg: String?)
+    fun showLoadingDialog(dialog: Dialog, msg: String?) {
+        dialog.setCancelable(isLoadingDialogCancelable())
+        dialog.setCanceledOnTouchOutside(isLoadingDialogCanceledOnTouchOutside())
+        dialog.show()
+        dialog.findViewById<TextView>(loadingDialogLayoutMsgId())?.text = msg
+    }
 
     /**
      * 隐藏加载中对话框
      */
-    fun dismissLoadingDialog()
+    fun dismissLoadingDialog(dialog: Dialog) = dialog.dismiss()
 
     /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogLayout]

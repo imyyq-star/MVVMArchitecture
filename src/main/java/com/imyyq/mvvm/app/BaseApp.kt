@@ -15,6 +15,7 @@ open class BaseApp : Application() {
     companion object {
         private lateinit var app: Application
 
+        @JvmStatic
         fun initApp(app: Application) {
             Companion.app = app
 
@@ -46,6 +47,7 @@ open class BaseApp : Application() {
             })
         }
 
+        @JvmStatic
         fun getInstance(): Application {
             return app
         }

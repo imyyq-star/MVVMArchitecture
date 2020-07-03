@@ -40,12 +40,12 @@ abstract class ParallaxSwipeBackActivity : AppCompatActivity() {
         //通过反射来改变SlidingPanelayout的值
         try {
             mSlidingPaneLayout = PagerEnabledSlidingPaneLayout(this)
-            val f_overHang =
+            val overhangSize =
                 SlidingPaneLayout::class.java.getDeclaredField("mOverhangSize")
-            f_overHang.isAccessible = true
-            f_overHang[mSlidingPaneLayout] = 0
+            overhangSize.isAccessible = true
+            overhangSize[mSlidingPaneLayout] = 0
             mSlidingPaneLayout!!.setPanelSlideListener(SlidingListener())
-            mSlidingPaneLayout!!.sliderFadeColor = resources.getColor(android.R.color.transparent)
+            mSlidingPaneLayout!!.sliderFadeColor = Color.TRANSPARENT
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -64,14 +64,14 @@ abstract class ParallaxSwipeBackActivity : AppCompatActivity() {
         // 容器
         val containerLayout = LinearLayout(this)
         containerLayout.orientation = LinearLayout.HORIZONTAL
-        containerLayout.setBackgroundColor(resources.getColor(android.R.color.transparent))
+        containerLayout.setBackgroundColor(Color.TRANSPARENT)
         containerLayout.layoutParams = ViewGroup.LayoutParams(
             ScreenUtils.getScreenWidth() + mShadowWidth,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         //you view container
         mFrameLayout = FrameLayout(this)
-        mFrameLayout!!.setBackgroundColor(resources.getColor(android.R.color.white))
+        mFrameLayout!!.setBackgroundColor(Color.WHITE)
         mFrameLayout!!.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
