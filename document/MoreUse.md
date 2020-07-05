@@ -65,7 +65,7 @@ viewModelScope.launch {
 
 以上只是简单的列了下用法，让大家看看方便程度，老是写 viewModelScope 或 withContext，这种重复代码挺没意思，参考了 [MVVMLin](https://github.com/AleynP/MVVMLin) 这个开源库后，我封装了类似的代码，详细的看下面关于请求结果的介绍。
 
-# 关于请求结果处理的问题
+## 关于请求结果处理的问题
 通常来说，服务端返回的数据格式都是 JSON，有些很老的接口可能还是 XML，有追求的团队还可能采用 ProtocolBuffer，解析的工作 Retrofit 已经帮我们做好了。
 我们要做的就是处理解析后的实体对象，一般来说，正常的后端接口都有统一格式的，比如如下：
 
@@ -227,6 +227,87 @@ launch({
 ```
 
 上述代码把请求网络过程中可能出现的问题都解决了，就连状态码是 null 也处理了，最大程度保证服务端异常的情况下应用不会受影响而崩溃。
+
+## 使用 Rx 请求网络
+```java
+@GET("wxarticle/chapters/json")
+Observable<BaseEntity<List<DemoEntity>>> demoGet();
+
+HttpRequest.getService(WanAndroidApiService.class).demoGet().
+    subscribeOn(Schedulers.io())
+    // 界面销毁自动取消
+    .doOnSubscribe(this::addSubscribe)
+    .observeOn(AndroidSchedulers.mainThread())
+    // 使用封装好的 Observer，
+    .subscribe(new CommonObserver<List<DemoEntity>>() {
+        @Override
+        public void onStart() {
+        }
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onFailed(int code, @Nullable String msg) {
+        }
+
+        @Override
+        public void onResult(List<DemoEntity> result) {
+            Log.i("MainViewModel", "commonLog - onResume: " + mBaseResult);
+            MainViewModel.this.result.set(String.valueOf(mBaseResult.code()));
+        }
+
+        @Override
+        public void onComplete() {
+            Log.i("MainViewModel", "onComplete: ");
+        }
+    });
+```
+
+详见 sample-java 示例。
+
+
+## 使用原生 Retrofit 的方法请求网络
+如果你的请求接口返回的是 Call<xxxx>，Retrofit 提供了 enqueue 和 execute 两种异步和同步的方法来发起请求，通过回调来接收结果，如果你的项目很小，或者说只有一小部分地方需要请求服务器数据，那么完全可以不要 rx，通过如下方式：
+
+```java
+@GET("https://www.google.com")
+Call<BaseEntity<List<DemoEntity>>> demoGet2();
+
+// 原生 Retrofit 请求，只有 addSubscribe 了才可以在界面销毁时取消
+addSubscribe(HttpRequest.request(HttpRequest.getService(WanAndroidApiService.class).demoGet2(),
+    new CommonObserver<List<DemoEntity>>() {
+        @Override
+        public void onStart() {
+        }
+
+        @Override
+        public void onSuccess() {
+            super.onSuccess();
+        }
+
+        @Override
+        public void onFailed(int code, @Nullable String msg) {
+            super.onFailed(code, msg);
+        }
+
+        @Override
+        public void onResult(List<DemoEntity> result) {
+            Log.i("MainViewModel", "commonLog - onResume: " + mBaseResult);
+            MainViewModel.this.result.set(String.valueOf(mBaseResult.code()));
+        }
+
+        @Override
+        public void onComplete() {
+            Log.i("MainViewModel", "onComplete: ");
+        }
+    }));
+```
+
+其中 BaseEntity 也是必须要实现 IBaseResponse 接口的。
+
+详见 sample-java 示例。
+
 
 # 全局配置类：GlobalConfig
 很多开关都在这里，功能都会尽量做成可配置的，详见注释。

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
 import retrofit2.HttpException
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel, IActivityResult {
@@ -33,6 +34,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     protected lateinit var mModel: M
 
     private lateinit var mCompositeDisposable: Any
+    private lateinit var mCompositeCall: MutableList<Call<*>>
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
@@ -139,6 +141,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         if (this::mCompositeDisposable.isInitialized) {
             (mCompositeDisposable as CompositeDisposable).clear()
         }
+        if (this::mCompositeCall.isInitialized) {
+            mCompositeCall.forEach { it.cancel() }
+            mCompositeCall.clear()
+        }
     }
 
     /**
@@ -146,6 +152,14 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      * 通常异步操作都是在 vm 中进行的，管理起来的目的是让异步操作在界面销毁时也一起销毁，避免造成内存泄露
      */
     protected fun addSubscribe(disposable: Any) {
+        // 不使用 Rx，使用 Retrofit 原生的请求方式
+        if (disposable is Call<*>) {
+            if (!this::mCompositeCall.isInitialized) {
+                mCompositeCall = mutableListOf()
+            }
+            mCompositeCall.add(disposable)
+            return
+        }
         if (!this::mCompositeDisposable.isInitialized) {
             mCompositeDisposable = CompositeDisposable()
         }

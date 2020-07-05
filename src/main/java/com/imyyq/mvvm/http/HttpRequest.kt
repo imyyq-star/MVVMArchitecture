@@ -2,6 +2,7 @@ package com.imyyq.mvvm.http
 
 import android.util.ArrayMap
 import com.imyyq.mvvm.BuildConfig
+import com.imyyq.mvvm.base.IBaseResponse
 import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
 import com.imyyq.mvvm.http.interceptor.logging.Level
 import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
@@ -10,6 +11,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.internal.platform.Platform
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -45,6 +48,7 @@ object HttpRequest {
     /**
      * 添加默认的请求头
      */
+    @JvmStatic
     fun addDefaultHeader(name: String, value: String) {
         if (!this::mDefaultHeader.isInitialized) {
             mDefaultHeader = ArrayMap()
@@ -55,6 +59,7 @@ object HttpRequest {
     /**
      * 如果有不同的 baseURL，那么可以相同 baseURL 的接口都放在一个 Service 钟，通过此方法来获取
      */
+    @JvmStatic
     fun <T> getService(cls: Class<T>, host: String, vararg interceptors: Interceptor?): T {
         val name = cls.name
 
@@ -111,6 +116,7 @@ object HttpRequest {
     /**
      * 设置了 [mDefaultBaseUrl] 后，可通过此方法获取 Service
      */
+    @JvmStatic
     fun <T> getService(cls: Class<T>): T {
         if (!this::mDefaultBaseUrl.isInitialized) {
             throw RuntimeException("必须初始化 mBaseUrl")
@@ -125,6 +131,7 @@ object HttpRequest {
     /**
      * 同步的请求，当一个界面需要调用多个接口才能呈现出来时，可以在子线程中或者Observable.zip操作多个接口
      */
+    @JvmStatic
     fun <T> execute(call: Call<T>): T? {
         try {
             return call.execute().body()
@@ -133,5 +140,43 @@ object HttpRequest {
         }
 
         return null
+    }
+
+    /**
+     * Retrofit 的原生异步请求，如果你不想使用 Rx，那么可以使用这个
+     */
+    @JvmStatic
+    fun <T, R> request(
+        call: Call<T>,
+        callback: CommonObserver<R>
+    ): Call<T> {
+        callback.onStart()
+
+        call.enqueue(object : Callback<T> {
+            override fun onResponse(
+                call: Call<T>,
+                response: Response<T>
+            ) {
+                val baseResponse = response.body()
+
+                @Suppress("UNCHECKED_CAST")
+                val resp = baseResponse as? IBaseResponse<R>
+                if (resp == null) {
+                    callback.onFailed(entityNullable, msgEntityNullable)
+                } else {
+                    callback.onNext(resp)
+                }
+                callback.onComplete()
+            }
+
+            override fun onFailure(
+                call: Call<T>,
+                t: Throwable
+            ) {
+                callback.onError(t)
+                callback.onComplete()
+            }
+        })
+        return call
     }
 }
