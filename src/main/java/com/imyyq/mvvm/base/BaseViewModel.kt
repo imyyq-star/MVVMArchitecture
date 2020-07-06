@@ -34,7 +34,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     protected lateinit var mModel: M
 
     private lateinit var mCompositeDisposable: Any
-    private lateinit var mCompositeCall: MutableList<Call<*>>
+    private lateinit var mCallList: MutableList<Call<*>>
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
@@ -141,9 +141,9 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         if (this::mCompositeDisposable.isInitialized) {
             (mCompositeDisposable as CompositeDisposable).clear()
         }
-        if (this::mCompositeCall.isInitialized) {
-            mCompositeCall.forEach { it.cancel() }
-            mCompositeCall.clear()
+        if (this::mCallList.isInitialized) {
+            mCallList.forEach { it.cancel() }
+            mCallList.clear()
         }
     }
 
@@ -152,18 +152,20 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      * 通常异步操作都是在 vm 中进行的，管理起来的目的是让异步操作在界面销毁时也一起销毁，避免造成内存泄露
      */
     protected fun addSubscribe(disposable: Any) {
-        // 不使用 Rx，使用 Retrofit 原生的请求方式
-        if (disposable is Call<*>) {
-            if (!this::mCompositeCall.isInitialized) {
-                mCompositeCall = mutableListOf()
-            }
-            mCompositeCall.add(disposable)
-            return
-        }
         if (!this::mCompositeDisposable.isInitialized) {
             mCompositeDisposable = CompositeDisposable()
         }
         (mCompositeDisposable as CompositeDisposable).add(disposable as Disposable)
+    }
+
+    /**
+     * 不使用 Rx，使用 Retrofit 原生的请求方式
+     */
+    protected fun addCall(call: Any) {
+        if (!this::mCallList.isInitialized) {
+            mCallList = mutableListOf()
+        }
+        mCallList.add(call as Call<*>)
     }
 
     // 以下是加载中对话框相关的 =========================================================

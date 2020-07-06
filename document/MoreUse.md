@@ -81,7 +81,7 @@ viewModelScope.launch {
 
 ```kotlin
 /**
- * 实体类必须实现这个接口并复写其中的方法，这样才可以使用 BaseViewModel 中的协程方法
+ * 实体基类必须实现这个接口并复写其中的方法，这样才可以使用 BaseViewModel 中的协程方法
  */
 interface IBaseResponse<T> {
     fun code(): Int?
@@ -229,20 +229,26 @@ launch({
 上述代码把请求网络过程中可能出现的问题都解决了，就连状态码是 null 也处理了，最大程度保证服务端异常的情况下应用不会受影响而崩溃。
 
 ## 使用 Rx 请求网络
+如果你是使用 Java 开发的，请求网络通常都是使用 RxJava + Retrofit，框架也对此提供了支持，如下：
+
 ```java
 @GET("wxarticle/chapters/json")
 Observable<BaseEntity<List<DemoEntity>>> demoGet();
 
 HttpRequest.getService(WanAndroidApiService.class).demoGet().
+    // 请求发生在 io 线程
     subscribeOn(Schedulers.io())
     // 界面销毁自动取消
     .doOnSubscribe(this::addSubscribe)
+    // 回调发生在主线程
     .observeOn(AndroidSchedulers.mainThread())
     // 使用封装好的 Observer，
     .subscribe(new CommonObserver<List<DemoEntity>>() {
+        // 哪个线程启动的订阅，onStart 就在哪个线程
         @Override
         public void onStart() {
         }
+
         @Override
         public void onSuccess() {
         }
@@ -268,14 +274,15 @@ HttpRequest.getService(WanAndroidApiService.class).demoGet().
 
 
 ## 使用原生 Retrofit 的方法请求网络
-如果你的请求接口返回的是 Call<xxxx>，Retrofit 提供了 enqueue 和 execute 两种异步和同步的方法来发起请求，通过回调来接收结果，如果你的项目很小，或者说只有一小部分地方需要请求服务器数据，那么完全可以不要 rx，通过如下方式：
+如果你的项目很小，或者项目很大但是只有一小部分地方需要请求服务器数据，但又不想使用 Rx 和协程，可能是对这两块不熟悉，还有其他的办法请求网络数据吗？Retrofit 提供了 enqueue 和 execute 两种异步和同步的方法来发起请求，通过回调来接收结果。
+即请求接口返回的是 Call<xxxx>，如果那么完全可以不要 rx 或协程，通过如下方式来请求数据：
 
 ```java
 @GET("https://www.google.com")
 Call<BaseEntity<List<DemoEntity>>> demoGet2();
 
 // 原生 Retrofit 请求，只有 addSubscribe 了才可以在界面销毁时取消
-addSubscribe(HttpRequest.request(HttpRequest.getService(WanAndroidApiService.class).demoGet2(),
+addCall(HttpRequest.request(HttpRequest.getService(WanAndroidApiService.class).demoGet2(),
     new CommonObserver<List<DemoEntity>>() {
         @Override
         public void onStart() {

@@ -2,7 +2,6 @@ package com.imyyq.mvvm.http
 
 import android.util.Log
 import androidx.annotation.CallSuper
-import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.base.IBaseResponse
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
@@ -55,10 +54,9 @@ abstract class CommonObserver<R> : Observer<IBaseResponse<R>> {
      */
     @CallSuper
     override fun onError(e: Throwable) {
-        if (BuildConfig.DEBUG) {
-            e.printStackTrace()
-        }
-        return if (e is HttpException) {
+        e.printStackTrace()
+
+        if (e is HttpException) {
             onFailed(e.code(), e.message())
         } else {
             val log = Log.getStackTraceString(e)
@@ -88,7 +86,10 @@ abstract class CommonObserver<R> : Observer<IBaseResponse<R>> {
 
     /**
      * 请求失败，可能是没网络等非服务器错误，或者是服务器返回失败
+     * 因为 RxJava 的机制，一次请求要么是成功后 complete，要么是失败。所以如果是失败的话，就不会调用 complete，这里手动调用
      */
+    @CallSuper
     open fun onFailed(code: Int, msg: String?) {
+        onComplete()
     }
 }

@@ -178,6 +178,7 @@ dependencies {
     } else {
         // 不使用 rx，以下是为了让封装的代码编译通过
         compileOnly(Deps.retrofit2RxJava2)
+        compileOnly Deps.rxAndroid2
     }
 
     // debug 阶段内存泄露检测
