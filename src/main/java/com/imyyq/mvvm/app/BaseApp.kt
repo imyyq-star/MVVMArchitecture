@@ -20,31 +20,36 @@ open class BaseApp : Application() {
             Companion.app = app
 
             // 监听所有 Activity 的创建和销毁
-            app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-                override fun onActivityPaused(activity: Activity) {
-                }
+            if (GlobalConfig.mIsNeedActivityManager) {
+                app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+                    override fun onActivityPaused(activity: Activity) {
+                    }
 
-                override fun onActivityStarted(activity: Activity) {
-                }
+                    override fun onActivityStarted(activity: Activity) {
+                    }
 
-                override fun onActivityDestroyed(activity: Activity) {
-                    AppActivityManager.remove(activity)
-                }
+                    override fun onActivityDestroyed(activity: Activity) {
+                        AppActivityManager.remove(activity)
+                    }
 
-                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                }
+                    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+                    }
 
-                override fun onActivityStopped(activity: Activity) {
-                }
+                    override fun onActivityStopped(activity: Activity) {
+                    }
 
-                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                    AppActivityManager.add(activity)
-                }
+                    override fun onActivityCreated(
+                        activity: Activity,
+                        savedInstanceState: Bundle?
+                    ) {
+                        AppActivityManager.add(activity)
+                    }
 
-                override fun onActivityResumed(activity: Activity) {
-                }
+                    override fun onActivityResumed(activity: Activity) {
+                    }
 
-            })
+                })
+            }
         }
 
         @JvmStatic

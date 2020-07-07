@@ -75,6 +75,11 @@ object GlobalConfig {
     var mClickIntervalMilliseconds = 800
 
     /**
+     * 是否需要管理 Activity 堆栈
+     */
+    var mIsNeedActivityManager = true
+
+    /**
      * 初始化 LoadSir 的相关界面。
      * [defCallback] 默认的界面，通常是加载中页面，设置了后，默认打开开启了 LoadSir 的页面后就显示这里设置的页面。
      * [clazz] 其他的状态页，比如空页面，加载错误等。

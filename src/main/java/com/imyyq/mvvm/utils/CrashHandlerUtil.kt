@@ -2,6 +2,7 @@ package com.imyyq.mvvm.utils
 
 import android.os.Build
 import com.imyyq.mvvm.app.AppActivityManager
+import com.imyyq.mvvm.app.GlobalConfig
 import java.io.*
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
@@ -25,7 +26,9 @@ object CrashHandlerUtil : UncaughtExceptionHandler {
         handleException(ex)
         ex.printStackTrace()
 
-        AppActivityManager.finishAllActivity()
+        if (GlobalConfig.mIsNeedActivityManager) {
+            AppActivityManager.finishAllActivity()
+        }
         exitProcess(0)
     }
 
