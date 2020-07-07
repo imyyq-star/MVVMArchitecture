@@ -91,29 +91,33 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
 
     final override fun initUiChangeLiveData() {
         if (isViewModelNeedStartAndFinish()) {
+            mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
+
             // vm 可以结束界面
-            mViewModel.mUiChangeLiveData.finishEvent.observe(this, Observer { activity?.finish() })
+            mViewModel.mUiChangeLiveData.finishEvent?.observe(this, Observer { activity?.finish() })
             // vm 可以启动界面
-            mViewModel.mUiChangeLiveData.startActivityEvent.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.startActivityEvent?.observe(this, Observer {
                 val intent = Intent(activity, it)
                 startActivity(intent)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
-            mViewModel.mUiChangeLiveData.startActivityEventWithBundle.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
                 val intent = Intent(activity, it?.first)
                 intent.putExtra(BaseViewModel.extraBundle, it?.second)
                 startActivity(intent)
             })
         }
         if (isViewModelNeedStartForResult()) {
+            mViewModel.mUiChangeLiveData.initStartActivityForResultEvent()
+
             // vm 可以启动界面
-            mViewModel.mUiChangeLiveData.startActivityForResultEvent.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.startActivityForResultEvent?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(activity, it)
                 mStartActivityForResult.launch(intent)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
-            mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(activity, it?.first)
                 intent.putExtra(BaseViewModel.extraBundle, it?.second)
@@ -122,12 +126,14 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         }
 
         if (isNeedLoadingDialog()) {
+            mViewModel.mUiChangeLiveData.initLoadingDialogEvent()
+
             // 显示对话框
-            mViewModel.mUiChangeLiveData.showLoadingDialogEvent.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.showLoadingDialogEvent?.observe(this, Observer {
                 showLoadingDialog(mLoadingDialog, it)
             })
             // 隐藏对话框
-            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent?.observe(this, Observer {
                 dismissLoadingDialog(mLoadingDialog)
             })
         }
@@ -160,7 +166,8 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
                 getLoadSirTarget()
             ) { v: View? -> onLoadSirReload() }
 
-            mViewModel.mUiChangeLiveData.loadSirEvent.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.initLoadSirEvent()
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
                 if (it == null) {
                     mLoadService.showSuccess()
                     onLoadSirSuccess()

@@ -177,69 +177,116 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun showLoadingDialog(msg: String?) {
-        mUiChangeLiveData.showLoadingDialogEvent.value = msg
+        if (mUiChangeLiveData.showLoadingDialogEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.loadingDialogTips))
+        }
+        mUiChangeLiveData.showLoadingDialogEvent?.value = msg
     }
 
     @MainThread
     protected fun dismissLoadingDialog() {
-        mUiChangeLiveData.dismissLoadingDialogEvent.call()
+        if (mUiChangeLiveData.dismissLoadingDialogEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.loadingDialogTips))
+        }
+        mUiChangeLiveData.dismissLoadingDialogEvent?.call()
     }
 
     // 以下是内嵌加载中布局相关的 =========================================================
 
     @MainThread
     protected fun showLoadSirSuccess() {
-        mUiChangeLiveData.loadSirEvent.value = null
+        if (mUiChangeLiveData.loadSirEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.load_sir_tips))
+        }
+        mUiChangeLiveData.loadSirEvent?.value = null
     }
 
     @MainThread
     protected fun showLoadSir(clz: Class<*>) {
-        mUiChangeLiveData.loadSirEvent.value = clz
+        if (mUiChangeLiveData.loadSirEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.load_sir_tips))
+        }
+        mUiChangeLiveData.loadSirEvent?.value = clz
     }
 
     // 以下是界面开启和结束相关的 =========================================================
 
     @MainThread
     protected fun finish() {
-        mUiChangeLiveData.finishEvent.call()
+        if (mUiChangeLiveData.finishEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
+        }
+        mUiChangeLiveData.finishEvent?.call()
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<*>) {
-        mUiChangeLiveData.startActivityEvent.value = clazz
+        if (mUiChangeLiveData.startActivityEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
+        }
+        mUiChangeLiveData.startActivityEvent?.value = clazz
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<*>, bundle: Bundle?) {
-        mUiChangeLiveData.startActivityEventWithBundle.value = Pair(clazz, bundle)
+        if (mUiChangeLiveData.startActivityEventWithBundle == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
+        }
+        mUiChangeLiveData.startActivityEventWithBundle?.value = Pair(clazz, bundle)
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<*>) {
-        mUiChangeLiveData.startActivityForResultEvent.value = clazz
+        if (mUiChangeLiveData.startActivityForResultEvent == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
+        }
+        mUiChangeLiveData.startActivityForResultEvent?.value = clazz
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<*>, bundle: Bundle?) {
-        mUiChangeLiveData.startActivityForResultEventWithBundle.value = Pair(clazz, bundle)
+        if (mUiChangeLiveData.startActivityForResultEventWithBundle == null) {
+            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
+        }
+        mUiChangeLiveData.startActivityForResultEventWithBundle?.value = Pair(clazz, bundle)
     }
 
     /**
      * 通用的 Ui 改变变量
      */
     class UiChangeLiveData {
-        val showLoadingDialogEvent by lazy { SingleLiveEvent<String?>() }
-        val dismissLoadingDialogEvent by lazy { SingleLiveEvent<Any?>() }
+        var showLoadingDialogEvent: SingleLiveEvent<String?>? = null
+        var dismissLoadingDialogEvent: SingleLiveEvent<Any?>? = null
 
-        val startActivityEvent by lazy { SingleLiveEvent<Class<*>>() }
-        val startActivityEventWithBundle by lazy { SingleLiveEvent<Pair<Class<*>, Bundle?>>() }
+        var startActivityEvent: SingleLiveEvent<Class<*>>? = null
+        var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>>? = null
 
-        val startActivityForResultEvent by lazy { SingleLiveEvent<Class<*>>() }
-        val startActivityForResultEventWithBundle by lazy { SingleLiveEvent<Pair<Class<*>, Bundle?>>() }
+        var startActivityForResultEvent: SingleLiveEvent<Class<*>>? = null
+        var startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>>? = null
 
-        val finishEvent by lazy { SingleLiveEvent<Any?>() }
+        var finishEvent: SingleLiveEvent<Any?>? = null
 
-        val loadSirEvent by lazy { SingleLiveEvent<Class<*>?>() }
+        var loadSirEvent: SingleLiveEvent<Class<*>?>? = null
+
+        fun initLoadSirEvent() {
+            loadSirEvent = SingleLiveEvent()
+        }
+
+        fun initLoadingDialogEvent() {
+            showLoadingDialogEvent = SingleLiveEvent()
+            dismissLoadingDialogEvent = SingleLiveEvent()
+        }
+
+        fun initStartActivityForResultEvent() {
+            startActivityForResultEvent = SingleLiveEvent()
+            startActivityForResultEventWithBundle = SingleLiveEvent()
+        }
+
+        fun initStartAndFinishEvent() {
+            startActivityEvent = SingleLiveEvent()
+            startActivityEventWithBundle = SingleLiveEvent()
+            finishEvent = SingleLiveEvent()
+        }
     }
 
     companion object {

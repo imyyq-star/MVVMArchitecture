@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="loading">正在加载中，请稍候</string>
-    <string name="please_wait">请稍后...</string>
+    <string name="please_wait">请稍后…</string>
+    <string name="load_sir_tips">必须复写 Activity/Fragment 的 getLoadSirTarget() 方法，且必须调用 GlobalConfig 的 initLoadSir 方法</string>
+    <string name="loadingDialogTips">GlobalConfig.isNeedLoadingDialog 变量可全局开启或关闭 ViewModel 的 showLoadingDialog/dismissLoadingDialog 等方法，而 Activity/Fragment 的 isNeedLoadingDialog() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
+    <string name="start_activity_finish_tips">GlobalConfig.isViewModelNeedStartAndFinish 变量可全局开启或关闭 ViewModel 的 startActivity/finish 等方法，而 Activity/Fragment 的 isViewModelNeedStartAndFinish() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
+    <string name="start_activity_for_result_tips">GlobalConfig.isViewModelNeedStartForResult 变量可全局开启或关闭 ViewModel 的 startActivityForResult 等方法，而 Activity/Fragment 的 isViewModelNeedStartForResult() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
 </resources>

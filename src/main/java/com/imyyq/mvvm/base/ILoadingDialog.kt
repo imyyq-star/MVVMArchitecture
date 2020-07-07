@@ -2,6 +2,8 @@ package com.imyyq.mvvm.base
 
 import android.app.Dialog
 import android.widget.TextView
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.app.GlobalConfig
 
 /**
@@ -26,11 +28,13 @@ interface ILoadingDialog {
     /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogLayout]
      */
+    @LayoutRes
     fun loadingDialogLayout() = GlobalConfig.loadingDialogLayout
 
     /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogLayoutMsgId]
      */
+    @IdRes
     fun loadingDialogLayoutMsgId() = GlobalConfig.loadingDialogLayoutMsgId
 
     /**
@@ -41,10 +45,10 @@ interface ILoadingDialog {
     /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogCancelable]
      */
-    fun isLoadingDialogCancelable(): Boolean = GlobalConfig.loadingDialogCancelable
+    fun isLoadingDialogCancelable() = GlobalConfig.loadingDialogCancelable
 
     /**
      * 详见 [com.imyyq.mvvm.app.GlobalConfig.loadingDialogCanceledOnTouchOutside]
      */
-    fun isLoadingDialogCanceledOnTouchOutside(): Boolean = GlobalConfig.loadingDialogCanceledOnTouchOutside
+    fun isLoadingDialogCanceledOnTouchOutside() = GlobalConfig.loadingDialogCanceledOnTouchOutside
 }
