@@ -70,11 +70,11 @@ interface IView<VM : BaseViewModel<*>> {
      * ViewModel 是否需要启动或结束对应的 Activity，即是否有调用 [BaseViewModel.startActivity] 和 [BaseViewModel.finish]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartAndFinish() = GlobalConfig.isViewModelNeedStartAndFinish
+    fun isViewModelNeedStartAndFinish() = GlobalConfig.gIsViewModelNeedStartAndFinish
 
     /**
      * ViewModel 是否需要调用 [BaseViewModel.startActivityForResult]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartForResult() = GlobalConfig.isViewModelNeedStartForResult
+    fun isViewModelNeedStartForResult() = GlobalConfig.gIsViewModelNeedStartForResult
 }

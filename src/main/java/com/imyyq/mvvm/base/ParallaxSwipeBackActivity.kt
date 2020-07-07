@@ -138,7 +138,7 @@ abstract class ParallaxSwipeBackActivity : AppCompatActivity() {
     /**
      * 是否支持侧滑返回
      */
-    protected open fun isSupportSwipe(): Boolean = GlobalConfig.isSupportSwipe
+    protected open fun isSupportSwipe(): Boolean = GlobalConfig.gIsSupportSwipe
 
     private inner class SlidingListener : PanelSlideListener {
         override fun onPanelClosed(view: View) {}

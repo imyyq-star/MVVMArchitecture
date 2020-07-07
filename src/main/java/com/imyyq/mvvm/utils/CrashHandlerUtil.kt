@@ -26,7 +26,7 @@ object CrashHandlerUtil : UncaughtExceptionHandler {
         handleException(ex)
         ex.printStackTrace()
 
-        if (GlobalConfig.mIsNeedActivityManager) {
+        if (GlobalConfig.gIsNeedActivityManager) {
             AppActivityManager.finishAllActivity()
         }
         exitProcess(0)

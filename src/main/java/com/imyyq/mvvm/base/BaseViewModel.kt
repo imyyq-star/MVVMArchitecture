@@ -13,12 +13,9 @@ import com.imyyq.mvvm.http.*
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.HttpException
 
@@ -35,6 +32,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     private lateinit var mCompositeDisposable: Any
     private lateinit var mCallList: MutableList<Call<*>>
+    private lateinit var mJobList: MutableList<Job>
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
@@ -47,14 +45,16 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         onResult: ((t: T) -> Unit),
         onFailed: ((code: Int, msg: String?) -> Unit)? = null,
         onComplete: (() -> Unit)? = null
-    ) = viewModelScope.launch {
-        try {
-            handleResult(withContext(Dispatchers.IO) { block() }, onSuccess, onResult, onFailed)
-        } catch (e: Exception) {
-            onFailed?.let { handleException(e, it) }
-        } finally {
-            onComplete?.invoke()
-        }
+    ) {
+        addJob(viewModelScope.launch {
+            try {
+                handleResult(withContext(Dispatchers.IO) { block() }, onSuccess, onResult, onFailed)
+            } catch (e: Exception) {
+                onFailed?.let { handleException(e, it) }
+            } finally {
+                onComplete?.invoke()
+            }
+        })
     }
 
     /**
@@ -137,6 +137,10 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mModel.onCleared()
         }
 
+        cancelConsumingTask()
+    }
+
+    fun cancelConsumingTask() {
         // ViewModel销毁时会执行，同时取消所有异步任务
         if (this::mCompositeDisposable.isInitialized) {
             (mCompositeDisposable as CompositeDisposable).clear()
@@ -145,13 +149,17 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mCallList.forEach { it.cancel() }
             mCallList.clear()
         }
+        if (this::mJobList.isInitialized) {
+            mJobList.forEach { it.cancel() }
+            mJobList.clear()
+        }
     }
 
     /**
      * 给 Rx 使用的，如果项目中有使用到 Rx 异步相关的，在订阅时需要把订阅管理起来。
      * 通常异步操作都是在 vm 中进行的，管理起来的目的是让异步操作在界面销毁时也一起销毁，避免造成内存泄露
      */
-    protected fun addSubscribe(disposable: Any) {
+    fun addSubscribe(disposable: Any) {
         if (!this::mCompositeDisposable.isInitialized) {
             mCompositeDisposable = CompositeDisposable()
         }
@@ -161,11 +169,21 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     /**
      * 不使用 Rx，使用 Retrofit 原生的请求方式
      */
-    protected fun addCall(call: Any) {
+    fun addCall(call: Any) {
         if (!this::mCallList.isInitialized) {
             mCallList = mutableListOf()
         }
         mCallList.add(call as Call<*>)
+    }
+
+    /**
+     * 不使用 Rx，使用 Retrofit 原生的请求方式
+     */
+    fun addJob(job: Job) {
+        if (!this::mJobList.isInitialized) {
+            mJobList = mutableListOf()
+        }
+        mJobList.add(job)
     }
 
     // 以下是加载中对话框相关的 =========================================================

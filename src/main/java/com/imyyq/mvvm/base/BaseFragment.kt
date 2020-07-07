@@ -178,4 +178,12 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
             })
         }
     }
+
+    /**
+     * 如果加载中对话框可手动取消，并且开启了取消耗时任务的功能，则在取消对话框后调用取消耗时任务
+     */
+    @CallSuper
+    override fun onCancelLoadingDialog() {
+        mViewModel.cancelConsumingTask()
+    }
 }

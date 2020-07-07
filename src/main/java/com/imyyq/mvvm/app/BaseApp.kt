@@ -20,7 +20,7 @@ open class BaseApp : Application() {
             Companion.app = app
 
             // 监听所有 Activity 的创建和销毁
-            if (GlobalConfig.mIsNeedActivityManager) {
+            if (GlobalConfig.gIsNeedActivityManager) {
                 app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
                     override fun onActivityPaused(activity: Activity) {
                     }
