@@ -2,7 +2,6 @@ package com.imyyq.mvvm.base
 
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
@@ -10,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.http.*
+import com.imyyq.mvvm.utils.LogUtil
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -122,7 +122,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         return if (e is HttpException) {
             onFailed(e.code(), e.message())
         } else {
-            val log = Log.getStackTraceString(e)
+            val log = LogUtil.getStackTraceString(e)
             onFailed(
                 notHttpException,
                 "$msgNotHttpException, 具体错误是\n${if (log.isEmpty()) e.message else log}"

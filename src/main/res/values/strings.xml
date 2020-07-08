@@ -6,4 +6,10 @@
     <string name="loadingDialogTips">GlobalConfig.isNeedLoadingDialog 变量可全局开启或关闭 ViewModel 的 showLoadingDialog/dismissLoadingDialog 等方法，而 Activity/Fragment 的 isNeedLoadingDialog() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
     <string name="start_activity_finish_tips">GlobalConfig.isViewModelNeedStartAndFinish 变量可全局开启或关闭 ViewModel 的 startActivity/finish 等方法，而 Activity/Fragment 的 isViewModelNeedStartAndFinish() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
     <string name="start_activity_for_result_tips">GlobalConfig.isViewModelNeedStartForResult 变量可全局开启或关闭 ViewModel 的 startActivityForResult 等方法，而 Activity/Fragment 的 isViewModelNeedStartForResult() 方法可局部开启/关闭。请查看这两者其中之一是否设置了关闭？</string>
+    <string name="confirm">确定</string>
+    <string name="log_already_open">Log 已打开并已保存到本地</string>
+    <string name="save_to_local">保存到本地</string>
+    <string name="please_input_pwd">请输入密码</string>
+    <string name="log_already_open2">Log 已打开</string>
+    <string name="wrong_pwd">密码错误</string>
 </resources>

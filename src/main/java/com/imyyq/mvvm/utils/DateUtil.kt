@@ -1,6 +1,5 @@
 package com.imyyq.mvvm.utils
 
-import android.util.Log
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -12,10 +11,15 @@ object DateUtil {
     private const val YMDHM_ = "yyyy-MM-dd HH:mm"
     const val HM = "HH:mm"
     const val YMDHMS_ = "yyyy-MM-dd HH:mm:ss"
+    const val YMDHMS_SSS = "yyyy-MM-dd HH:mm:ss.SSS"
     const val YMD_ = "yyyy-MM-dd"
 
     fun formatYMDHMS_(): String {
         return SimpleDateFormat(YMDHMS_, Locale.getDefault()).format(Date())
+    }
+
+    fun formatYMDHMS_SSS(): String {
+        return SimpleDateFormat(YMDHMS_SSS, Locale.getDefault()).format(Date())
     }
 
     fun formatYMDHM_(): String {
@@ -113,7 +117,7 @@ object DateUtil {
     }
 
     fun parseYMDHMS_FrontZero(source: String, field: Int, targetLen: Int): String? {
-        Log.i("DateUtil", "parseYMDHMS_FrontZero: $source")
+        LogUtil.i("DateUtil", "parseYMDHMS_FrontZero: $source")
         try {
             val calendar = Calendar.getInstance()
             calendar.time = SimpleDateFormat(YMDHM_, Locale.getDefault()).parse(source)!!

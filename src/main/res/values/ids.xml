@@ -2,4 +2,7 @@
 <resources>
     <item name="triggerDelayKey" type="id"/>
     <item name="triggerLastTimeKey" type="id"/>
+
+    <item name="multiClickFrequency" type="id"/>
+    <item name="multiClickLastTime" type="id"/>
 </resources>

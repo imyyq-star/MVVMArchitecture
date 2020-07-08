@@ -2,11 +2,9 @@ package com.imyyq.mvvm.utils
 
 import android.os.Build
 import android.view.View
-import com.imyyq.mvvm.BuildConfig
+import com.imyyq.mvvm.R
 
 object Utils {
-    const val isRelease: Boolean = "release" == BuildConfig.BUILD_TYPE
-
     val isNeedCheckPermission: Boolean
         get() = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
 
@@ -29,4 +27,28 @@ object Utils {
      * 判断集合是否为空
      */
     fun <E> isEmpty(e: Collection<E>?) = e == null || e.isEmpty()
+
+    /**
+     * 连续点击达到点击次数后回调监听
+     */
+    @JvmStatic
+    fun multiClickListener(view: View, frequency: Int, listener: (() -> Unit)? = null) {
+        view.setTag(R.id.multiClickFrequency, 0)
+        view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
+        view.setOnClickListener {
+            val f = view.getTag(R.id.multiClickFrequency) as Int
+            if (f == frequency) {
+                view.setTag(R.id.multiClickFrequency, 0)
+                view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
+
+                listener?.invoke()
+            } else {
+                val lastTime = view.getTag(R.id.multiClickLastTime) as Long
+                if (System.currentTimeMillis() - lastTime < 400) {
+                    view.setTag(R.id.multiClickFrequency, f + 1)
+                }
+                view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
+            }
+        }
+    }
 }

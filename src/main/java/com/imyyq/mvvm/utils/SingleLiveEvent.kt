@@ -1,6 +1,6 @@
 package com.imyyq.mvvm.utils
 
-import android.util.Log
+import com.imyyq.mvvm.utils.LogUtil
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +21,7 @@ class SingleLiveEvent<T> : MutableLiveData<T?>() {
         observer: Observer<in T?>
     ) {
         if (hasActiveObservers()) {
-            Log.w(
+            LogUtil.w(
                 TAG,
                 "Multiple observers registered but only one will be notified of changes."
             )

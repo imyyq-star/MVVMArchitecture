@@ -1,8 +1,8 @@
 package com.imyyq.mvvm.http
 
-import android.util.Log
 import androidx.annotation.CallSuper
 import com.imyyq.mvvm.base.IBaseResponse
+import com.imyyq.mvvm.utils.LogUtil
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import retrofit2.HttpException
@@ -59,7 +59,7 @@ abstract class CommonObserver<R> : Observer<IBaseResponse<R>> {
         if (e is HttpException) {
             onFailed(e.code(), e.message())
         } else {
-            val log = Log.getStackTraceString(e)
+            val log = LogUtil.getStackTraceString(e)
             onFailed(
                 notHttpException,
                 "$msgNotHttpException, 具体错误是\n${if (log.isEmpty()) e.message else log}"
