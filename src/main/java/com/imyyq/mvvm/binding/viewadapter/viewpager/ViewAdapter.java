@@ -40,10 +40,10 @@ public class ViewAdapter {
     }
 
     public static class ViewPagerDataWrapper {
-        public float positionOffset;
-        public float position;
-        public int positionOffsetPixels;
-        public int state;
+        public final float positionOffset;
+        public final float position;
+        public final int positionOffsetPixels;
+        public final int state;
 
         public ViewPagerDataWrapper(float position, float positionOffset, int positionOffsetPixels, int state) {
             this.positionOffset = positionOffset;

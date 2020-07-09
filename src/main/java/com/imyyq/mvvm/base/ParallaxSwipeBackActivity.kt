@@ -19,7 +19,7 @@ import com.imyyq.mvvm.utils.ScreenUtils
 abstract class ParallaxSwipeBackActivity : AppCompatActivity() {
     // 父布局
     private var mSlidingPaneLayout: PagerEnabledSlidingPaneLayout? = null
-    protected var mFrameLayout: FrameLayout? = null
+    private var mFrameLayout: FrameLayout? = null
 
     // 背景图
     private var mBehindImageView: ImageView? = null

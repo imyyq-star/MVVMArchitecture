@@ -9,6 +9,7 @@ import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
@@ -158,10 +159,24 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<*>> :
     }
 
     /**
+     * <pre>
+     *     // 一开始我们这么写
+     *     mViewModel.liveData.observe(this, Observer { })
+     *
+     *     // 用这个方法可以这么写
+     *     observe(mViewModel.liveData) { }
+     *
+     *     // 或者这么写
+     *     observe(mViewModel.liveData, this::onChanged)
+     *     private fun onChanged(s: String) { }
+     * </pre>
+     */
+    fun <T> observe(liveData: LiveData<T>, onChanged: ((t: T) -> Unit)) =
+        liveData.observe(this, Observer { onChanged(it) })
+
+    /**
      * 如果加载中对话框可手动取消，并且开启了取消耗时任务的功能，则在取消对话框后调用取消耗时任务
      */
     @CallSuper
-    override fun onCancelLoadingDialog() {
-        mViewModel.cancelConsumingTask()
-    }
+    override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
 }

@@ -45,10 +45,10 @@ public final class ViewAdapter {
     }
 
     public static class ListViewScrollDataWrapper {
-        public int firstVisibleItem;
-        public int visibleItemCount;
-        public int totalItemCount;
-        public int scrollState;
+        public final int firstVisibleItem;
+        public final int visibleItemCount;
+        public final int totalItemCount;
+        public final int scrollState;
 
         public ListViewScrollDataWrapper(int scrollState, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             this.firstVisibleItem = firstVisibleItem;

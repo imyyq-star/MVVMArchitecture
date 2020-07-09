@@ -20,8 +20,8 @@ import okhttp3.internal.platform.Platform;
 
 public class LoggingInterceptor implements Interceptor {
 
-    private boolean isDebug;
-    private Builder builder;
+    private final boolean isDebug;
+    private final Builder builder;
 
     private LoggingInterceptor(Builder builder) {
         this.builder = builder;

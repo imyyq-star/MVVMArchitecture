@@ -28,8 +28,8 @@ public final class ViewAdapter {
     }
 
     public static class ScrollDataWrapper {
-        public float scrollX;
-        public float scrollY;
+        public final float scrollX;
+        public final float scrollY;
 
         public ScrollDataWrapper(float scrollX, float scrollY) {
             this.scrollX = scrollX;
@@ -38,10 +38,10 @@ public final class ViewAdapter {
     }
 
     public static class NestScrollDataWrapper {
-        public int scrollX;
-        public int scrollY;
-        public int oldScrollX;
-        public int oldScrollY;
+        public final int scrollX;
+        public final int scrollY;
+        public final int oldScrollX;
+        public final int oldScrollY;
 
         public NestScrollDataWrapper(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
             this.scrollX = scrollX;

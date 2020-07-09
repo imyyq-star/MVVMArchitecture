@@ -43,7 +43,7 @@ abstract class CommonObserver<R> : Observer<IBaseResponse<R>> {
 
         if (entity.isSuccess()) {
             onSuccess()
-            entity.data()?.let { onResult(it) };
+            entity.data()?.let { onResult(it) }
         } else {
             onFailed(code, msg)
         }

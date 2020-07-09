@@ -173,12 +173,12 @@ object CaptureAndCropManager {
 
         val intentToTakePhoto = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val imageUri: Uri
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intentToTakePhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            imageUri = FileProvider.getUriForFile(context
-                    ?: fragment!!.requireActivity(), AUTHORITY, lastCameraCaptureImageFile!!)
+            FileProvider.getUriForFile(context
+                ?: fragment!!.requireActivity(), AUTHORITY, lastCameraCaptureImageFile!!)
         } else {
-            imageUri = Uri.fromFile(lastCameraCaptureImageFile)
+            Uri.fromFile(lastCameraCaptureImageFile)
         }
         //下面这句指定调用相机拍照后的照片存储的路径
         intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)

@@ -22,7 +22,7 @@ public class DividerLine extends RecyclerView.ItemDecoration {
     //控制分隔线的属性,值为一个drawable
     private static final int[] ATTRS = {android.R.attr.listDivider};
     //divider对应的drawable
-    private Drawable dividerDrawable;
+    private final Drawable dividerDrawable;
     private int dividerSize;
     //默认为null
     private Integer mMode = null;

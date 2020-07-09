@@ -1,6 +1,5 @@
 package com.imyyq.mvvm.utils
 
-import com.imyyq.mvvm.utils.LogUtil
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData

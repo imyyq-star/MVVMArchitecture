@@ -18,6 +18,7 @@ import com.imyyq.mvvm.app.BaseApp
 import java.io.BufferedWriter
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import java.util.*
 
 
 /**
@@ -191,16 +192,11 @@ object LogUtil {
         var methodName = stackTrace[index].methodName
         val lineNumber = stackTrace[index].lineNumber
         val tag = tagStr ?: className
-        methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1)
+        methodName = methodName.substring(0, 1).toUpperCase(Locale.getDefault()) + methodName.substring(1)
         val stringBuilder = StringBuilder()
         stringBuilder.append("[ (").append(className).append(":").append(lineNumber).append(")#")
             .append(methodName).append(" ] ")
-        val msg: String?
-        if (objectMsg == null) {
-            msg = "Log with null Object"
-        } else {
-            msg = objectMsg.toString()
-        }
+        val msg = objectMsg?.toString() ?: "Log with null Object"
         stringBuilder.append(msg)
         val logStr = stringBuilder.toString()
         when (type) {

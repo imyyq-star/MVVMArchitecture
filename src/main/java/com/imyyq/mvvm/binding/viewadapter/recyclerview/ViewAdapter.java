@@ -51,9 +51,9 @@ public class ViewAdapter {
     }
 
     public static class ScrollDataWrapper {
-        public float scrollX;
-        public float scrollY;
-        public int state;
+        public final float scrollX;
+        public final float scrollY;
+        public final int state;
 
         public ScrollDataWrapper(float scrollX, float scrollY, int state) {
             this.scrollX = scrollX;
