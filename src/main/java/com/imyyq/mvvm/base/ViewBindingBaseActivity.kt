@@ -2,15 +2,15 @@ package com.imyyq.mvvm.base
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
-import androidx.annotation.LayoutRes
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
+import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
@@ -18,12 +18,9 @@ import com.kingja.loadsir.core.LoadSir
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
  */
-abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
-    @LayoutRes private val layoutId: Int,
-    private val varViewModelId: Int? = null
-) :
+abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<*>> :
     ParallaxSwipeBackActivity(),
-    IView<VM>, ILoadingDialog, ILoading, IActivityResult {
+    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
@@ -41,23 +38,19 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
         }
 
         initParam()
-        initViewDataBinding()
+        mBinding = initBinding(layoutInflater, null)
+        initViewAndViewModel()
         initUiChangeLiveData()
         initViewObservable()
         initData()
     }
 
-    final override fun initViewDataBinding() {
-        mBinding = DataBindingUtil.inflate(layoutInflater, layoutId, mFrameLayout, false)
+    abstract override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V
+
+    @CallSuper
+    override fun initViewAndViewModel() {
         setContentView(mBinding.root)
         mViewModel = initViewModel(this)
-        // 绑定 v 和 vm
-        if (varViewModelId != null) {
-            mBinding.setVariable(varViewModelId, mViewModel)
-        }
-
-        // 让 LiveData 和 xml 可以双向绑定
-        mBinding.lifecycleOwner = this
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -67,8 +60,6 @@ abstract class BaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
-
-        mBinding.unbind()
     }
 
     final override fun initUiChangeLiveData() {

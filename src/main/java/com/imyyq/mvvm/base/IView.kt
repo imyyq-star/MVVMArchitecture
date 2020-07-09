@@ -2,8 +2,11 @@ package com.imyyq.mvvm.base
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.app.BaseApp
 import com.imyyq.mvvm.app.GlobalConfig
 import java.lang.reflect.ParameterizedType
@@ -12,7 +15,7 @@ import java.lang.reflect.Type
 /**
  * V 层，这里的视图都是 Activity 或 Fragment
  */
-interface IView<VM : BaseViewModel<*>> {
+interface IView<V : ViewBinding, VM : BaseViewModel<*>> {
     /**
      * 初始化外部传进来的参数
      */
@@ -31,7 +34,12 @@ interface IView<VM : BaseViewModel<*>> {
     /**
      * 初始化 DataBinding，基类应该在初始化后设为 final
      */
-    fun initViewDataBinding()
+    fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V?
+
+    /**
+     * 初始化视图和 VM
+     */
+    fun initViewAndViewModel()
 
     /**
      * 初始化通用的 UI 改变事件，基类应该在初始化后设为 final

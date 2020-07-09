@@ -3,16 +3,48 @@ package com.imyyq.mvvm.utils
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
+import androidx.annotation.NonNull
 import com.imyyq.mvvm.app.BaseApp
+
 
 object AppUtil {
     private const val TAG = "AppUtil"
+
+    /**
+     * Return the activity by view.
+     *
+     * @param view The view.
+     * @return the activity by view.
+     */
+    fun getActivityByView(@NonNull view: View): Activity? {
+        return getActivityByContext(view.context)
+    }
+
+    /**
+     * Return the activity by context.
+     *
+     * @param context The context.
+     * @return the activity by context.
+     */
+    fun getActivityByContext(context: Context?): Activity? {
+        var contextTemp = context
+        if (contextTemp is Activity) return contextTemp
+        while (contextTemp is ContextWrapper) {
+            if (contextTemp is Activity) {
+                return contextTemp
+            }
+            contextTemp = contextTemp.baseContext
+        }
+        return null
+    }
 
     /**
      * 获取当前进程的名称，默认进程名称是包名

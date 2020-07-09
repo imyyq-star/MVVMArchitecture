@@ -8,21 +8,16 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
-import androidx.annotation.LayoutRes
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
 
-abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
-    @LayoutRes val layoutId: Int,
-    private val varViewModelId: Int? = null
-) :
+abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<BaseModel>> :
     Fragment(),
-    IView<VM>, ILoadingDialog, ILoading, IActivityResult {
+    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected var mBinding: V? = null
     protected lateinit var mViewModel: VM
@@ -44,33 +39,21 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mBinding = DataBindingUtil.inflate(
-            inflater,
-            layoutId,
-            container,
-            false
-        )
+        mBinding = initBinding(inflater, container)
         return mBinding?.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViewDataBinding()
+        initViewAndViewModel()
         initUiChangeLiveData()
         initViewObservable()
         initData()
     }
 
-    final override fun initViewDataBinding() {
+    @CallSuper
+    override fun initViewAndViewModel() {
         mViewModel = initViewModel(this)
-        // 绑定 v 和 vm
-        if (varViewModelId != null) {
-            mBinding?.setVariable(varViewModelId, mViewModel)
-        }
-
-        // 让 LiveData 和 xml 可以双向绑定
-        mBinding?.lifecycleOwner = this
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -81,12 +64,6 @@ abstract class BaseFragment<V : ViewDataBinding, VM : BaseViewModel<BaseModel>>(
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
 
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mBinding?.unbind()
-        mBinding = null
     }
 
     final override fun initUiChangeLiveData() {
