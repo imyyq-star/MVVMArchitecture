@@ -148,6 +148,16 @@ data class BaseEntity<T>(
 除了 AppStateTracker 外，还有许多工具类可用，比如数据库 RoomUtil 类，AppActivityManager 管理类等。
 
 
+## 8. DataBinding 的问题
+DataBinding 是用来实现 MVVM 架构的一个非常好的方式，但它不是必须的。而且它是一个一直被人嫌弃的技术，我个人在熟悉 DataBinding 之前，也挺嫌弃它的，所以一直用 LiveData 多写点代码让 UI 响应数据的更改。
+后来随着框架封装的深入使用，才发现 DataBinding 真香，它不仅可以消灭 findViewById，还可以和 LiveData 联动，**最重要的是：DataBinding 可以让你少写很多代码。**
+
+本框架是推荐同学们首选使用 DataBinding 的，但可能有些同学对 DataBinding 还不是很熟悉，使用此框架时只用到了它能解决 findViewById 的功能，甚至使用 Kotlin 开发的，直接用 kotlin-android-extensions 就解决 findViewById 了。
+
+如果你不想使用 DataBinding，对于解决 findViewById 我是不希望使用 kotlin-android-extensions 的，它的可读性不好，最好使用 ViewBinding 来解决。
+
+因此框架提供了对单纯 ViewBinding 的支持，将基类分成了 DataBindingBaseActivity/ViewBindingBaseActivity 和 DataBindingBaseFragment/ViewBindingBaseFragment，按需继承相关基类。
+
 
 # 引入框架
 经过上述的描述，你应该能认识到使用框架的好处了，如果看到这你还有兴趣，那么去看本框架的 [GitHub Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 吧，根据 Wiki 去引入框架和使用框架。
