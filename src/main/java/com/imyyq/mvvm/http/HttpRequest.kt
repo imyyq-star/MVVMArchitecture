@@ -1,14 +1,25 @@
 package com.imyyq.mvvm.http
 
 import android.util.ArrayMap
+import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.imyyq.mvvm.BuildConfig
+import com.imyyq.mvvm.R
+import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.base.IBaseResponse
 import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
 import com.imyyq.mvvm.http.interceptor.logging.Level
 import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
 import com.imyyq.mvvm.utils.AppUtil
+import com.imyyq.mvvm.utils.LogUtil
+import com.imyyq.mvvm.utils.Utils
+import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.internal.platform.Platform
 import retrofit2.Call
 import retrofit2.Callback
@@ -39,6 +50,11 @@ object HttpRequest {
 
     // 默认的请求头
     private lateinit var mDefaultHeader: ArrayMap<String, String>
+
+    /**
+     * 存储 baseUrl，以便可以动态更改
+     */
+    private lateinit var mBaseUrlMap: ArrayMap<String, String>
 
     /**
      * 请求超时时间，秒为单位
@@ -97,11 +113,46 @@ object HttpRequest {
                     )
             }
 
-            val builder = Retrofit.Builder().client(httpClientBuilder.build())
+            val client = httpClientBuilder.build()
+            val builder = Retrofit.Builder().client(client)
                 // 基础url
                 .baseUrl(host)
                 // JSON解析
                 .addConverterFactory(GsonConverterFactory.create())
+
+            if (GlobalConfig.gIsNeedChangeBaseUrl) {
+                if (!this::mBaseUrlMap.isInitialized) {
+                    mBaseUrlMap = ArrayMap()
+                }
+                // 将 url 缓存起来
+                mBaseUrlMap[host] = ""
+
+                builder.callFactory {
+                    LogUtil.i("HttpRequest", "getService: old ${it.url()}")
+                    mBaseUrlMap.forEach { entry ->
+                        val key = entry.key
+                        var value = entry.value
+                        // 找到 url 并且需要更改
+                        val url = it.url().toString()
+                        if (url.startsWith(key) && value.isNotEmpty()) {
+                            // 防止尾缀有问题
+                            if (key.endsWith("/") && !value.endsWith("/")) {
+                                value += "/"
+                            } else if (!key.endsWith("/") && value.endsWith("/")) {
+                                value = value.substring(0, value.length - 1)
+                            }
+                            // 替换 url 并创建新的 call
+                            val newRequest: Request =
+                                it.newBuilder()
+                                    .url(HttpUrl.get(url.replaceFirst(key, value)))
+                                    .build()
+                            LogUtil.i("HttpRequest", "getService: new ${newRequest.url()}")
+                            return@callFactory client.newCall(newRequest)
+                        }
+                    }
+                    client.newCall(it)
+                }
+            }
             if (AppUtil.isRetrofitUseRx) {
                 // Kotlin 使用协程，Java 使用 rx
                 builder.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
@@ -178,5 +229,54 @@ object HttpRequest {
             }
         })
         return call
+    }
+
+    /**
+     * 在合适的位置调用此方法，多次连击后将弹出修改 baseUrl 的对话框。
+     * 前提是必须开启了 [GlobalConfig.gIsNeedChangeBaseUrl] 属性，同时获取了 service 实例
+     */
+    fun multiClickToChangeBaseUrl(view: View, frequency: Int) {
+        if (!GlobalConfig.gIsNeedChangeBaseUrl) {
+            return
+        }
+        Utils.multiClickListener(view, frequency) {
+            if (!this::mBaseUrlMap.isInitialized) {
+                return@multiClickListener
+            }
+            AppUtil.getActivityByView(view)?.let { activity ->
+                val tvList = mutableListOf<TextView>()
+                val etList = mutableListOf<EditText>()
+
+                val layout = LinearLayout(activity)
+                layout.orientation = LinearLayout.VERTICAL
+
+                mBaseUrlMap.forEach { entry ->
+                    val textView = TextView(activity)
+                    val edit = EditText(activity)
+
+                    textView.text = entry.key
+                    edit.setText(if (entry.value.isNotEmpty()) entry.value else entry.key)
+                    edit.selectAll()
+
+                    layout.addView(textView)
+                    layout.addView(edit)
+
+                    tvList.add(textView)
+                    etList.add(edit)
+                }
+
+                val editDialog = AlertDialog.Builder(activity)
+                editDialog.setView(layout)
+
+                editDialog.setPositiveButton(R.string.confirm) { dialog, _ ->
+                    tvList.forEachIndexed { index, textView ->
+                        mBaseUrlMap.put(textView.text.toString(), etList[index].text.toString())
+                    }
+                    dialog.dismiss()
+                }
+
+                editDialog.create().show()
+            }
+        }
     }
 }

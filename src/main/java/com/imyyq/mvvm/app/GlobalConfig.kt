@@ -86,18 +86,23 @@ object GlobalConfig {
     var gIsNeedActivityManager = true
 
     /**
+     * 是否需要动态修改 BaseURL，如果需要，请设置为 true，并在合适的位置调用：[com.imyyq.mvvm.http.HttpRequest.multiClickToChangeBaseUrl]
+     */
+    var gIsNeedChangeBaseUrl = false
+
+    /**
      * 初始化 LoadSir 的相关界面。
      * [defCallback] 默认的界面，通常是加载中页面，设置了后，默认打开开启了 LoadSir 的页面后就显示这里设置的页面。
      * [clazz] 其他的状态页，比如空页面，加载错误等。
      */
-    fun initLoadSir(defCallback: Class<*>, vararg clazz: Class<*>) {
+    fun initLoadSir(defCallback: Class<out Callback>, vararg clazz: Class<out Callback>) {
         val builder = LoadSir.beginBuilder()
         clazz.forEach {
-            builder.addCallback(it.newInstance() as Callback)
+            builder.addCallback(it.newInstance())
         }
-        builder.addCallback(defCallback.newInstance() as Callback)
+        builder.addCallback(defCallback.newInstance())
         //设置默认状态页
-        builder.setDefaultCallback(defCallback as Class<out Callback>)
+        builder.setDefaultCallback(defCallback)
             .commit()
     }
 }

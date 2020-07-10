@@ -160,7 +160,7 @@ DataBinding 是用来实现 MVVM 架构的一个非常好的方式，但它不�
 
 
 # 引入框架
-经过上述的描述，你应该能认识到使用框架的好处了，如果看到这你还有兴趣，那么去看本框架的 [GitHub Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 吧，根据 Wiki 去引入框架和使用框架。
+经过上述的描述，你应该能认识到使用框架的好处了，如果看到这你还有兴趣，那么去看本框架的 [GitHub Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 吧，根据 Wiki 去引入框架和使用框架。**更多功能详细使用都在 wiki 中了**。
 
 不要担心，其实就是一些代码封装而已，并没有什么复杂的东西。
 
