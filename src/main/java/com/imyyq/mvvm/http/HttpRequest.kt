@@ -2,9 +2,7 @@ package com.imyyq.mvvm.http
 
 import android.util.ArrayMap
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
@@ -15,6 +13,7 @@ import com.imyyq.mvvm.http.interceptor.logging.Level
 import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
 import com.imyyq.mvvm.utils.AppUtil
 import com.imyyq.mvvm.utils.LogUtil
+import com.imyyq.mvvm.utils.SPUtils
 import com.imyyq.mvvm.utils.Utils
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
@@ -41,6 +40,8 @@ import java.util.concurrent.TimeUnit
  * 目的3：不同的接口，不同的缓存策略（？）
  */
 object HttpRequest {
+    private const val mSpName = "http_request_flag"
+    private const val mKeyIsSave = "is_save"
 
     // 缓存 service
     private val mServiceMap = ArrayMap<String, Any>()
@@ -125,7 +126,12 @@ object HttpRequest {
                     mBaseUrlMap = ArrayMap()
                 }
                 // 将 url 缓存起来
-                mBaseUrlMap[host] = ""
+                val sp = SPUtils.getInstance(mSpName)
+                if (sp.getBoolean(mKeyIsSave)) {
+                    mBaseUrlMap[host] = sp.getString(host)
+                } else {
+                    mBaseUrlMap[host] = ""
+                }
 
                 builder.callFactory {
                     LogUtil.i("HttpRequest", "getService: old ${it.url()}")
@@ -265,12 +271,41 @@ object HttpRequest {
                     etList.add(edit)
                 }
 
+                val btn = Button(activity)
+                btn.text = activity.getString(R.string.restore)
+                btn.setOnClickListener {
+                    tvList.forEachIndexed { index, textView ->
+                        etList[index].setText(textView.text.toString())
+                    }
+                }
+                layout.addView(btn)
+
+                val sp = SPUtils.getInstance(mSpName)
+
+                val checkBox = CheckBox(activity)
+                checkBox.text = activity.getString(R.string.effective_next_time)
+                checkBox.isChecked = sp.getBoolean(mKeyIsSave)
+                layout.addView(checkBox)
+
                 val editDialog = AlertDialog.Builder(activity)
                 editDialog.setView(layout)
 
                 editDialog.setPositiveButton(R.string.confirm) { dialog, _ ->
                     tvList.forEachIndexed { index, textView ->
                         mBaseUrlMap.put(textView.text.toString(), etList[index].text.toString())
+                    }
+                    checkBox.isChecked.apply {
+                        sp.put(mKeyIsSave, this)
+
+                        if (this) {
+                            mBaseUrlMap.forEach { entry ->
+                                sp.put(entry.key, entry.value)
+                            }
+                        } else {
+                            mBaseUrlMap.forEach { entry ->
+                                sp.put(entry.key, "")
+                            }
+                        }
                     }
                     dialog.dismiss()
                 }
