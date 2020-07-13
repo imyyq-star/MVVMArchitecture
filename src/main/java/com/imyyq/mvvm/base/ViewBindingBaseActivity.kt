@@ -19,7 +19,7 @@ import com.kingja.loadsir.core.LoadSir
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
  */
-abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<*>> :
+abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
     ParallaxSwipeBackActivity(),
     IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 

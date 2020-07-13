@@ -6,7 +6,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-abstract class DataBindingBaseActivity<V : ViewDataBinding, VM : BaseViewModel<*>>(
+abstract class DataBindingBaseActivity<V : ViewDataBinding, VM : BaseViewModel<out BaseModel>>(
     @LayoutRes private val layoutId: Int,
     private val varViewModelId: Int? = null
 ) : ViewBindingBaseActivity<V, VM>() {

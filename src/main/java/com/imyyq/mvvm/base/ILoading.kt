@@ -1,5 +1,7 @@
 package com.imyyq.mvvm.base
 
+import com.kingja.loadsir.callback.Callback
+
 /**
  * 加载中接口
  */
@@ -7,7 +9,7 @@ interface ILoading {
     /**
      * 加载失败，显示 LoadSir 的页面
      */
-    fun onLoadSirShowed(it: Class<*>) {}
+    fun onLoadSirShowed(it: Class<out Callback>) {}
 
     /**
      * 加载成功，LoadSir 消失，显示结果页

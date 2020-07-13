@@ -16,7 +16,7 @@ import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
 
-abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<BaseModel>> :
+abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
     Fragment(),
     IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 

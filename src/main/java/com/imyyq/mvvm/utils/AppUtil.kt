@@ -180,20 +180,20 @@ object AppUtil {
      *
      * @param cls 要打开的Activity
      */
-    fun startActivity(context: Context?, cls: Class<*>) {
+    fun startActivity(context: Context?, cls: Class<out Activity>) {
         if (context == null) {
             return
         }
         context.startActivity(Intent(context, cls))
     }
 
-    fun startActivity(context: Context, cls: Class<*>, name: String, value: Int) {
+    fun startActivity(context: Context, cls: Class<out Activity>, name: String, value: Int) {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
         context.startActivity(intent)
     }
 
-    fun startActivity(context: Context, cls: Class<*>, name: String, value: Boolean) {
+    fun startActivity(context: Context, cls: Class<out Activity>, name: String, value: Boolean) {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
         context.startActivity(intent)
@@ -206,14 +206,14 @@ object AppUtil {
      * @param name  字符串名称
      * @param value 字符串值
      */
-    fun startActivity(context: Context, cls: Class<*>, name: String, value: String) {
+    fun startActivity(context: Context, cls: Class<out Activity>, name: String, value: String) {
         val intent = Intent(context, cls)
         intent.putExtra(name, value)
         context.startActivity(intent)
     }
 
     fun startActivityForResult(
-        context: Activity, cls: Class<*>, requestCode: Int,
+        context: Activity, cls: Class<out Activity>, requestCode: Int,
         name: String, value: String
     ) {
         val intent = Intent(context, cls)

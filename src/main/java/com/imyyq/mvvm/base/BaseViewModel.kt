@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.base
 
+import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.annotation.CallSuper
@@ -10,6 +11,7 @@ import com.imyyq.mvvm.R
 import com.imyyq.mvvm.http.*
 import com.imyyq.mvvm.utils.LogUtil
 import com.imyyq.mvvm.utils.SingleLiveEvent
+import com.kingja.loadsir.callback.Callback
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
@@ -221,7 +223,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun showLoadSir(clz: Class<*>) {
+    protected fun showLoadSir(clz: Class<out Callback>) {
         if (mUiChangeLiveData.loadSirEvent == null) {
             throw RuntimeException(getApplication<Application>().getString(R.string.load_sir_tips))
         }
@@ -239,7 +241,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun startActivity(clazz: Class<*>) {
+    protected fun startActivity(clazz: Class<out Activity>) {
         if (mUiChangeLiveData.startActivityEvent == null) {
             throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
         }
@@ -247,7 +249,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun startActivity(clazz: Class<*>, bundle: Bundle?) {
+    protected fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
         if (mUiChangeLiveData.startActivityEventWithBundle == null) {
             throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
         }
@@ -255,7 +257,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun startActivityForResult(clazz: Class<*>) {
+    protected fun startActivityForResult(clazz: Class<out Activity>) {
         if (mUiChangeLiveData.startActivityForResultEvent == null) {
             throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
         }
@@ -263,7 +265,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
-    protected fun startActivityForResult(clazz: Class<*>, bundle: Bundle?) {
+    protected fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
         if (mUiChangeLiveData.startActivityForResultEventWithBundle == null) {
             throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
         }
@@ -277,15 +279,15 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var showLoadingDialogEvent: SingleLiveEvent<String?>? = null
         var dismissLoadingDialogEvent: SingleLiveEvent<Any?>? = null
 
-        var startActivityEvent: SingleLiveEvent<Class<*>>? = null
-        var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>>? = null
+        var startActivityEvent: SingleLiveEvent<Class<out Activity>>? = null
+        var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
-        var startActivityForResultEvent: SingleLiveEvent<Class<*>>? = null
-        var startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<*>, Bundle?>>? = null
+        var startActivityForResultEvent: SingleLiveEvent<Class<out Activity>>? = null
+        var startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
         var finishEvent: SingleLiveEvent<Any?>? = null
 
-        var loadSirEvent: SingleLiveEvent<Class<*>?>? = null
+        var loadSirEvent: SingleLiveEvent<Class<out Callback>?>? = null
 
         fun initLoadSirEvent() {
             loadSirEvent = SingleLiveEvent()
