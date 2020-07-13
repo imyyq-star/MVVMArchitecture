@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.http.*
@@ -32,12 +31,12 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     private lateinit var mCompositeDisposable: Any
     private lateinit var mCallList: MutableList<Call<*>>
-    private lateinit var mJobList: MutableList<Job>
+    private lateinit var mCoroutineScope: CoroutineScope
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
     /**
-     * 所有网络请求都在 viewModelScope 域中启动协程，当页面销毁时会自动取消
+     * 所有网络请求都在 mCoroutineScope 域中启动协程，当页面销毁时会自动取消
      */
     fun <T> launch(
         block: suspend CoroutineScope.() -> IBaseResponse<T?>?,
@@ -46,21 +45,31 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         onFailed: ((code: Int, msg: String?) -> Unit)? = null,
         onComplete: (() -> Unit)? = null
     ) {
-        addJob(viewModelScope.launch {
+        initScope()
+        mCoroutineScope.launch {
             try {
-                handleResult(withContext(Dispatchers.IO) { block() }, onSuccess, onResult, onFailed)
+                handleResult(block(), onSuccess, onResult, onFailed)
             } catch (e: Exception) {
                 onFailed?.let { handleException(e, it) }
             } finally {
                 onComplete?.invoke()
             }
-        })
+        }
+    }
+
+    private fun initScope() {
+        if (!this::mCoroutineScope.isInitialized) {
+            mCoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+        }
     }
 
     /**
      * 发起协程，让协程和 UI 相关
      */
-    fun launchUI(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch { block() }
+    fun launchUI(block: suspend CoroutineScope.() -> Unit) {
+        initScope()
+        mCoroutineScope.launch { block() }
+    }
 
     /**
      * 发起流
@@ -140,6 +149,9 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         cancelConsumingTask()
     }
 
+    /**
+     * 取消耗时任务，比如在界面销毁时，或者在对话框消失时
+     */
     fun cancelConsumingTask() {
         // ViewModel销毁时会执行，同时取消所有异步任务
         if (this::mCompositeDisposable.isInitialized) {
@@ -149,9 +161,8 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mCallList.forEach { it.cancel() }
             mCallList.clear()
         }
-        if (this::mJobList.isInitialized) {
-            mJobList.forEach { it.cancel() }
-            mJobList.clear()
+        if (this::mCoroutineScope.isInitialized) {
+            mCoroutineScope.cancel()
         }
     }
 
@@ -174,16 +185,6 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mCallList = mutableListOf()
         }
         mCallList.add(call as Call<*>)
-    }
-
-    /**
-     * 不使用 Rx，使用 Retrofit 原生的请求方式
-     */
-    fun addJob(job: Job) {
-        if (!this::mJobList.isInitialized) {
-            mJobList = mutableListOf()
-        }
-        mJobList.add(job)
     }
 
     // 以下是加载中对话框相关的 =========================================================

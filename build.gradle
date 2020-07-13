@@ -80,8 +80,6 @@ dependencies {
     api Deps.lifecycleLiveDataKTX
     // 简化 Fragment 的 API 调用，同时通过 viewModels 扩展方法创建 vm 来的非常容易
     api Deps.fragmentKTX
-    // 在 vm 中使用协程，视图销毁自动取消
-    api Deps.viewModelKTX
     // 使用 Java8 替换 lifecycleCompiler，让 vm 可以感知 v 生命周期
     api Deps.lifecycleJava8
 
