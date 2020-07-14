@@ -6,8 +6,10 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
+import com.imyyq.mvvm.app.RepositoryManager
 import com.imyyq.mvvm.http.*
 import com.imyyq.mvvm.utils.LogUtil
 import com.imyyq.mvvm.utils.SingleLiveEvent
@@ -19,9 +21,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Call
 import retrofit2.HttpException
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel, IActivityResult {
     constructor(app: Application, model: M) : this(app) {
+        isAutoCreateRepo = false
         mModel = model
     }
 
@@ -36,6 +41,16 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     private lateinit var mCoroutineScope: CoroutineScope
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
+
+    /**
+     * 是否自动创建仓库，默认是 true，
+     */
+    private var isAutoCreateRepo = true
+
+    /**
+     * 是否缓存自动创建的仓库，默认是 true
+     */
+    protected open fun isCacheRepo() = true
 
     /**
      * 所有网络请求都在 mCoroutineScope 域中启动协程，当页面销毁时会自动取消
@@ -138,6 +153,21 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
                 notHttpException,
                 "$msgNotHttpException, 具体错误是\n${if (log.isEmpty()) e.message else log}"
             )
+        }
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        if (isAutoCreateRepo) {
+            if (!this::mModel.isInitialized) {
+                val modelClass: Class<M>?
+                val type: Type? = javaClass.genericSuperclass
+                modelClass = if (type is ParameterizedType) {
+                    type.actualTypeArguments[0] as? Class<M>
+                } else null
+                if (modelClass != null && modelClass != BaseModel::class.java) {
+                    mModel = RepositoryManager.getRepo(modelClass, isCacheRepo())
+                }
+            }
         }
     }
 
