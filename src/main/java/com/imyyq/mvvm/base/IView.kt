@@ -1,7 +1,5 @@
 package com.imyyq.mvvm.base
 
-import android.app.Activity
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +13,7 @@ import java.lang.reflect.Type
 /**
  * V 层，这里的视图都是 Activity 或 Fragment
  */
-interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>> {
+interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArguments {
     /**
      * 初始化外部传进来的参数
      */
@@ -65,13 +63,6 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>> {
             viewModelStoreOwner,
             ViewModelProvider.AndroidViewModelFactory(BaseApp.getInstance())
         ).get(modelClass)
-    }
-
-    /**
-     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
-     */
-    fun getBundle(activity: Activity): Bundle? {
-        return activity.intent.getBundleExtra(BaseViewModel.extraBundle)
     }
 
     /**

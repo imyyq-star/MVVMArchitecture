@@ -38,9 +38,9 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        initParam()
         mBinding = initBinding(layoutInflater, null)
         initViewAndViewModel()
+        initParam()
         initUiChangeLiveData()
         initViewObservable()
         initData()
@@ -61,6 +61,13 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
+    }
+
+    /**
+     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
+     */
+    override fun getBundle(): Bundle? {
+        return intent.getBundleExtra(BaseViewModel.extraBundle)
     }
 
     final override fun initUiChangeLiveData() {

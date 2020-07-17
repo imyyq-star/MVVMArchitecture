@@ -29,12 +29,6 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     private lateinit var mLoadService: LoadService<*>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        initParam()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,6 +41,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewAndViewModel()
+        initParam()
         initUiChangeLiveData()
         initViewObservable()
         initData()
@@ -64,7 +59,13 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
+    }
 
+    /**
+     * 通过 setArguments 传递 bundle，在这里可以获取
+     */
+    override fun getBundle(): Bundle? {
+        return arguments
     }
 
     final override fun initUiChangeLiveData() {
