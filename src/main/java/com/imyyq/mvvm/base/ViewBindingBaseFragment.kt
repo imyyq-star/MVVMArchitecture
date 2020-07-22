@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.base
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -122,13 +123,20 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         if (!this::mStartActivityForResult.isInitialized) {
             mStartActivityForResult =
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    val data = it.data
-                    if (data != null) {
-                        onActivityResult(it.resultCode, data)
-                        mViewModel.onActivityResult(it.resultCode, data)
-                    } else {
-                        onActivityResult(it.resultCode)
-                        mViewModel.onActivityResult(it.resultCode)
+                    val data = it.data ?: Intent()
+                    when (it.resultCode) {
+                        Activity.RESULT_OK -> {
+                            onActivityResultOk(data)
+                            mViewModel.onActivityResultOk(data)
+                        }
+                        Activity.RESULT_CANCELED -> {
+                            onActivityResultCanceled(data)
+                            mViewModel.onActivityResultCanceled(data)
+                        }
+                        else -> {
+                            onActivityResult(it.resultCode, data)
+                            mViewModel.onActivityResult(it.resultCode, data)
+                        }
                     }
                 }
         }
