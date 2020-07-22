@@ -68,7 +68,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
      */
     override fun getBundle(): Bundle? {
-        return intent.getBundleExtra(BaseViewModel.extraBundle)
+        return intent.extras
     }
 
     final override fun initUiChangeLiveData() {
@@ -85,7 +85,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
                 val intent = Intent(this, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 startActivity(intent)
             })
         }
@@ -102,7 +102,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(this, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 mStartActivityForResult.launch(intent)
             })
         }

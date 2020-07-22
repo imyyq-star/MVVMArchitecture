@@ -59,10 +59,13 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArguments 
         }
         //如果没有指定泛型参数，则默认使用BaseViewModel
         BaseViewModel::class.java
-        return ViewModelProvider(
+        val vm = ViewModelProvider(
             viewModelStoreOwner,
             ViewModelProvider.AndroidViewModelFactory(BaseApp.getInstance())
         ).get(modelClass)
+        // 让 vm 也可以直接获取到 bundle
+        vm.mBundle = getBundle()
+        return vm
     }
 
     /**

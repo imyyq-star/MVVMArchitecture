@@ -83,7 +83,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
                 val intent = Intent(activity, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 startActivity(intent)
             })
         }
@@ -100,7 +100,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(activity, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 mStartActivityForResult.launch(intent)
             })
         }
