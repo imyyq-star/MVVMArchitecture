@@ -2,6 +2,7 @@ package com.imyyq.mvvm.base
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
@@ -22,7 +23,9 @@ import retrofit2.Call
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel, IActivityResult, IArguments {
+open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel,
+    IActivityResult, IArgumentsFromBundle, IArgumentsFromIntent {
+
     constructor(app: Application, model: M) : this(app) {
         isAutoCreateRepo = false
         mModel = model
@@ -41,6 +44,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
     var mBundle: Bundle? = null
+    var mIntent: Intent? = null
 
     /**
      * 是否自动创建仓库，默认是 true，
@@ -209,6 +213,12 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     }
 
     @MainThread
+    protected fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
+        mUiChangeLiveData.startActivityWithMapEvent?.value = Pair(clazz, map)
+    }
+
+    @MainThread
     protected fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEventWithBundle)
         mUiChangeLiveData.startActivityEventWithBundle?.value = Pair(clazz, bundle)
@@ -237,6 +247,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var dismissLoadingDialogEvent: SingleLiveEvent<Any?>? = null
 
         var startActivityEvent: SingleLiveEvent<Class<out Activity>>? = null
+        var startActivityWithMapEvent: SingleLiveEvent<Pair<Class<out Activity>, Map<String, *>>>? = null
         var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
         var startActivityForResultEvent: SingleLiveEvent<Class<out Activity>>? = null
@@ -262,10 +273,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
         fun initStartAndFinishEvent() {
             startActivityEvent = SingleLiveEvent()
+            startActivityWithMapEvent = SingleLiveEvent()
             startActivityEventWithBundle = SingleLiveEvent()
             finishEvent = SingleLiveEvent()
         }
     }
 
     override fun getBundle(): Bundle? = mBundle
+
+    override fun getArgumentsIntent(): Intent? = mIntent
 }

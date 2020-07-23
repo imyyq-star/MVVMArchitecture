@@ -2,7 +2,7 @@ package com.imyyq.mvvm.base
 
 import android.os.Bundle
 
-interface IArguments {
+interface IArgumentsFromBundle {
     /**
      * 传递 bundle，在这里可以获取
      */

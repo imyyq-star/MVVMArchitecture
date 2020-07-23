@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 /**
  * V 层，这里的视图都是 Activity 或 Fragment
  */
-interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArguments {
+interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsFromBundle {
     /**
      * 初始化外部传进来的参数
      */
