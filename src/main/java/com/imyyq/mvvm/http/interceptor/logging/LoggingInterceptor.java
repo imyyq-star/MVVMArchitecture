@@ -4,12 +4,12 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.imyyq.mvvm.utils.LogUtil;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -20,33 +20,17 @@ import okhttp3.internal.platform.Platform;
 
 public class LoggingInterceptor implements Interceptor {
 
-    private final boolean isDebug;
     private final Builder builder;
 
     private LoggingInterceptor(Builder builder) {
         this.builder = builder;
-        this.isDebug = builder.isDebug;
     }
 
     @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
-        if (builder.getHeaders().size() > 0) {
-            Headers headers = request.headers();
-            Request.Builder requestBuilder = request.newBuilder();
-            requestBuilder.headers(builder.getHeaders());
-            Set<String> names = headers.names();
-            for (String name : names) {
-                String header = headers.get(name);
-                if (header != null) {
-                    requestBuilder.addHeader(name, header);
-                }
-            }
-            request = requestBuilder.build();
-        }
-
-        if (!isDebug || builder.getLevel() == Level.NONE) {
+        if (!LogUtil.INSTANCE.isLog() || builder.getLevel() == Level.NONE) {
             return chain.proceed(request);
         }
         RequestBody requestBody = request.body();
@@ -110,16 +94,13 @@ public class LoggingInterceptor implements Interceptor {
     public static class Builder {
 
         private static String TAG = "LoggingI";
-        private boolean isDebug;
         private int type = Platform.INFO;
         private String requestTag;
         private String responseTag;
         private Integer level = Level.BASIC;
-        private Headers.Builder builder;
         private Logger logger;
 
         public Builder() {
-            builder = new Headers.Builder();
         }
 
         int getType() {
@@ -128,10 +109,6 @@ public class LoggingInterceptor implements Interceptor {
 
         Integer getLevel() {
             return level;
-        }
-
-        Headers getHeaders() {
-            return builder.build();
         }
 
         String getTag(boolean isRequest) {
@@ -144,17 +121,6 @@ public class LoggingInterceptor implements Interceptor {
 
         Logger getLogger() {
             return logger;
-        }
-
-        /**
-         * @param name  Filed
-         * @param value Value
-         * @return Builder
-         * Add a field with the specified value
-         */
-        public Builder addHeader(String name, String value) {
-            builder.set(name, value);
-            return this;
         }
 
         /**
@@ -197,15 +163,6 @@ public class LoggingInterceptor implements Interceptor {
          */
         public Builder response(String tag) {
             this.responseTag = tag;
-            return this;
-        }
-
-        /**
-         * @param isDebug set can sending log output
-         * @return Builder
-         */
-        public Builder loggable(boolean isDebug) {
-            this.isDebug = isDebug;
             return this;
         }
 

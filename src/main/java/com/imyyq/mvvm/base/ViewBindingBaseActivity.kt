@@ -1,7 +1,9 @@
 package com.imyyq.mvvm.base
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +17,14 @@ import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
+import java.io.Serializable
 
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
  */
 abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
     ParallaxSwipeBackActivity(),
-    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
+    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult, IArgumentsFromIntent {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
@@ -38,9 +41,9 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        initParam()
         mBinding = initBinding(layoutInflater, null)
         initViewAndViewModel()
+        initParam()
         initUiChangeLiveData()
         initViewObservable()
         initData()
@@ -52,6 +55,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     override fun initViewAndViewModel() {
         setContentView(mBinding.root)
         mViewModel = initViewModel(this)
+        mViewModel.mIntent = getArgumentsIntent()
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -61,6 +65,17 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
+    }
+
+    /**
+     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
+     */
+    override fun getBundle(): Bundle? {
+        return intent.extras
+    }
+
+    override fun getArgumentsIntent(): Intent? {
+        return intent
     }
 
     final override fun initUiChangeLiveData() {
@@ -74,10 +89,91 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 val intent = Intent(this, it)
                 startActivity(intent)
             })
+            mViewModel.mUiChangeLiveData.startActivityWithMapEvent?.observe(this, Observer {
+                val intent = Intent(this, it?.first)
+                it?.second?.forEach { entry ->
+                    when (val value = entry.value) {
+                        is Boolean -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Byte -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Char -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Short -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Int -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Long -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Float -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Double -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is String -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is CharSequence -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Parcelable -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Serializable -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is BooleanArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is ByteArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is ShortArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is CharArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is IntArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is LongArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is FloatArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is DoubleArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is Array<*> -> {
+                            @Suppress("UNCHECKED_CAST")
+                            if (value.isArrayOf<String>()) {
+                                intent.putExtra(entry.key, value as Array<String>)
+                            } else if (value.isArrayOf<Parcelable>()) {
+                                intent.putExtra(entry.key, value as Array<Parcelable>)
+                            } else {
+                                throw RuntimeException("不支持此类型 $value")
+                            }
+                        }
+                        else -> {
+                            throw RuntimeException("不支持此类型 $value")
+                        }
+                    }
+                }
+                startActivity(intent)
+            })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
                 val intent = Intent(this, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 startActivity(intent)
             })
         }
@@ -94,7 +190,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(this, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 mStartActivityForResult.launch(intent)
             })
         }
@@ -117,13 +213,20 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         if (!this::mStartActivityForResult.isInitialized) {
             mStartActivityForResult =
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    val data = it.data
-                    if (data != null) {
-                        onActivityResult(it.resultCode, data)
-                        mViewModel.onActivityResult(it.resultCode, data)
-                    } else {
-                        onActivityResult(it.resultCode)
-                        mViewModel.onActivityResult(it.resultCode)
+                    val data = it.data ?: Intent()
+                    when (it.resultCode) {
+                        Activity.RESULT_OK -> {
+                            onActivityResultOk(data)
+                            mViewModel.onActivityResultOk(data)
+                        }
+                        Activity.RESULT_CANCELED -> {
+                            onActivityResultCanceled(data)
+                            mViewModel.onActivityResultCanceled(data)
+                        }
+                        else -> {
+                            onActivityResult(it.resultCode, data)
+                            mViewModel.onActivityResult(it.resultCode, data)
+                        }
                     }
                 }
         }

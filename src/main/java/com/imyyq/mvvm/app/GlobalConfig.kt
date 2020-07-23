@@ -30,7 +30,7 @@ object GlobalConfig {
     /**
      * 页面在显示数据时需要时间，因此显示加载中对话框，如果不需要，可以设置为 false，以免创建不必要的对象
      */
-    var gIsNeedLoadingDialog = true
+    var gIsNeedLoadingDialog = false
 
     /**
      * 加载中对话框的 layout
@@ -83,7 +83,7 @@ object GlobalConfig {
     /**
      * 是否需要管理 Activity 堆栈
      */
-    var gIsNeedActivityManager = true
+    var gIsNeedActivityManager = false
 
     /**
      * 是否需要动态修改 BaseURL，如果需要，请设置为 true，并在合适的位置调用：[com.imyyq.mvvm.http.HttpRequest.multiClickToChangeBaseUrl]

@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.base
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,12 +30,6 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     private lateinit var mLoadService: LoadService<*>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        initParam()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,6 +42,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewAndViewModel()
+        initParam()
         initUiChangeLiveData()
         initViewObservable()
         initData()
@@ -64,7 +60,13 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
+    }
 
+    /**
+     * 通过 setArguments 传递 bundle，在这里可以获取
+     */
+    override fun getBundle(): Bundle? {
+        return arguments
     }
 
     final override fun initUiChangeLiveData() {
@@ -81,7 +83,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
                 val intent = Intent(activity, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 startActivity(intent)
             })
         }
@@ -98,7 +100,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
                 initStartActivityForResult()
                 val intent = Intent(activity, it?.first)
-                intent.putExtra(BaseViewModel.extraBundle, it?.second)
+                it?.second?.let { bundle -> intent.putExtras(bundle) }
                 mStartActivityForResult.launch(intent)
             })
         }
@@ -121,13 +123,20 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         if (!this::mStartActivityForResult.isInitialized) {
             mStartActivityForResult =
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    val data = it.data
-                    if (data != null) {
-                        onActivityResult(it.resultCode, data)
-                        mViewModel.onActivityResult(it.resultCode, data)
-                    } else {
-                        onActivityResult(it.resultCode)
-                        mViewModel.onActivityResult(it.resultCode)
+                    val data = it.data ?: Intent()
+                    when (it.resultCode) {
+                        Activity.RESULT_OK -> {
+                            onActivityResultOk(data)
+                            mViewModel.onActivityResultOk(data)
+                        }
+                        Activity.RESULT_CANCELED -> {
+                            onActivityResultCanceled(data)
+                            mViewModel.onActivityResultCanceled(data)
+                        }
+                        else -> {
+                            onActivityResult(it.resultCode, data)
+                            mViewModel.onActivityResult(it.resultCode, data)
+                        }
                     }
                 }
         }

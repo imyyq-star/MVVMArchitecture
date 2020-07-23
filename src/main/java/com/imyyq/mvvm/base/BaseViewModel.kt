@@ -2,16 +2,16 @@ package com.imyyq.mvvm.base
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
-import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
+import com.imyyq.mvvm.app.CheckUtil
 import com.imyyq.mvvm.app.RepositoryManager
-import com.imyyq.mvvm.http.*
-import com.imyyq.mvvm.utils.LogUtil
+import com.imyyq.mvvm.http.HttpHandler
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import com.kingja.loadsir.callback.Callback
 import io.reactivex.disposables.CompositeDisposable
@@ -20,11 +20,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Call
-import retrofit2.HttpException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel, IActivityResult {
+open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel,
+    IActivityResult, IArgumentsFromBundle, IArgumentsFromIntent {
+
     constructor(app: Application, model: M) : this(app) {
         isAutoCreateRepo = false
         mModel = model
@@ -41,6 +42,9 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     private lateinit var mCoroutineScope: CoroutineScope
 
     val mUiChangeLiveData by lazy { UiChangeLiveData() }
+
+    var mBundle: Bundle? = null
+    var mIntent: Intent? = null
 
     /**
      * 是否自动创建仓库，默认是 true，
@@ -62,19 +66,19 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         onFailed: ((code: Int, msg: String?) -> Unit)? = null,
         onComplete: (() -> Unit)? = null
     ) {
-        initScope()
+        initCoroutineScope()
         mCoroutineScope.launch {
             try {
-                handleResult(block(), onSuccess, onResult, onFailed)
+                HttpHandler.handleResult(block(), onSuccess, onResult, onFailed)
             } catch (e: Exception) {
-                onFailed?.let { handleException(e, it) }
+                onFailed?.let { HttpHandler.handleException(e, it) }
             } finally {
                 onComplete?.invoke()
             }
         }
     }
 
-    private fun initScope() {
+    private fun initCoroutineScope() {
         if (!this::mCoroutineScope.isInitialized) {
             mCoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
         }
@@ -84,7 +88,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      * 发起协程，让协程和 UI 相关
      */
     fun launchUI(block: suspend CoroutineScope.() -> Unit) {
-        initScope()
+        initCoroutineScope()
         mCoroutineScope.launch { block() }
     }
 
@@ -97,65 +101,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
     }
 
-    /**
-     * 处理请求结果
-     *
-     * [entity] 实体
-     * [onSuccess] 状态码对了就回调
-     * [onResult] 状态码对了，且实体不是 null 才回调
-     * [onFailed] 有错误发生，可能是服务端错误，可能是数据错误，详见 code 错误码和 msg 错误信息
-     */
-    private fun <T> handleResult(
-        entity: IBaseResponse<T?>?,
-        onSuccess: (() -> Unit)? = null,
-        onResult: ((t: T) -> Unit),
-        onFailed: ((code: Int, msg: String?) -> Unit)? = null
-    ) {
-        // 防止实体为 null
-        if (entity == null) {
-            onFailed?.invoke(entityNullable, msgEntityNullable)
-            return
-        }
-        val code = entity.code()
-        val msg = entity.msg()
-        // 防止状态码为 null
-        if (code == null) {
-            onFailed?.invoke(entityCodeNullable, msgEntityCodeNullable)
-            return
-        }
-        // 请求成功
-        if (entity.isSuccess()) {
-            // 回调成功
-            onSuccess?.invoke()
-            // 实体不为 null 才有价值
-            entity.data()?.let { onResult.invoke(it) }
-        } else {
-            // 失败了
-            onFailed?.invoke(code, msg)
-        }
-    }
-
-    /**
-     * 处理异常
-     */
-    private fun handleException(
-        e: Exception,
-        onFailed: (code: Int, msg: String?) -> Unit
-    ) {
-        if (BuildConfig.DEBUG) {
-            e.printStackTrace()
-        }
-        return if (e is HttpException) {
-            onFailed(e.code(), e.message())
-        } else {
-            val log = LogUtil.getStackTraceString(e)
-            onFailed(
-                notHttpException,
-                "$msgNotHttpException, 具体错误是\n${if (log.isEmpty()) e.message else log}"
-            )
-        }
-    }
-
+    @CallSuper
     override fun onCreate(owner: LifecycleOwner) {
         if (isAutoCreateRepo) {
             if (!this::mModel.isInitialized) {
@@ -228,17 +174,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun showLoadingDialog(msg: String?) {
-        if (mUiChangeLiveData.showLoadingDialogEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.loadingDialogTips))
-        }
+        CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.showLoadingDialogEvent)
         mUiChangeLiveData.showLoadingDialogEvent?.value = msg
     }
 
     @MainThread
     protected fun dismissLoadingDialog() {
-        if (mUiChangeLiveData.dismissLoadingDialogEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.loadingDialogTips))
-        }
+        CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.dismissLoadingDialogEvent)
         mUiChangeLiveData.dismissLoadingDialogEvent?.call()
     }
 
@@ -246,17 +188,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun showLoadSirSuccess() {
-        if (mUiChangeLiveData.loadSirEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.load_sir_tips))
-        }
+        CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
         mUiChangeLiveData.loadSirEvent?.value = null
     }
 
     @MainThread
     protected fun showLoadSir(clz: Class<out Callback>) {
-        if (mUiChangeLiveData.loadSirEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.load_sir_tips))
-        }
+        CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
         mUiChangeLiveData.loadSirEvent?.value = clz
     }
 
@@ -264,43 +202,42 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     @MainThread
     protected fun finish() {
-        if (mUiChangeLiveData.finishEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
-        }
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
         mUiChangeLiveData.finishEvent?.call()
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<out Activity>) {
-        if (mUiChangeLiveData.startActivityEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
-        }
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEvent)
         mUiChangeLiveData.startActivityEvent?.value = clazz
     }
 
     @MainThread
+    protected fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
+        mUiChangeLiveData.startActivityWithMapEvent?.value = Pair(clazz, map)
+    }
+
+    @MainThread
     protected fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
-        if (mUiChangeLiveData.startActivityEventWithBundle == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_finish_tips))
-        }
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEventWithBundle)
         mUiChangeLiveData.startActivityEventWithBundle?.value = Pair(clazz, bundle)
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<out Activity>) {
-        if (mUiChangeLiveData.startActivityForResultEvent == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
-        }
+        CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEvent)
         mUiChangeLiveData.startActivityForResultEvent?.value = clazz
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
-        if (mUiChangeLiveData.startActivityForResultEventWithBundle == null) {
-            throw RuntimeException(getApplication<Application>().getString(R.string.start_activity_for_result_tips))
-        }
+        CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithBundle)
         mUiChangeLiveData.startActivityForResultEventWithBundle?.value = Pair(clazz, bundle)
     }
+
+
+    // ===================================================================================
 
     /**
      * 通用的 Ui 改变变量
@@ -310,6 +247,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var dismissLoadingDialogEvent: SingleLiveEvent<Any?>? = null
 
         var startActivityEvent: SingleLiveEvent<Class<out Activity>>? = null
+        var startActivityWithMapEvent: SingleLiveEvent<Pair<Class<out Activity>, Map<String, *>>>? = null
         var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
         var startActivityForResultEvent: SingleLiveEvent<Class<out Activity>>? = null
@@ -335,12 +273,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
         fun initStartAndFinishEvent() {
             startActivityEvent = SingleLiveEvent()
+            startActivityWithMapEvent = SingleLiveEvent()
             startActivityEventWithBundle = SingleLiveEvent()
             finishEvent = SingleLiveEvent()
         }
     }
 
-    companion object {
-        const val extraBundle = "extraBundle"
-    }
+    override fun getBundle(): Bundle? = mBundle
+
+    override fun getArgumentsIntent(): Intent? = mIntent
 }

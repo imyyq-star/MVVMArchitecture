@@ -4,7 +4,6 @@ import android.util.ArrayMap
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.base.IBaseResponse
@@ -94,25 +93,21 @@ object HttpRequest {
                 }
             }
 
-            // 日志拦截器，只在 debug 期间生效
-            if (BuildConfig.DEBUG) {
-                httpClientBuilder
-                    .addInterceptor(
-                        LoggingInterceptor
-                            .Builder()
-                            // 是否开启日志打印
-                            .loggable(BuildConfig.DEBUG)
-                            // 打印的等级
-                            .setLevel(Level.BASIC)
-                            // 打印类型
-                            .log(Platform.INFO)
-                            // request 的 Tag
-                            .request("Request")
-                            // Response 的 Tag
-                            .response("Response")
-                            .build()
-                    )
-            }
+            // 日志拦截器，是否打印由 LogUtil 控制
+            httpClientBuilder
+                .addInterceptor(
+                    LoggingInterceptor
+                        .Builder()
+                        // 打印的等级
+                        .setLevel(Level.BASIC)
+                        // 打印类型
+                        .log(Platform.INFO)
+                        // request 的 Tag
+                        .request("Request")
+                        // Response 的 Tag
+                        .response("Response")
+                        .build()
+                )
 
             val client = httpClientBuilder.build()
             val builder = Retrofit.Builder().client(client)

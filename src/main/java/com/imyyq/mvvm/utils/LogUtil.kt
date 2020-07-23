@@ -181,8 +181,10 @@ object LogUtil {
         printLog(A, tag, msg)
     }
 
+    fun isLog() = mIsForceLog || mIsLog
+
     private fun printLog(type: Int, tagStr: String?, objectMsg: Any?) {
-        if (!mIsLog && !mIsForceLog) {
+        if (!isLog()) {
             return
         }
         val stackTrace =
