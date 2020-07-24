@@ -108,6 +108,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
                 val modelClass: Class<M>?
                 val type: Type? = javaClass.genericSuperclass
                 modelClass = if (type is ParameterizedType) {
+                    @Suppress("UNCHECKED_CAST")
                     type.actualTypeArguments[0] as? Class<M>
                 } else null
                 if (modelClass != null && modelClass != BaseModel::class.java) {
