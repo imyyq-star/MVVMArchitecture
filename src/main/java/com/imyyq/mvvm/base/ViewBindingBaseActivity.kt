@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
@@ -92,29 +91,54 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.startActivityWithMapEvent?.observe(this, Observer {
                 val intent = Intent(this, it?.first)
                 it?.second?.forEach { entry ->
+                    @Suppress("UNCHECKED_CAST")
                     when (val value = entry.value) {
                         is Boolean -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is BooleanArray -> {
                             intent.putExtra(entry.key, value)
                         }
                         is Byte -> {
                             intent.putExtra(entry.key, value)
                         }
+                        is ByteArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
                         is Char -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is CharArray -> {
                             intent.putExtra(entry.key, value)
                         }
                         is Short -> {
                             intent.putExtra(entry.key, value)
                         }
+                        is ShortArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
                         is Int -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is IntArray -> {
                             intent.putExtra(entry.key, value)
                         }
                         is Long -> {
                             intent.putExtra(entry.key, value)
                         }
+                        is LongArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
                         is Float -> {
                             intent.putExtra(entry.key, value)
                         }
+                        is FloatArray -> {
+                            intent.putExtra(entry.key, value)
+                        }
                         is Double -> {
+                            intent.putExtra(entry.key, value)
+                        }
+                        is DoubleArray -> {
                             intent.putExtra(entry.key, value)
                         }
                         is String -> {
@@ -129,36 +153,35 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                         is Serializable -> {
                             intent.putExtra(entry.key, value)
                         }
-                        is BooleanArray -> {
+                        is Bundle -> {
                             intent.putExtra(entry.key, value)
                         }
-                        is ByteArray -> {
+                        is Intent -> {
                             intent.putExtra(entry.key, value)
                         }
-                        is ShortArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is CharArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is IntArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is LongArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is FloatArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is DoubleArray -> {
-                            intent.putExtra(entry.key, value)
+                        is ArrayList<*> -> {
+                            val any = if (value.isNotEmpty()) {
+                                value[0]
+                            } else null
+                            if (any is String) {
+                                intent.putExtra(entry.key, value as ArrayList<String>)
+                            } else if (any is Parcelable) {
+                                intent.putExtra(entry.key, value as ArrayList<Parcelable>)
+                            } else if (any is Int) {
+                                intent.putExtra(entry.key, value as ArrayList<Int>)
+                            } else if (any is CharSequence) {
+                                intent.putExtra(entry.key, value as ArrayList<CharSequence>)
+                            } else {
+                                throw RuntimeException("不支持此类型 $value")
+                            }
                         }
                         is Array<*> -> {
-                            @Suppress("UNCHECKED_CAST")
                             if (value.isArrayOf<String>()) {
                                 intent.putExtra(entry.key, value as Array<String>)
                             } else if (value.isArrayOf<Parcelable>()) {
                                 intent.putExtra(entry.key, value as Array<Parcelable>)
+                            } else if (value.isArrayOf<CharSequence>()) {
+                                intent.putExtra(entry.key, value as Array<CharSequence>)
                             } else {
                                 throw RuntimeException("不支持此类型 $value")
                             }
@@ -246,7 +269,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         if (getLoadSirTarget() != null) {
             mLoadService = LoadSir.getDefault().register(
                 getLoadSirTarget()
-            ) { v: View? -> onLoadSirReload() }
+            ) { onLoadSirReload() }
 
             mViewModel.mUiChangeLiveData.initLoadSirEvent()
             mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
