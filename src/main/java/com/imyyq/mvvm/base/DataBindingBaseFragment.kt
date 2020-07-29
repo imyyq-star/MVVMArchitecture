@@ -6,7 +6,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-abstract class DataBindingFragment<V : ViewDataBinding, VM : BaseViewModel<out BaseModel>>(
+abstract class DataBindingBaseFragment<V : ViewDataBinding, VM : BaseViewModel<out BaseModel>>(
     @LayoutRes private val layoutId: Int,
     private val varViewModelId: Int? = null
 ) : ViewBindingBaseFragment<V, VM>() {

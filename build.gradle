@@ -25,6 +25,18 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            ext.enableCrashlytics = false
+            ext.alwaysUpdateBuildId = false
+            aaptOptions {
+                cruncherEnabled false
+            }
+        }
+
+        beta {
+            initWith release
+        }
     }
 
     buildFeatures{
