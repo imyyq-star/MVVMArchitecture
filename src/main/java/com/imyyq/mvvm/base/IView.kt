@@ -32,7 +32,7 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
     /**
      * 初始化 DataBinding，基类应该在初始化后设为 final
      */
-    fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V?
+    fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V
 
     /**
      * 初始化视图和 VM
