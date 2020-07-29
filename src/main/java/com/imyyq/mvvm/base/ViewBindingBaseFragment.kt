@@ -48,6 +48,11 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         initData()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
+    }
+
     @CallSuper
     override fun initViewAndViewModel() {
         mViewModel = initViewModel(this)

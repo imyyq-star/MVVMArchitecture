@@ -26,8 +26,7 @@ abstract class DataBindingBaseFragment<V : ViewDataBinding, VM : BaseViewModel<o
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         mBinding?.unbind()
-        mBinding = null
+        super.onDestroyView()
     }
 }
