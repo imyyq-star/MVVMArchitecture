@@ -2,11 +2,13 @@ package com.imyyq.mvvm.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.app.BaseApp
 import com.imyyq.mvvm.app.GlobalConfig
+import com.imyyq.mvvm.bus.LiveDataBus
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -43,6 +45,11 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
      * 初始化通用的 UI 改变事件，基类应该在初始化后设为 final
      */
     fun initUiChangeLiveData()
+
+    fun removeLiveDataBus(owner: LifecycleOwner) {
+        LiveDataBus.removeObserve(owner)
+        LiveDataBus.removeObserveForever(this)
+    }
 
     /**
      * 每个视图肯定会持有一个 ViewModel

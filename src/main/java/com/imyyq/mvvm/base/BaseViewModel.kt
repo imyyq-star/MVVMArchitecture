@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.CheckUtil
 import com.imyyq.mvvm.app.RepositoryManager
+import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.http.HttpHandler
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import com.kingja.loadsir.callback.Callback
@@ -125,6 +126,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mModel.onCleared()
         }
 
+        LiveDataBus.removeObserveForever(this)
         cancelConsumingTask()
     }
 
