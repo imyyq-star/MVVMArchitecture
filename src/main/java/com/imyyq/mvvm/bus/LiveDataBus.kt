@@ -28,9 +28,9 @@ object LiveDataBus {
     /**
      * 生命周期类型的监听
      */
-    fun <T, R : Any> observe(
+    fun <R : Any> observe(
         owner: LifecycleOwner,
-        tag: T,
+        tag: Any,
         observer: Observer<R>
     ) {
         val liveData = MutableLiveData<R>()
@@ -55,9 +55,9 @@ object LiveDataBus {
     /**
      * 无生命周期的监听，任意类都可以使用，比如 vm 中，不过需要注意的是，在不需要的时候需要手动移除监听，就像 EventBus 一样
      */
-    fun <T, R : Any> observeForever(
+    fun <R : Any> observeForever(
         obj: Any,
-        tag: T,
+        tag: Any,
         observer: Observer<R>
     ) {
         val liveData = MutableLiveData<R>()
@@ -83,7 +83,7 @@ object LiveDataBus {
     /**
      * 移除 [obj] 对象下的 [tag] 监听
      */
-    fun <T> removeObserveForever(obj: Any, tag: T) {
+    fun removeObserveForever(obj: Any, tag: Any) {
         val objMap = mLiveDataForeverMap[obj]
         val pair = objMap?.get(tag)
         pair?.let {
@@ -95,7 +95,7 @@ object LiveDataBus {
     /**
      * 发送消息，只要是相同的 tag，就会触发对应的 LiveData，不管这个 tag 是在哪里注册的。
      */
-    fun <T, R> send(tag: T, result: R) {
+    fun send(tag: Any, result: Any) {
         mLiveDataMap.forEach {
             it.value.forEach inside@{ entry ->
                 if (entry.key == tag) {
