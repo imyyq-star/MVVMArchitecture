@@ -126,7 +126,8 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mModel.onCleared()
         }
 
-        LiveDataBus.removeObserveForever(this)
+        LiveDataBus.removeObserve(this)
+        LiveDataBus.removeStickyObserver(this)
         cancelConsumingTask()
     }
 

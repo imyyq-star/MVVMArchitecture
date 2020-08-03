@@ -48,7 +48,7 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
 
     fun removeLiveDataBus(owner: LifecycleOwner) {
         LiveDataBus.removeObserve(owner)
-        LiveDataBus.removeObserveForever(this)
+        LiveDataBus.removeStickyObserver(this)
     }
 
     /**
