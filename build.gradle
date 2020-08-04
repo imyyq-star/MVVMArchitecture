@@ -34,6 +34,10 @@ android {
             }
         }
 
+        /**
+         * 建议提测用这个构建类型，并使用 BuildConfig.BUILD_TYPE 判断是否等于 beta，作为
+         * 开启动态修改 Url，动态打开日志等功能的标记。
+         */
         beta {
             initWith release
         }
