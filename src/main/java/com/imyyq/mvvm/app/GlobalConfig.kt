@@ -2,6 +2,7 @@ package com.imyyq.mvvm.app
 
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.kingja.loadsir.callback.Callback
 import com.kingja.loadsir.core.LoadSir
@@ -11,6 +12,12 @@ import com.kingja.loadsir.core.LoadSir
  * 全局配置
  */
 object GlobalConfig {
+    /**
+     * beta 构建选项是否保存 log 到缓存目录。目录地址：
+     * /sdcard/Android/data/应用包名/cache/Log
+     */
+    var gIsBetaSaveLog = BuildConfig.BUILD_TYPE == "beta"
+
     /**
      * 加载中对话框是否可点击返回键隐藏对话框
      */

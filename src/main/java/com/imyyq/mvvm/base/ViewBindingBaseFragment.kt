@@ -83,6 +83,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
         // 界面销毁时移除 vm 的生命周期感知
         lifecycle.removeObserver(mViewModel)
+        removeLiveDataBus(this)
     }
 
     /**

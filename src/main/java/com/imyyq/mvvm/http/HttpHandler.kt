@@ -1,6 +1,5 @@
 package com.imyyq.mvvm.http
 
-import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.base.IBaseResponse
 import com.imyyq.mvvm.utils.LogUtil
 import retrofit2.HttpException
@@ -51,7 +50,7 @@ object HttpHandler {
         e: Exception,
         onFailed: (code: Int, msg: String?) -> Unit
     ) {
-        if (BuildConfig.DEBUG) {
+        if (LogUtil.isLog()) {
             e.printStackTrace()
         }
         return if (e is HttpException) {
