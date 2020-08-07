@@ -6,6 +6,8 @@ import com.kingja.loadsir.callback.Callback
  * 加载中接口
  */
 interface ILoading {
+    fun initLoadSir()
+
     /**
      * 加载失败，显示 LoadSir 的页面
      */

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
@@ -35,15 +34,13 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (isKeepScreenOn()) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
 
         mBinding = initBinding(layoutInflater, null)
         initViewAndViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
+        initLoadSir()
         initData()
     }
 
@@ -56,25 +53,6 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         mViewModel.mIntent = getArgumentsIntent()
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // 界面销毁时移除 vm 的生命周期感知
-        lifecycle.removeObserver(mViewModel)
-        removeLiveDataBus(this)
-    }
-
-    /**
-     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
-     */
-    override fun getBundle(): Bundle? {
-        return intent.extras
-    }
-
-    override fun getArgumentsIntent(): Intent? {
-        return intent
     }
 
     final override fun initUiChangeLiveData() {
@@ -125,6 +103,26 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         }
     }
 
+    final override fun initLoadSir() {
+        // 只有目标不为空的情况才有实例化的必要
+        if (getLoadSirTarget() != null) {
+            mLoadService = LoadSir.getDefault().register(
+                getLoadSirTarget()
+            ) { onLoadSirReload() }
+
+            mViewModel.mUiChangeLiveData.initLoadSirEvent()
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
+                if (it == null) {
+                    mLoadService.showSuccess()
+                    onLoadSirSuccess()
+                } else {
+                    mLoadService.showCallback(it)
+                    onLoadSirShowed(it)
+                }
+            })
+        }
+    }
+
     fun startActivity(
         clz: Class<out Activity>?,
         map: Map<String, *>? = null,
@@ -166,32 +164,14 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     }
 
     /**
-     * true 则当前界面常亮
+     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
      */
-    protected open fun isKeepScreenOn() = false
+    final override fun getBundle(): Bundle? {
+        return intent.extras
+    }
 
-    /**
-     * CallSuper 要求之类必须调用 super
-     */
-    @CallSuper
-    override fun initData() {
-        // 只有目标不为空的情况才有实例化的必要
-        if (getLoadSirTarget() != null) {
-            mLoadService = LoadSir.getDefault().register(
-                getLoadSirTarget()
-            ) { onLoadSirReload() }
-
-            mViewModel.mUiChangeLiveData.initLoadSirEvent()
-            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
-                if (it == null) {
-                    mLoadService.showSuccess()
-                    onLoadSirSuccess()
-                } else {
-                    mLoadService.showCallback(it)
-                    onLoadSirShowed(it)
-                }
-            })
-        }
+    final override fun getArgumentsIntent(): Intent? {
+        return intent
     }
 
     /**
@@ -215,4 +195,12 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      */
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // 界面销毁时移除 vm 的生命周期感知
+        lifecycle.removeObserver(mViewModel)
+        removeLiveDataBus(this)
+    }
 }

@@ -44,32 +44,13 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initViewAndViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
+        initLoadSir()
         initData()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        // 通过反射，解决内存泄露问题
-        GlobalScope.launch {
-            var clz: Class<*>? = this@ViewBindingBaseFragment.javaClass
-            while (clz != null) {
-                // 找到 mBinding 所在的类
-                if (clz == ViewBindingBaseFragment::class.java) {
-                    try {
-                        val field = clz.getDeclaredField("mBinding")
-                        field.isAccessible = true
-                        field.set(this@ViewBindingBaseFragment, null)
-                    } catch (ignore: Exception) {
-                    }
-                }
-                clz = clz.superclass
-            }
-        }
     }
 
     @CallSuper
@@ -77,21 +58,6 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         mViewModel = initViewModel(this)
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // 界面销毁时移除 vm 的生命周期感知
-        lifecycle.removeObserver(mViewModel)
-        removeLiveDataBus(this)
-    }
-
-    /**
-     * 通过 setArguments 传递 bundle，在这里可以获取
-     */
-    override fun getBundle(): Bundle? {
-        return arguments
     }
 
     final override fun initUiChangeLiveData() {
@@ -143,6 +109,26 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         }
     }
 
+    final override fun initLoadSir() {
+        // 只有目标不为空的情况才有实例化的必要
+        if (getLoadSirTarget() != null) {
+            mLoadService = LoadSir.getDefault().register(
+                getLoadSirTarget()
+            ) { onLoadSirReload() }
+
+            mViewModel.mUiChangeLiveData.initLoadSirEvent()
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
+                if (it == null) {
+                    mLoadService.showSuccess()
+                    onLoadSirSuccess()
+                } else {
+                    mLoadService.showCallback(it)
+                    onLoadSirShowed(it)
+                }
+            })
+        }
+    }
+
     fun startActivity(
         clz: Class<out Activity>?,
         map: Map<String, *>? = null,
@@ -184,27 +170,10 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     }
 
     /**
-     * CallSuper 要求子类必须调用 super
+     * 通过 setArguments 传递 bundle，在这里可以获取
      */
-    @CallSuper
-    override fun initData() {
-        // 只有目标不为空的情况才有实例化的必要
-        if (getLoadSirTarget() != null) {
-            mLoadService = LoadSir.getDefault().register(
-                getLoadSirTarget()
-            ) { onLoadSirReload() }
-
-            mViewModel.mUiChangeLiveData.initLoadSirEvent()
-            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
-                if (it == null) {
-                    mLoadService.showSuccess()
-                    onLoadSirSuccess()
-                } else {
-                    mLoadService.showCallback(it)
-                    onLoadSirShowed(it)
-                }
-            })
-        }
+    override fun getBundle(): Bundle? {
+        return arguments
     }
 
     /**
@@ -228,4 +197,33 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
      */
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        // 通过反射，解决内存泄露问题
+        GlobalScope.launch {
+            var clz: Class<*>? = this@ViewBindingBaseFragment.javaClass
+            while (clz != null) {
+                // 找到 mBinding 所在的类
+                if (clz == ViewBindingBaseFragment::class.java) {
+                    try {
+                        val field = clz.getDeclaredField("mBinding")
+                        field.isAccessible = true
+                        field.set(this@ViewBindingBaseFragment, null)
+                    } catch (ignore: Exception) {
+                    }
+                }
+                clz = clz.superclass
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // 界面销毁时移除 vm 的生命周期感知
+        lifecycle.removeObserver(mViewModel)
+        removeLiveDataBus(this)
+    }
 }
