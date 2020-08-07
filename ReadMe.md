@@ -164,7 +164,7 @@ DataBinding 是用来实现 MVVM 架构的一个非常好的方式，但它不�
 
 因此框架提供了对单纯 ViewBinding 的支持，将基类分成了 DataBindingBaseActivity/ViewBindingBaseActivity 和 DataBindingBaseFragment/ViewBindingBaseFragment，按需继承相关基类即可。也就是说如果你不熟悉 DataBinding，那可以继承自 ViewBindingBaseXxxxx，这样就只帮你解决 findViewById 的问题，具体的 V 和 VM 数据交互和响应就得自己做了。
 
-个人推荐把 DataBinding 学起来，告别 setText、setOnClickListener 等样板无聊的代码。
+个人推荐把 DataBinding 学起来，告别 setText、setOnClickListener 等样板无聊的代码。可以看看本人的文章：[DataBinding，让人又爱又恨的一个框架](https://juejin.im/post/6857815150565687303/)
 
 
 # 引入框架

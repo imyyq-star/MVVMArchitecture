@@ -3,6 +3,7 @@ package com.imyyq.mvvm.app
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import com.imyyq.mvvm.utils.LogUtil
 
 open class BaseApp : Application() {
 
@@ -18,6 +19,8 @@ open class BaseApp : Application() {
         @JvmStatic
         fun initApp(app: Application) {
             Companion.app = app
+
+            LogUtil.init()
 
             // 监听所有 Activity 的创建和销毁
             if (GlobalConfig.gIsNeedActivityManager) {

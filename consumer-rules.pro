@@ -81,3 +81,11 @@
 # ====================================================== LoadSir
 -dontwarn com.kingja.loadsir.**
 -keep class com.kingja.loadsir.** {*;}
+
+-dontwarn androidx.navigation.**
+-keep class androidx.navigation.** {*;}
+
+# Fragment 的 mBinding 变量不要混淆，因为要手动反射设置为 null
+-keepclassmembers class com.imyyq.mvvm.base.ViewBindingBaseFragment {
+     protected * mBinding;
+}

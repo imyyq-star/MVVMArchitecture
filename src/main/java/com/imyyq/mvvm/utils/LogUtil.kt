@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.BaseApp
+import com.imyyq.mvvm.app.GlobalConfig
 import java.io.BufferedWriter
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -38,8 +39,8 @@ object LogUtil {
      */
     var mLogPwd = if (BuildConfig.DEBUG) "12345678" else BaseApp.getInstance().packageName
 
-    // 只有 debug 才输出 log
-    private val mIsLog: Boolean = BuildConfig.DEBUG
+    // 只有 debug 和 beta 才默认输出 log
+    private val mIsLog: Boolean = BuildConfig.DEBUG || GlobalConfig.gIsBetaSaveLog
 
     private const val V = 0x1
     private const val D = 0x2
@@ -54,10 +55,11 @@ object LogUtil {
     private lateinit var mCurDateTime: String
 
     @JvmStatic
-    fun init() {
+    internal fun init() {
         CrashHandlerUtil.init()
     }
 
+    @Synchronized
     private fun initLogHandler() {
         if (this::mHandler.isInitialized) {
             return
@@ -110,6 +112,7 @@ object LogUtil {
 
         sb.append("appVerName:").append(AppUtil.versionName).append(lineSeparator)
         sb.append("appVerCode:").append(AppUtil.versionCode).append(lineSeparator)
+        sb.append("buildType:").append(BuildConfig.BUILD_TYPE).append(lineSeparator)
         // 系统版本
         sb.append("OsVer:").append(Build.VERSION.RELEASE).append(lineSeparator)
         // 手机厂商
@@ -208,6 +211,10 @@ object LogUtil {
             W -> Log.w(tag, logStr)
             E -> Log.e(tag, logStr)
             A -> Log.wtf(tag, logStr)
+        }
+        // 是否保存到本地缓存目录
+        if (!this::mHandler.isInitialized && GlobalConfig.gIsBetaSaveLog && BuildConfig.BUILD_TYPE == "beta") {
+            initLogHandler()
         }
         // 已初始化，则可以发送消息了
         if (this::mHandler.isInitialized) {
