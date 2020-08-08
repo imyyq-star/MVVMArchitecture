@@ -21,7 +21,6 @@ ext {
             retrofit2         : false,
             retrofit2RxJava2  : false,
 
-            swipeRefreshLayout: false,
             glide             : false,
 
             // 权限申请

@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
@@ -101,14 +102,15 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.finishEvent?.observe(this, Observer { activity?.finish() })
             // vm 可以启动界面
             mViewModel.mUiChangeLiveData.startActivityEvent?.observe(this, Observer {
-                val intent = Intent(activity, it)
-                startActivity(intent)
+                startActivity(it)
+            })
+            mViewModel.mUiChangeLiveData.startActivityWithMapEvent?.observe(this, Observer {
+                startActivity(it?.first, it?.second)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
+            // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
-                val intent = Intent(activity, it?.first)
-                it?.second?.let { bundle -> intent.putExtras(bundle) }
-                startActivity(intent)
+                startActivity(it?.first, bundle = it?.second)
             })
         }
         if (isViewModelNeedStartForResult()) {
@@ -116,16 +118,14 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
             // vm 可以启动界面
             mViewModel.mUiChangeLiveData.startActivityForResultEvent?.observe(this, Observer {
-                initStartActivityForResult()
-                val intent = Intent(activity, it)
-                mStartActivityForResult.launch(intent)
+                startActivityForResult(it)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
-                initStartActivityForResult()
-                val intent = Intent(activity, it?.first)
-                it?.second?.let { bundle -> intent.putExtras(bundle) }
-                mStartActivityForResult.launch(intent)
+                startActivityForResult(it?.first, bundle = it?.second)
+            })
+            mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap?.observe(this, Observer {
+                startActivityForResult(it?.first, it?.second)
             })
         }
 
@@ -141,6 +141,23 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
                 dismissLoadingDialog(mLoadingDialog)
             })
         }
+    }
+
+    fun startActivity(
+        clz: Class<out Activity>?,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        startActivity(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
+    }
+
+    fun startActivityForResult(
+        clz: Class<out Activity>?,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        initStartActivityForResult()
+        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
     }
 
     private fun initStartActivityForResult() {

@@ -240,6 +240,12 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         mUiChangeLiveData.startActivityForResultEventWithBundle?.value = Pair(clazz, bundle)
     }
 
+    @MainThread
+    protected fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
+        CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithMap)
+        mUiChangeLiveData.startActivityForResultEventWithMap?.value = Pair(clazz, map)
+    }
+
 
     // ===================================================================================
 
@@ -255,6 +261,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
         var startActivityForResultEvent: SingleLiveEvent<Class<out Activity>>? = null
+        var startActivityForResultEventWithMap: SingleLiveEvent<Pair<Class<out Activity>, Map<String, *>>>? = null
         var startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
 
         var finishEvent: SingleLiveEvent<Any?>? = null
@@ -272,6 +279,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
         fun initStartActivityForResultEvent() {
             startActivityForResultEvent = SingleLiveEvent()
+            startActivityForResultEventWithMap = SingleLiveEvent()
             startActivityForResultEventWithBundle = SingleLiveEvent()
         }
 

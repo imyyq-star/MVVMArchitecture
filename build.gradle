@@ -127,17 +127,9 @@ dependencies {
     checkMVVMConfigProperty(IncludeLib.room, "room")
     if (IncludeLib.room) {
         api Deps.roomRuntime
-        kapt Deps.roomCompiler
+        // kapt Deps.roomCompiler
     } else {
         compileOnly Deps.roomRuntime
-    }
-
-    // Android 提供的下拉刷新，上拉加载可以使用第三方的 SmartRefreshLayout
-    checkMVVMConfigProperty(IncludeLib.swipeRefreshLayout, "swipeRefreshLayout")
-    if (IncludeLib.swipeRefreshLayout) {
-        api Deps.swipeRefreshLayout
-    } else {
-        compileOnly Deps.swipeRefreshLayout
     }
 
     // 网络，默认使用 gson 解析 json
@@ -155,7 +147,7 @@ dependencies {
     checkMVVMConfigProperty(IncludeLib.glide, "glide")
     if (IncludeLib.glide) {
         api Deps.glide
-        kapt Deps.glideCompiler
+        // kapt Deps.glideCompiler
     } else {
         compileOnly Deps.glide
     }

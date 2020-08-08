@@ -17,19 +17,22 @@ import java.lang.reflect.Type
  */
 interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsFromBundle {
     /**
+     * 1.
      * 初始化外部传进来的参数
      */
     fun initParam() {}
 
     /**
-     * 初始化数据
-     */
-    fun initData() {}
-
-    /**
+     * 2.
      * 初始化界面观察者
      */
     fun initViewObservable() {}
+
+    /**
+     * 3.
+     * 初始化数据
+     */
+    fun initData() {}
 
     /**
      * 初始化 DataBinding，基类应该在初始化后设为 final
@@ -46,6 +49,9 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
      */
     fun initUiChangeLiveData()
 
+    /**
+     * 移除事件总线监听，避免内存泄露
+     */
     fun removeLiveDataBus(owner: LifecycleOwner) {
         LiveDataBus.removeObserve(owner)
         LiveDataBus.removeStickyObserver(this)
