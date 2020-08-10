@@ -213,7 +213,7 @@ object LogUtil {
             A -> Log.wtf(tag, logStr)
         }
         // 是否保存到本地缓存目录
-        if (!this::mHandler.isInitialized && GlobalConfig.gIsBetaSaveLog && BuildConfig.BUILD_TYPE == "beta") {
+        if (!this::mHandler.isInitialized && GlobalConfig.gIsBetaSaveLog) {
             initLogHandler()
         }
         // 已初始化，则可以发送消息了

@@ -1,12 +1,18 @@
+[![](https://jitpack.io/v/imyyq-star/MVVMArch.svg)](https://jitpack.io/#imyyq-star/MVVMArch) [![LICENSE](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/imyyq-star/MVVMArchitecture/blob/master/LICENSE)
+
+
+**框架已发布到 jitpack 远程仓库中**，可以根据 [Wiki - 通过远程仓库引入框架](https://github.com/imyyq-star/MVVMArchitecture/wiki/0%E3%80%81%E9%80%9A%E8%BF%87%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E5%BC%95%E5%85%A5%E6%A1%86%E6%9E%B6)。
+
+也可以不通过远程仓库，直接引入源码，**如需引入源码，请参照 [Wiki - 通过 submodule 引入框架](https://github.com/imyyq-star/MVVMArchitecture/wiki/1%E3%80%81%E9%80%9A%E8%BF%87%20submodule%20%E5%BC%95%E5%85%A5%E6%A1%86%E6%9E%B6)**
+
+
 # 简介
 
 ![图1](https://imyyq.coding.net/p/MyMarkdownImg/d/MyMarkdownImg/git/raw/master/eda038cc59438bb9582f6d0dbe21cc14efa514b567d429a9bfbeb2b89ba9f9e6.png)  
 
-Android 的 MVVM 框架，在 GitHub 上也有不少，都蛮优秀的，在我看来其实**框架的好处就是经过尽可能的封装，让开发变得更便捷，同时也更稳定，更安全，代码也更统一，更干净等等**。你只需经过简单的几个步骤，就能很快的上手，MVVM 的分层方式可以看看这篇：[MVVMArchitecture，一款可配置的 MVVM 框架](https://www.jianshu.com/p/87fabd2523b4)，或自行搜索相关的知识点，这里就不展开叙述了。
+本框架设计遵循以上架构图，框架的好处**就是经过尽可能的封装，让开发变得更便捷，同时也更稳定，更安全，代码也更统一，更干净等等**。你只需经过简单的几个步骤，就能很快的上手，MVVM 的分层方式可以看看这篇：[MVVMArchitecture，一款可配置的 MVVM 框架](https://www.jianshu.com/p/87fabd2523b4)，或自行搜索相关的知识点，这里就不展开叙述了。
 
-本框架也是一样的，**目的也是为了方便开发者而对常用的功能进行封装**。目前它的灵感**部分**来源于 [MVVMHabit](https://github.com/goldze/MVVMHabit)，以及 [MVVMLin](https://github.com/AleynP/MVVMLin) 这两个框架，从中吸收了不少优点，如果后续发现其他框架有很好的功能封装点，我也会将其吸收过来，不断完善功能。
-
-框架主体代码使用 Kotlin 编写，小部分工具代码使用 Java 编写，兼容 Kotlin 和 Java，兼容 Rx 和 协程。
+本框架为了方便开发者而对常用的功能进行了封装。框架主体代码使用 Kotlin 编写，小部分工具代码使用 Java 编写，兼容 Kotlin 和 Java，兼容 Rx 和 协程。
 
 下面我们通过一些举例来认识框架的好处，详细使用方法可参考 [Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 或 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)。
 
@@ -32,14 +38,9 @@ APK 的大小向来是一个敏感的点，越小则被用户接受的可能性�
 
 最后是也许你的项目是需要交付源码出去的，客户可能会要求你除去项目中无用的代码或减少 APK 的大小。
 
-**本框架第二个独特的点，在于项目并不通过远程仓库发布，而是通过 git submodule 的方式，让框架以源码引入的方式，成为你项目中的子仓库**。
+**本框架第二个独特的点，在于项目即可通过远程仓库引入，也可通过 git submodule，让框架以源码引入的方式，成为你项目中的子仓库**。
 
-我认为使用本框架最好的使用方式是：
-1. Fork 框架到你的 GitHub 成为你的仓库。
-2. 将 Fork 后的仓库作为你的项目子仓库引入项目中。（后面再说如何引入框架）
-
-如此一来，框架就成为你自己的了，你即可以对框架进行修改后，**发起合并请求合并到我的框架中，也可以从我的框架中获取实时更新**。发现 Bug 后马上能得到修复，不需要等到版本发布。
-
+根据自己的需要去选择。
 
 ## 3. 生命周期的问题
 在 Jetpack 出来之前，生命周期的处理还是比较麻烦的，有了 Jetpack 后，我们可以通过 LiveData 和 DataBinding 来关联数据和界面，这样生命周期就安全了。
@@ -74,7 +75,8 @@ Glide.with(imageView.getContext())
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     url="@{viewModel.mImageUrl}"
-    placeholderRes="@{R.mipmap.ic_launcher}"
+    placeholderRes="@{@drawable/ic_launcher}"
+    errorRes="@{@drawable/error}"
 />
 ```
 
@@ -156,6 +158,7 @@ data class BaseEntity<T>(
 
 ## 8. DataBinding 的问题
 DataBinding 是用来实现 MVVM 架构的一个非常好的方式，但它不是必须的。而且它是一个一直被人嫌弃的技术，我个人在熟悉 DataBinding 之前，也挺嫌弃它的，所以一直用 LiveData 多写点代码让 UI 响应数据的更改。
+
 后来随着框架封装的深入使用，才发现 DataBinding 真香，它不仅可以消灭 findViewById，还可以和 LiveData 联动，**最重要的是：DataBinding 可以让你少写很多代码。**
 
 本框架是推荐同学们首选使用 DataBinding 的，但可能有些同学对 DataBinding 还不是很熟悉，使用此框架时只用到了它能解决 findViewById 的功能，甚至使用 Kotlin 开发的，直接用 kotlin-android-extensions 就解决 findViewById 了。
@@ -166,13 +169,11 @@ DataBinding 是用来实现 MVVM 架构的一个非常好的方式，但它不�
 
 个人推荐把 DataBinding 学起来，告别 setText、setOnClickListener 等样板无聊的代码。可以看看本人的文章：[DataBinding，让人又爱又恨的一个框架](https://juejin.im/post/6857815150565687303/)
 
+## 9. 更多使用
+以上只是列了下部分的问题，详细使用详见 [Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 或 [MVVMArchitectureSample](https://github.com/imyyq-star/MVVMArchitectureSample)。
 
-# 引入框架
-经过上述的描述，你应该能认识到使用框架的好处了，详细的去看本框架的 [GitHub Wiki](https://github.com/imyyq-star/MVVMArchitecture/wiki) 吧，根据 Wiki 去引入框架和使用框架。**更多功能详细使用都在 wiki 中了**。
-
-不要担心，其实就是一些代码封装而已，并没有什么复杂的东西。
 
 # 交流 QQ 群 828441270
-如果你有更好的封装想法，有更好的代码技巧，欢迎入群一起讨论，群人数不多，我们的**目的是更好的代码，更快的开发速度，更优雅的风格，更早下班撩妹的工作方式**
+如果你有任何疑问，有更好的封装想法，有更好的代码技巧，欢迎入群一起讨论，我们的**目的是更好的代码，更快的开发速度，更优雅的风格，更早下班撩妹的工作方式**
 
 **另外，如果你发现问题，欢迎提交合并或提 Issue，或者是有相关的建议或不明确的功能点也可以在群里提**。
