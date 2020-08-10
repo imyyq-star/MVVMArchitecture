@@ -3,20 +3,18 @@ package com.imyyq.mvvm.base
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
-import java.io.Serializable
 
 /**
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
@@ -36,15 +34,13 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (isKeepScreenOn()) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
 
         mBinding = initBinding(layoutInflater, null)
         initViewAndViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
+        initLoadSir()
         initData()
     }
 
@@ -59,25 +55,6 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         lifecycle.addObserver(mViewModel)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // 界面销毁时移除 vm 的生命周期感知
-        lifecycle.removeObserver(mViewModel)
-        removeLiveDataBus(this)
-    }
-
-    /**
-     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
-     */
-    override fun getBundle(): Bundle? {
-        return intent.extras
-    }
-
-    override fun getArgumentsIntent(): Intent? {
-        return intent
-    }
-
     final override fun initUiChangeLiveData() {
         if (isViewModelNeedStartAndFinish()) {
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
@@ -86,119 +63,14 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.finishEvent?.observe(this, Observer { finish() })
             // vm 可以启动界面
             mViewModel.mUiChangeLiveData.startActivityEvent?.observe(this, Observer {
-                val intent = Intent(this, it)
-                startActivity(intent)
+                startActivity(it)
             })
             mViewModel.mUiChangeLiveData.startActivityWithMapEvent?.observe(this, Observer {
-                val intent = Intent(this, it?.first)
-                it?.second?.forEach { entry ->
-                    @Suppress("UNCHECKED_CAST")
-                    when (val value = entry.value) {
-                        is Boolean -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is BooleanArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Byte -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is ByteArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Char -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is CharArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Short -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is ShortArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Int -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is IntArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Long -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is LongArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Float -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is FloatArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Double -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is DoubleArray -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is String -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is CharSequence -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Parcelable -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Serializable -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Bundle -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is Intent -> {
-                            intent.putExtra(entry.key, value)
-                        }
-                        is ArrayList<*> -> {
-                            val any = if (value.isNotEmpty()) {
-                                value[0]
-                            } else null
-                            if (any is String) {
-                                intent.putExtra(entry.key, value as ArrayList<String>)
-                            } else if (any is Parcelable) {
-                                intent.putExtra(entry.key, value as ArrayList<Parcelable>)
-                            } else if (any is Int) {
-                                intent.putExtra(entry.key, value as ArrayList<Int>)
-                            } else if (any is CharSequence) {
-                                intent.putExtra(entry.key, value as ArrayList<CharSequence>)
-                            } else {
-                                throw RuntimeException("不支持此类型 $value")
-                            }
-                        }
-                        is Array<*> -> {
-                            if (value.isArrayOf<String>()) {
-                                intent.putExtra(entry.key, value as Array<String>)
-                            } else if (value.isArrayOf<Parcelable>()) {
-                                intent.putExtra(entry.key, value as Array<Parcelable>)
-                            } else if (value.isArrayOf<CharSequence>()) {
-                                intent.putExtra(entry.key, value as Array<CharSequence>)
-                            } else {
-                                throw RuntimeException("不支持此类型 $value")
-                            }
-                        }
-                        else -> {
-                            throw RuntimeException("不支持此类型 $value")
-                        }
-                    }
-                }
-                startActivity(intent)
+                startActivity(it?.first, it?.second)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
-                val intent = Intent(this, it?.first)
-                it?.second?.let { bundle -> intent.putExtras(bundle) }
-                startActivity(intent)
+                startActivity(it?.first, bundle = it?.second)
             })
         }
         if (isViewModelNeedStartForResult()) {
@@ -206,16 +78,14 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
             // vm 可以启动界面
             mViewModel.mUiChangeLiveData.startActivityForResultEvent?.observe(this, Observer {
-                initStartActivityForResult()
-                val intent = Intent(this, it)
-                mStartActivityForResult.launch(intent)
+                startActivityForResult(it)
             })
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
-                initStartActivityForResult()
-                val intent = Intent(this, it?.first)
-                it?.second?.let { bundle -> intent.putExtras(bundle) }
-                mStartActivityForResult.launch(intent)
+                startActivityForResult(it?.first, bundle = it?.second)
+            })
+            mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap?.observe(this, Observer {
+                startActivityForResult(it?.first, it?.second)
             })
         }
 
@@ -231,6 +101,43 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 dismissLoadingDialog(mLoadingDialog)
             })
         }
+    }
+
+    final override fun initLoadSir() {
+        // 只有目标不为空的情况才有实例化的必要
+        if (getLoadSirTarget() != null) {
+            mLoadService = LoadSir.getDefault().register(
+                getLoadSirTarget()
+            ) { onLoadSirReload() }
+
+            mViewModel.mUiChangeLiveData.initLoadSirEvent()
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
+                if (it == null) {
+                    mLoadService.showSuccess()
+                    onLoadSirSuccess()
+                } else {
+                    mLoadService.showCallback(it)
+                    onLoadSirShowed(it)
+                }
+            })
+        }
+    }
+
+    fun startActivity(
+        clz: Class<out Activity>?,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        startActivity(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
+    }
+
+    fun startActivityForResult(
+        clz: Class<out Activity>?,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        initStartActivityForResult()
+        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
     }
 
     private fun initStartActivityForResult() {
@@ -257,32 +164,14 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     }
 
     /**
-     * true 则当前界面常亮
+     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
      */
-    protected open fun isKeepScreenOn() = false
+    final override fun getBundle(): Bundle? {
+        return intent.extras
+    }
 
-    /**
-     * CallSuper 要求之类必须调用 super
-     */
-    @CallSuper
-    override fun initData() {
-        // 只有目标不为空的情况才有实例化的必要
-        if (getLoadSirTarget() != null) {
-            mLoadService = LoadSir.getDefault().register(
-                getLoadSirTarget()
-            ) { onLoadSirReload() }
-
-            mViewModel.mUiChangeLiveData.initLoadSirEvent()
-            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
-                if (it == null) {
-                    mLoadService.showSuccess()
-                    onLoadSirSuccess()
-                } else {
-                    mLoadService.showCallback(it)
-                    onLoadSirShowed(it)
-                }
-            })
-        }
+    final override fun getArgumentsIntent(): Intent? {
+        return intent
     }
 
     /**
@@ -306,4 +195,12 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      */
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // 界面销毁时移除 vm 的生命周期感知
+        lifecycle.removeObserver(mViewModel)
+        removeLiveDataBus(this)
+    }
 }

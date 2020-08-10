@@ -37,34 +37,34 @@ interface ILoadingDialog {
     fun dismissLoadingDialog(dialog: Dialog) = dialog.dismiss()
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gLoadingDialogLayout]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gLoadingDialogLayout]
      */
     @LayoutRes
-    fun loadingDialogLayout() = GlobalConfig.gLoadingDialogLayout
+    fun loadingDialogLayout() = GlobalConfig.LoadingDialog.gLoadingDialogLayout
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gLoadingDialogLayoutMsgId]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gLoadingDialogLayoutMsgId]
      */
     @IdRes
-    fun loadingDialogLayoutMsgId() = GlobalConfig.gLoadingDialogLayoutMsgId
+    fun loadingDialogLayoutMsgId() = GlobalConfig.LoadingDialog.gLoadingDialogLayoutMsgId
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gIsNeedLoadingDialog]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gIsNeedLoadingDialog]
      */
-    fun isNeedLoadingDialog() = GlobalConfig.gIsNeedLoadingDialog
+    fun isNeedLoadingDialog() = GlobalConfig.LoadingDialog.gIsNeedLoadingDialog
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gLoadingDialogCancelable]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gLoadingDialogCancelable]
      */
-    fun isLoadingDialogCancelable() = GlobalConfig.gLoadingDialogCancelable
+    fun isLoadingDialogCancelable() = GlobalConfig.LoadingDialog.gLoadingDialogCancelable
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gLoadingDialogCanceledOnTouchOutside]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gLoadingDialogCanceledOnTouchOutside]
      */
-    fun isLoadingDialogCanceledOnTouchOutside() = GlobalConfig.gLoadingDialogCanceledOnTouchOutside
+    fun isLoadingDialogCanceledOnTouchOutside() = GlobalConfig.LoadingDialog.gLoadingDialogCanceledOnTouchOutside
 
     /**
-     * 详见 [com.imyyq.mvvm.app.GlobalConfig.gIsCancelConsumingTaskWhenLoadingDialogCanceled]
+     * 详见 [com.imyyq.mvvm.app.GlobalConfig.LoadingDialog.gIsCancelConsumingTaskWhenLoadingDialogCanceled]
      */
-    fun isCancelConsumingTaskWhenLoadingDialogCanceled() = GlobalConfig.gIsCancelConsumingTaskWhenLoadingDialogCanceled
+    fun isCancelConsumingTaskWhenLoadingDialogCanceled() = GlobalConfig.LoadingDialog.gIsCancelConsumingTaskWhenLoadingDialogCanceled
 }

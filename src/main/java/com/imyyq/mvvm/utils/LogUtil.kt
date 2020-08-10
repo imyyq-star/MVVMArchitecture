@@ -40,7 +40,7 @@ object LogUtil {
     var mLogPwd = if (BuildConfig.DEBUG) "12345678" else BaseApp.getInstance().packageName
 
     // 只有 debug 和 beta 才默认输出 log
-    private val mIsLog: Boolean = BuildConfig.DEBUG || GlobalConfig.gIsBetaSaveLog
+    private val mIsLog: Boolean = BuildConfig.DEBUG || GlobalConfig.gIsSaveLog
 
     private const val V = 0x1
     private const val D = 0x2
@@ -213,7 +213,7 @@ object LogUtil {
             A -> Log.wtf(tag, logStr)
         }
         // 是否保存到本地缓存目录
-        if (!this::mHandler.isInitialized && GlobalConfig.gIsBetaSaveLog && BuildConfig.BUILD_TYPE == "beta") {
+        if (!this::mHandler.isInitialized && GlobalConfig.gIsSaveLog) {
             initLogHandler()
         }
         // 已初始化，则可以发送消息了

@@ -17,19 +17,22 @@ import java.lang.reflect.Type
  */
 interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsFromBundle {
     /**
+     * 1.
      * 初始化外部传进来的参数
      */
     fun initParam() {}
 
     /**
-     * 初始化数据
-     */
-    fun initData() {}
-
-    /**
+     * 2.
      * 初始化界面观察者
      */
     fun initViewObservable() {}
+
+    /**
+     * 3.
+     * 初始化数据
+     */
+    fun initData() {}
 
     /**
      * 初始化 DataBinding，基类应该在初始化后设为 final
@@ -46,6 +49,9 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
      */
     fun initUiChangeLiveData()
 
+    /**
+     * 移除事件总线监听，避免内存泄露
+     */
     fun removeLiveDataBus(owner: LifecycleOwner) {
         LiveDataBus.removeObserve(owner)
         LiveDataBus.removeStickyObserver(this)
@@ -79,11 +85,11 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
      * ViewModel 是否需要启动或结束对应的 Activity，即是否有调用 [BaseViewModel.startActivity] 和 [BaseViewModel.finish]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartAndFinish() = GlobalConfig.gIsViewModelNeedStartAndFinish
+    fun isViewModelNeedStartAndFinish() = GlobalConfig.StartAndFinish.gIsViewModelNeedStartAndFinish
 
     /**
      * ViewModel 是否需要调用 [BaseViewModel.startActivityForResult]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartForResult() = GlobalConfig.gIsViewModelNeedStartForResult
+    fun isViewModelNeedStartForResult() = GlobalConfig.StartAndFinish.gIsViewModelNeedStartForResult
 }

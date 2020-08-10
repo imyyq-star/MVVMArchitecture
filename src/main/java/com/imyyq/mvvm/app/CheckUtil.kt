@@ -3,7 +3,7 @@ package com.imyyq.mvvm.app
 import androidx.lifecycle.LiveData
 import com.imyyq.mvvm.R
 
-object CheckUtil {
+internal object CheckUtil {
 
     fun checkStartAndFinishEvent(event: LiveData<*>?) {
         if (event == null) {
