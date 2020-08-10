@@ -2,7 +2,6 @@ package com.imyyq.mvvm.app
 
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
-import com.imyyq.mvvm.BuildConfig
 import com.imyyq.mvvm.R
 import com.kingja.loadsir.callback.Callback
 import com.kingja.loadsir.core.LoadSir
@@ -13,10 +12,12 @@ import com.kingja.loadsir.core.LoadSir
  */
 object GlobalConfig {
     /**
-     * beta 构建选项是否保存 log 到缓存目录。目录地址：
+     * 是否保存 log 到缓存目录。目录地址：
      * /sdcard/Android/data/应用包名/cache/Log
+     *
+     * 建议打包提测的都开启保存。比如 beta 构建选项
      */
-    var gIsBetaSaveLog = BuildConfig.BUILD_TYPE == "beta"
+    var gIsSaveLog = false
 
     /**
      * activity 是否支持侧滑返回。
