@@ -85,11 +85,11 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
      * ViewModel 是否需要启动或结束对应的 Activity，即是否有调用 [BaseViewModel.startActivity] 和 [BaseViewModel.finish]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartAndFinish() = GlobalConfig.gIsViewModelNeedStartAndFinish
+    fun isViewModelNeedStartAndFinish() = GlobalConfig.StartAndFinish.gIsViewModelNeedStartAndFinish
 
     /**
      * ViewModel 是否需要调用 [BaseViewModel.startActivityForResult]
      * 不需要的话可以设置为 false，避免创建不必要的对象
      */
-    fun isViewModelNeedStartForResult() = GlobalConfig.gIsViewModelNeedStartForResult
+    fun isViewModelNeedStartForResult() = GlobalConfig.StartAndFinish.gIsViewModelNeedStartForResult
 }
