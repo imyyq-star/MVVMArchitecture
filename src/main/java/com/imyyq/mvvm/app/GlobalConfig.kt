@@ -112,4 +112,9 @@ object GlobalConfig {
         builder.setDefaultCallback(defCallback)
             .commit()
     }
+
+    object ImageView {
+        var errorRes: Int? = null
+        var placeholderRes: Int? = null
+    }
 }
