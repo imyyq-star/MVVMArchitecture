@@ -13,11 +13,6 @@ android {
         versionName "1.0"
 
         consumerProguardFiles "consumer-rules.pro"
-
-        checkMVVMConfigProperty(IncludeLib.retrofit2RxJava2, "retrofit2RxJava2")
-        manifestPlaceholders = [
-                "isRetrofitUseRx": IncludeLib.retrofit2RxJava2
-        ]
     }
 
     buildTypes {

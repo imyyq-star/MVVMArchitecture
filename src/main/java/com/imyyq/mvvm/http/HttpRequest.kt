@@ -19,10 +19,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.internal.platform.Platform
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
+import retrofit2.*
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
@@ -70,6 +67,17 @@ object HttpRequest {
             mDefaultHeader = ArrayMap()
         }
         mDefaultHeader[name] = value
+    }
+
+    /**
+     * 获取
+     */
+    private fun getRxJavaAdapter(): Any? {
+        try {
+            return RxJava2CallAdapterFactory.create()
+        } catch (e: Throwable) {
+        }
+        return null
     }
 
     /**
@@ -154,9 +162,10 @@ object HttpRequest {
                     client.newCall(it)
                 }
             }
-            if (AppUtil.isRetrofitUseRx) {
-                // Kotlin 使用协程，Java 使用 rx
-                builder.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 回调处理，可以设置Rx作为回调的处理
+            // Kotlin 使用协程，Java 使用 rx
+            val adapter = getRxJavaAdapter()
+            adapter?.let {
+                builder.addCallAdapterFactory(it as CallAdapter.Factory) // 回调处理，可以设置Rx作为回调的处理
             }
             obj = builder.build().create(cls)
             mServiceMap[name] = obj

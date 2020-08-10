@@ -227,11 +227,4 @@ object AppUtil {
             PackageManager.GET_META_DATA
         ).metaData
     }
-
-    /**
-     * true，则说明引入了 retrofit2RxJava2
-     */
-    val isRetrofitUseRx by lazy {
-        mMetaData.getBoolean("isRetrofitUseRx")
-    }
 }
