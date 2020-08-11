@@ -1,46 +1,41 @@
 ext {
-    SysConfig = [
-            compileSdkVersion: SDKVersion.compileSdkVersion,
-            minSdkVersion    : SDKVersion.minSdkVersion,
-            targetSdkVersion : SDKVersion.targetSdkVersion
-    ]
-
     Versions = [
             glideVersion  : "4.11.0",
             room          : "2.2.5",
             retrofit2     : "2.9.0",
             kotlinVersion : '1.3.72',
             bindingAdapter: '4.0.0',
-            navigation    : "2.3.0-rc01",
-            hilt          : "2.28-alpha",
+            navigation    : "2.3.0",
+            hilt          : "2.28.3-alpha",
+            lifecycle     : "2.2.0",
     ]
 
     Deps = [
 
             // 官方支持库
-            appcompat                 : "androidx.appcompat:appcompat:1.1.0",
+            appcompat                 : "androidx.appcompat:appcompat:1.2.0",
             recyclerView              : "androidx.recyclerview:recyclerview:1.1.0",
-            material                  : "com.google.android.material:material:1.1.0",
-            swipeRefreshLayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01",
+            material                  : "com.google.android.material:material:1.2.0",
+            swipeRefreshLayout        : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
 
-            activity                  : 'androidx.activity:activity:1.2.0-alpha06',
-            activityKTX               : 'androidx.activity:activity-ktx:1.2.0-alpha06',
-            fragment                  : 'androidx.fragment:fragment:1.3.0-alpha06',
-            fragmentKTX               : 'androidx.fragment:fragment-ktx:1.3.0-alpha06',
+            activity                  : 'androidx.activity:activity:1.2.0-alpha07',
+            activityKTX               : 'androidx.activity:activity-ktx:1.2.0-alpha07',
+            fragment                  : 'androidx.fragment:fragment:1.3.0-alpha07',
+            fragmentKTX               : 'androidx.fragment:fragment-ktx:1.3.0-alpha07',
 
-            constraintLayout          : "androidx.constraintlayout:constraintlayout:2.0.0-beta6",
-            slidingPaneLayout         : "androidx.slidingpanelayout:slidingpanelayout:1.1.0-rc01",
+            constraintLayout          : "androidx.constraintlayout:constraintlayout:2.0.0-rc1",
+            slidingPaneLayout         : "androidx.slidingpanelayout:slidingpanelayout:1.1.0",
 
             paging                    : "androidx.paging:paging-runtime:2.1.2",
             viewPager2                : "androidx.viewpager2:viewpager2:1.0.0",
 
-            lifecycleJava8            : "androidx.lifecycle:lifecycle-common-java8:2.2.0",
-            lifecycleProcess          : "androidx.lifecycle:lifecycle-process:2.2.0",
+            lifecycleJava8            : "androidx.lifecycle:lifecycle-common-java8:$Versions.lifecycle",
+            lifecycleProcess          : "androidx.lifecycle:lifecycle-process:$Versions.lifecycle",
 
             // 数据库
             roomRuntime               : "androidx.room:room-runtime:$Versions.room",
             roomCompiler              : "androidx.room:room-compiler:$Versions.room",
-            roomRxJava2                : "androidx.room:room-rxjava2:$Versions.room",
+            roomRxJava2               : "androidx.room:room-rxjava2:$Versions.room",
 
             // debugImplementation，可以在debug阶段通过浏览器看到数据库
             debugDB                   : "com.amitshekhar.android:debug-db:1.0.6",
@@ -84,14 +79,14 @@ ext {
 
             // ktx
             // 在 LiveData 中使用协程
-            lifecycleLiveDataKTX      : "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0",
+            lifecycleLiveDataKTX      : "androidx.lifecycle:lifecycle-livedata-ktx:$Versions.lifecycle",
             // 在 Lifecycles 中使用协程，视图销毁则自动取消
-            lifecycleRuntimeKTX       : "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0",
+            lifecycleRuntimeKTX       : "androidx.lifecycle:lifecycle-runtime-ktx:$Versions.lifecycle",
             // 创建可监测的 LiveData 流
-            reactiveStreamsKTX        : "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.2.0",
+            reactiveStreamsKTX        : "androidx.lifecycle:lifecycle-reactivestreams-ktx:$Versions.lifecycle",
 
             // viewModelScope，会在 view 消失时取消协程
-            viewModelKTX              : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0",
+            viewModelKTX              : "androidx.lifecycle:lifecycle-viewmodel-ktx:$Versions.lifecycle",
 
             // Java language implementation
             natigationFragment        : "androidx.navigation:navigation-fragment:${Versions.navigation}",
@@ -106,9 +101,9 @@ ext {
             natigationFragmentKTX     : "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}",
 
             // 可在 room 中使用协程
-            roomKTX                   : "androidx.room:room-ktx:2.2.5",
+            roomKTX                   : "androidx.room:room-ktx:$Versions.room",
             sqliteKTX                 : "androidx.sqlite:sqlite-ktx:2.1.0",
-            workKTX                   : "androidx.work:work-runtime-ktx:2.3.4",
+            workKTX                   : "androidx.work:work-runtime-ktx:2.4.0",
             paletteKTX                : "androidx.palette:palette-ktx:1.0.0",
             collectionKTX             : "androidx.collection:collection-ktx:1.1.0",
     ]
@@ -135,22 +130,5 @@ static def addRepository(RepositoryHandler handler) {
     handler.mavenCentral()
 }
 
-static def curDate() {
-    return new Date().format("yyyy-MM-dd")
-}
-
-static def curDateTime() {
-    return new Date().format("yyyy-MM-dd_HH-mm")
-}
-
-static void checkMVVMConfigProperty(Object o, String p) {
-    if (o == null) {
-        throw new RuntimeException("mvvm-config.gradle 配置文件缺少了 $p 属性，属性列表需要和 MVVMArchitecture/mvvm-config.gradle.template 文件保持一致")
-    }
-}
-
 // 添加到全局的变量中
 ext.addRepository = this.&addRepository
-ext.curDate = this.&curDate
-ext.curDateTime = this.&curDateTime
-ext.checkMVVMConfigProperty = this.&checkMVVMConfigProperty
