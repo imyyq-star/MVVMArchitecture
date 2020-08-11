@@ -296,7 +296,7 @@ object HttpRequest {
 
                 editDialog.setPositiveButton(R.string.confirm) { dialog, _ ->
                     tvList.forEachIndexed { index, textView ->
-                        mBaseUrlMap.put(textView.text.toString(), etList[index].text.toString())
+                        mBaseUrlMap[textView.text.toString()] = etList[index].text.toString()
                     }
                     checkBox.isChecked.apply {
                         sp.put(mKeyIsSave, this)

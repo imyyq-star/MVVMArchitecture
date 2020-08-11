@@ -43,6 +43,7 @@ public final class ScreenUtils {
      *
      * @return the width of screen, in pixel
      */
+    @SuppressLint("ObsoleteSdkInt")
     public static int getScreenWidth() {
         WindowManager wm = (WindowManager) BaseApp.Companion.getInstance().getSystemService(Context.WINDOW_SERVICE);
         if (wm == null) return -1;
@@ -60,6 +61,7 @@ public final class ScreenUtils {
      *
      * @return the height of screen, in pixel
      */
+    @SuppressLint("ObsoleteSdkInt")
     public static int getScreenHeight() {
         WindowManager wm = (WindowManager) BaseApp.Companion.getInstance().getSystemService(Context.WINDOW_SERVICE);
         if (wm == null) return -1;

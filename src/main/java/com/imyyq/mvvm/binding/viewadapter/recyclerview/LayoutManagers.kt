@@ -95,7 +95,7 @@ object LayoutManagers {
         spanCount: Int,
         @Orientation orientation: Int
     ): BindingFunction<RecyclerView, RecyclerView.LayoutManager> {
-        return BindingFunction { it: RecyclerView? ->
+        return BindingFunction {
             StaggeredGridLayoutManager(
                 spanCount,
                 orientation
