@@ -1,0 +1,25 @@
+ext {
+    SysConfig = [
+            compileSdkVersion: SDKVersion.compileSdkVersion,
+            minSdkVersion    : SDKVersion.minSdkVersion,
+            targetSdkVersion : SDKVersion.targetSdkVersion
+    ]
+}
+
+static def curDate() {
+    return new Date().format("yyyy-MM-dd")
+}
+
+static def curDateTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm")
+}
+
+static void checkMVVMConfigProperty(Object o, String p) {
+    if (o == null) {
+        throw new RuntimeException("mvvm-config.gradle 配置文件缺少了 $p 属性，属性列表需要和 MVVMArchitecture/mvvm-config.gradle.template 文件保持一致")
+    }
+}
+
+ext.curDate = this.&curDate
+ext.curDateTime = this.&curDateTime
+ext.checkMVVMConfigProperty = this.&checkMVVMConfigProperty
