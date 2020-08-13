@@ -138,27 +138,38 @@ object Utils {
                     val any = if (value.isNotEmpty()) {
                         value[0]
                     } else null
-                    if (any is String) {
-                        intent.putExtra(entry.key, value as ArrayList<String>)
-                    } else if (any is Parcelable) {
-                        intent.putExtra(entry.key, value as ArrayList<Parcelable>)
-                    } else if (any is Int) {
-                        intent.putExtra(entry.key, value as ArrayList<Int>)
-                    } else if (any is CharSequence) {
-                        intent.putExtra(entry.key, value as ArrayList<CharSequence>)
-                    } else {
-                        throw RuntimeException("不支持此类型 $value")
+                    when (any) {
+                        is String -> {
+                            intent.putExtra(entry.key, value as ArrayList<String>)
+                        }
+                        is Parcelable -> {
+                            intent.putExtra(entry.key, value as ArrayList<Parcelable>)
+                        }
+                        is Int -> {
+                            intent.putExtra(entry.key, value as ArrayList<Int>)
+                        }
+                        is CharSequence -> {
+                            intent.putExtra(entry.key, value as ArrayList<CharSequence>)
+                        }
+                        else -> {
+                            throw RuntimeException("不支持此类型 $value")
+                        }
                     }
                 }
                 is Array<*> -> {
-                    if (value.isArrayOf<String>()) {
-                        intent.putExtra(entry.key, value as Array<String>)
-                    } else if (value.isArrayOf<Parcelable>()) {
-                        intent.putExtra(entry.key, value as Array<Parcelable>)
-                    } else if (value.isArrayOf<CharSequence>()) {
-                        intent.putExtra(entry.key, value as Array<CharSequence>)
-                    } else {
-                        throw RuntimeException("不支持此类型 $value")
+                    when {
+                        value.isArrayOf<String>() -> {
+                            intent.putExtra(entry.key, value as Array<String>)
+                        }
+                        value.isArrayOf<Parcelable>() -> {
+                            intent.putExtra(entry.key, value as Array<Parcelable>)
+                        }
+                        value.isArrayOf<CharSequence>() -> {
+                            intent.putExtra(entry.key, value as Array<CharSequence>)
+                        }
+                        else -> {
+                            throw RuntimeException("不支持此类型 $value")
+                        }
                     }
                 }
                 else -> {

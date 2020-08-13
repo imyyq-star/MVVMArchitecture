@@ -37,7 +37,7 @@ object LogUtil {
     /**
      * Log 密码
      */
-    var mLogPwd = if (BuildConfig.DEBUG) "12345678" else BaseApp.getInstance().packageName
+    var mLogPwd: String = if (BuildConfig.DEBUG) "12345678" else BaseApp.getInstance().packageName
 
     // 只有 debug 和 beta 才默认输出 log
     private val mIsLog: Boolean = BuildConfig.DEBUG || GlobalConfig.gIsSaveLog
