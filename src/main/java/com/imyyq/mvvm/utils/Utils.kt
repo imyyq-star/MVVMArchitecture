@@ -39,18 +39,32 @@ object Utils {
      */
     @JvmStatic
     fun multiClickListener(view: View, frequency: Int, listener: (() -> Unit)? = null) {
-        view.setTag(R.id.multiClickFrequency, 0)
+        val startIndex = 1
+        val interval = 400
+        view.setTag(R.id.multiClickFrequency, startIndex)
         view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
+
         view.setOnClickListener {
-            val f = view.getTag(R.id.multiClickFrequency) as Int
-            if (f == frequency) {
-                view.setTag(R.id.multiClickFrequency, 0)
+            var f = view.getTag(R.id.multiClickFrequency) as Int
+
+            // 点击间隔超时，重置次数
+            if (System.currentTimeMillis() - (view.getTag(R.id.multiClickLastTime) as Long) > interval) {
+                view.setTag(R.id.multiClickFrequency, startIndex)
+                f = startIndex
+            }
+
+            // 第一次点击，重置时间
+            if (f == startIndex) {
                 view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
+            }
+
+            if (f == frequency) {
+                view.setTag(R.id.multiClickFrequency, startIndex)
 
                 listener?.invoke()
             } else {
                 val lastTime = view.getTag(R.id.multiClickLastTime) as Long
-                if (System.currentTimeMillis() - lastTime < 400) {
+                if (System.currentTimeMillis() - lastTime < interval) {
                     view.setTag(R.id.multiClickFrequency, f + 1)
                 }
                 view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
