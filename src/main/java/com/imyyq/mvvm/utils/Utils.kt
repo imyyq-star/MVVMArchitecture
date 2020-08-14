@@ -72,6 +72,21 @@ object Utils {
         }
     }
 
+    /**
+     * 系统分享文本的 Intent
+     */
+    fun shareTextIntent(text: String): Intent {
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text)
+        sendIntent.type = "text/plain"
+        return sendIntent
+    }
+
+    /**
+     * 创建 Intent 实例，并把参数 [map] [bundle] 放进去
+     */
     fun getIntentByMapOrBundle(
         context: Context?,
         clz: Class<out Activity>?,

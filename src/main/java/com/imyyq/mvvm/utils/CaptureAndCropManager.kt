@@ -15,6 +15,11 @@ import com.ftd.livepermissions.PermissionResult
 import com.imyyq.mvvm.app.BaseApp
 import java.io.File
 
+/**
+ * 拍照或选择图片的类，选择图片后会调用系统裁剪功能，最终得到想要的裁剪后的图片
+ *
+ * 此类后期可能改成使用最新的 API 来完成
+ */
 object CaptureAndCropManager {
     const val REQUEST_CODE_CAPTURE = 200
     const val REQUEST_CODE_CROP = 300

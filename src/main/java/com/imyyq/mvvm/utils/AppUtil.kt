@@ -11,7 +11,6 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.provider.Settings
 import android.view.View
-import androidx.annotation.NonNull
 import com.imyyq.mvvm.app.BaseApp
 
 
@@ -19,20 +18,14 @@ object AppUtil {
     private const val TAG = "AppUtil"
 
     /**
-     * Return the activity by view.
-     *
-     * @param view The view.
-     * @return the activity by view.
+     * 根据 view，获取其关联的 activity
      */
-    fun getActivityByView(@NonNull view: View): Activity? {
+    fun getActivityByView(view: View): Activity? {
         return getActivityByContext(view.context)
     }
 
     /**
-     * Return the activity by context.
-     *
-     * @param context The context.
-     * @return the activity by context.
+     * 根据 context，获取其关联的 activity
      */
     fun getActivityByContext(context: Context?): Activity? {
         var contextTemp = context
@@ -124,19 +117,6 @@ object AppUtil {
         }
 
     /**
-     * 系统分享文本的 Intent
-     */
-    fun shareTextIntent(text: String): Intent {
-        val sendIntent = Intent()
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        sendIntent.putExtra(Intent.EXTRA_TEXT, text)
-        sendIntent.type = "text/plain"
-        return sendIntent
-    }
-
-
-    /**
      * 指定包名[packageName]的 App 是否已安装到设备上
      */
     fun isAppExist(packageName: String): Boolean {
@@ -221,6 +201,9 @@ object AppUtil {
         context.startActivityForResult(intent, requestCode)
     }
 
+    /**
+     * manifest 中的源数据
+     */
     private val mMetaData by lazy {
         BaseApp.getInstance().packageManager.getApplicationInfo(
             BaseApp.getInstance().packageName,
