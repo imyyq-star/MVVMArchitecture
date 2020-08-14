@@ -3,6 +3,8 @@ package com.imyyq.mvvm.binding.viewadapter.view
 import android.view.View
 import androidx.databinding.BindingAdapter
 import com.imyyq.mvvm.app.GlobalConfig
+import com.imyyq.mvvm.http.HttpRequest
+import com.imyyq.mvvm.utils.LogUtil
 
 @BindingAdapter(
     value = ["onClickCommand", "isInterval", "intervalMilliseconds"],
@@ -21,4 +23,24 @@ fun onClickCommand(
     } else {
         view.setOnClickListener(clickCommand)
     }
+}
+
+@BindingAdapter(
+    value = ["multiClickToOpenLog"]
+)
+fun multiClickToOpenLog(
+    view: View,
+    frequency: Int
+) {
+    LogUtil.multiClickToOpenLog(view, frequency)
+}
+
+@BindingAdapter(
+    value = ["multiClickToChangeBaseUrl"]
+)
+fun multiClickToChangeBaseUrl(
+    view: View,
+    frequency: Int
+) {
+    HttpRequest.multiClickToChangeBaseUrl(view, frequency)
 }
