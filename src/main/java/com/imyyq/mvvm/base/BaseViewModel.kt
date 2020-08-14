@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.Call
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.*
 
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel,
     IActivityResult, IArgumentsFromBundle, IArgumentsFromIntent {
@@ -207,43 +208,43 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     @MainThread
     protected fun finish() {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
-        mUiChangeLiveData.finishEvent?.call()
+        LiveDataBus.send(mUiChangeLiveData.finishEvent!!, "")
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<out Activity>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEvent)
-        mUiChangeLiveData.startActivityEvent?.value = clazz
+        LiveDataBus.send(mUiChangeLiveData.startActivityEvent!!, clazz)
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
-        mUiChangeLiveData.startActivityWithMapEvent?.value = Pair(clazz, map)
+        LiveDataBus.send(mUiChangeLiveData.startActivityWithMapEvent!!, Pair(clazz, map))
     }
 
     @MainThread
     protected fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEventWithBundle)
-        mUiChangeLiveData.startActivityEventWithBundle?.value = Pair(clazz, bundle)
+        LiveDataBus.send(mUiChangeLiveData.startActivityEventWithBundle!!, Pair(clazz, bundle))
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<out Activity>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEvent)
-        mUiChangeLiveData.startActivityForResultEvent?.value = clazz
+        LiveDataBus.send(mUiChangeLiveData.startActivityForResultEvent!!, clazz)
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithBundle)
-        mUiChangeLiveData.startActivityForResultEventWithBundle?.value = Pair(clazz, bundle)
+        LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithBundle!!, Pair(clazz, bundle))
     }
 
     @MainThread
     protected fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithMap)
-        mUiChangeLiveData.startActivityForResultEventWithMap?.value = Pair(clazz, map)
+        LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithMap!!, Pair(clazz, map))
     }
 
 
@@ -256,15 +257,15 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var showLoadingDialogEvent: SingleLiveEvent<String?>? = null
         var dismissLoadingDialogEvent: SingleLiveEvent<Any?>? = null
 
-        var startActivityEvent: SingleLiveEvent<Class<out Activity>>? = null
-        var startActivityWithMapEvent: SingleLiveEvent<Pair<Class<out Activity>, Map<String, *>>>? = null
-        var startActivityEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
+        var startActivityEvent: String? = null
+        var startActivityWithMapEvent: String? = null
+        var startActivityEventWithBundle: String? = null
 
-        var startActivityForResultEvent: SingleLiveEvent<Class<out Activity>>? = null
-        var startActivityForResultEventWithMap: SingleLiveEvent<Pair<Class<out Activity>, Map<String, *>>>? = null
-        var startActivityForResultEventWithBundle: SingleLiveEvent<Pair<Class<out Activity>, Bundle?>>? = null
+        var startActivityForResultEvent: String? = null
+        var startActivityForResultEventWithMap: String? = null
+        var startActivityForResultEventWithBundle: String? = null
 
-        var finishEvent: SingleLiveEvent<Any?>? = null
+        var finishEvent: String? = null
 
         var loadSirEvent: SingleLiveEvent<Class<out Callback>?>? = null
 
@@ -278,16 +279,16 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
 
         fun initStartActivityForResultEvent() {
-            startActivityForResultEvent = SingleLiveEvent()
-            startActivityForResultEventWithMap = SingleLiveEvent()
-            startActivityForResultEventWithBundle = SingleLiveEvent()
+            startActivityForResultEvent = UUID.randomUUID().toString()
+            startActivityForResultEventWithMap = UUID.randomUUID().toString()
+            startActivityForResultEventWithBundle = UUID.randomUUID().toString()
         }
 
         fun initStartAndFinishEvent() {
-            startActivityEvent = SingleLiveEvent()
-            startActivityWithMapEvent = SingleLiveEvent()
-            startActivityEventWithBundle = SingleLiveEvent()
-            finishEvent = SingleLiveEvent()
+            startActivityEvent = UUID.randomUUID().toString()
+            startActivityWithMapEvent = UUID.randomUUID().toString()
+            startActivityEventWithBundle = UUID.randomUUID().toString()
+            finishEvent = UUID.randomUUID().toString()
         }
     }
 
