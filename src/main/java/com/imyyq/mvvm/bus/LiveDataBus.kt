@@ -25,11 +25,10 @@ object LiveDataBus {
         ArrayMap<Any /* registrants */, ArrayMap<Any /* tag */, Pair<MutableLiveData<Any>, Observer<Any>>>>()
 
     /**
-     * 粘性事件，一个 tag 对应一个 LiveData，这个 LiveData 可被所有人注册。
-     * LiveData 对应注册者和响应器。
+     * 粘性事件，一个 tag 对应一个列表，每个元素表示一个注册者，包含的数据在 [StickyData]
      */
     private val mStickyLiveDataMap =
-        ArrayMap<Any /* tag */, Pair<MutableLiveData<Any>, ArrayMap<Any /* registrants */, Observer<Any>>>>()
+        ArrayMap<Any /* tag */, MutableList<StickyData>>()
 
     /**
      * 监听事件，[registrants] 如果是 V 和 VM，那么无需手动移除监听，框架已经实现了自动移除。
@@ -51,6 +50,10 @@ object LiveDataBus {
             mLiveDataMap[registrants] = objMap
         }
         // TODO 有重复的 tag 怎么办？
+
+        if (objMap[tag] != null) {
+            throw RuntimeException("同一个注册者下，不可以重复注册一个 tag")
+        }
 
         objMap[tag] = Pair(liveData as MutableLiveData<Any>, observer as Observer<Any>)
         if (registrants is LifecycleOwner && !isForever) {
@@ -90,49 +93,89 @@ object LiveDataBus {
         tag: Any,
         observer: Observer<R>
     ) {
-        var pair = mStickyLiveDataMap[tag]
-        // 拿到 LiveData，并注册
-        val liveData: MutableLiveData<R>
-        if (pair == null) {
-            liveData = MutableLiveData<R>()
-            pair = Pair(liveData as MutableLiveData<Any>, arrayMapOf())
-            mStickyLiveDataMap[tag] = pair
+        // 一个 tag 对应多个监听者
+        var list = mStickyLiveDataMap[tag]
+        if (list == null) {
+            list = mutableListOf()
+            mStickyLiveDataMap[tag] = list
+        }
+
+        // 找到没有被人注册的 liveData
+        var stickyData: StickyData? = null
+        list.forEach {
+            if (it.registrants == null) {
+                stickyData = it
+                return@forEach
+            }
+        }
+
+        val obs = observer as Observer<Any>
+        // 没有 liveData，则创建
+        if (stickyData == null) {
+            val liveData = MutableLiveData<Any>()
+            // 新创建的 liveData，需要有效数据
+            if (list.isNotEmpty()) {
+                val data = list[0]
+                if (data.isValueValid) {
+                    liveData.postValue(data.liveData.value)
+                }
+            }
+            stickyData = StickyData(liveData, registrants, obs, false)
+            list.add(stickyData!!)
         } else {
-            liveData = pair.first as MutableLiveData<R>
+            stickyData!!.registrants = registrants
+            stickyData!!.observer = obs
         }
         if (registrants is LifecycleOwner) {
-            liveData.observe(registrants, observer)
+            stickyData!!.liveData.observe(registrants, obs)
         } else {
-            liveData.observeForever(observer)
+            stickyData!!.liveData.observeForever(obs)
         }
-        // 拿到 map，缓存注册者和响应器
-        pair.second?.put(registrants, observer as Observer<Any>)
     }
 
     /**
      * 发送粘性事件
      */
-    fun sendSticky(tag: Any, result: Any) {
-        var pair = mStickyLiveDataMap[tag]
-        // 拿到 LiveData，再发送
-        val liveData: MutableLiveData<Any>
-        if (pair == null) {
-            liveData = MutableLiveData<Any>()
-            pair = Pair(liveData, arrayMapOf())
-            mStickyLiveDataMap[tag] = pair
-        } else {
-            liveData = pair.first as MutableLiveData<Any>
+    fun sendSticky(tag: Any, result: Any, inUiThread: Boolean = true) {
+        var list = mStickyLiveDataMap[tag]
+        if (list == null) {
+            list = mutableListOf()
+            mStickyLiveDataMap[tag] = list
         }
-        liveData.postValue(result)
+        if (list.isEmpty()) {
+            val liveData: MutableLiveData<Any> = MutableLiveData()
+            val data = StickyData(liveData, null, null, true)
+            list.add(data)
+            if (inUiThread) {
+                liveData.value = result
+            } else {
+                liveData.postValue(result)
+            }
+        } else {
+            list.forEach {
+                it.isValueValid = true
+                if (inUiThread) {
+                    it.liveData.value = result
+                } else {
+                    it.liveData.postValue(result)
+                }
+            }
+        }
     }
 
     /**
      * 移除粘性事件监听者
      */
     fun removeStickyObserver(registrants: Any) {
-        mStickyLiveDataMap.forEach {
-            val observe = it.value?.second?.remove(registrants)
-            observe?.let { o -> it.value?.first?.removeObserver(o) }
+        mStickyLiveDataMap.forEach { entry ->
+            entry.value?.forEach {
+                val isRemove = registrants == it.registrants
+                if (isRemove) {
+                    it.observer?.let { observer -> it.liveData.removeObserver(observer) }
+                    it.observer = null
+                    it.registrants = null
+                }
+            }
         }
     }
 
@@ -140,11 +183,11 @@ object LiveDataBus {
      * 根据 [tag] 移除一类粘性事件，如果确定粘性事件不需要了，需要手动移除。
      */
     fun removeSticky(tag: Any) {
-        val pair = mStickyLiveDataMap[tag]
-        if (pair != null) {
-            pair.second?.forEach {
-                pair.first?.removeObserver(it.value)
-            }
+        val list = mStickyLiveDataMap[tag]
+        list?.forEach {
+            it.observer?.let { observer -> it.liveData.removeObserver(observer) }
+            it.observer = null
+            it.registrants = null
         }
         mStickyLiveDataMap.remove(tag)
     }
@@ -152,19 +195,25 @@ object LiveDataBus {
     /**
      * 发送消息，只要是相同的 tag，就会触发对应的 LiveData，不管这个 tag 是在哪里注册的。包括粘性事件，也可以接收普通的事件。
      */
-    fun send(tag: Any, result: Any) {
+    fun send(tag: Any, result: Any, inUiThread: Boolean = true) {
         mLiveDataMap.forEach {
             it.value.forEach inside@{ entry ->
                 if (entry.key == tag) {
-                    entry.value.first?.postValue(result)
+                    if (inUiThread) {
+                        entry.value.first?.value = result
+                    } else {
+                        entry.value.first?.postValue(result)
+                    }
                     return@inside
                 }
             }
         }
 
-        mStickyLiveDataMap.forEach {
-            if (tag == it.key) {
-                it.value?.first?.postValue(result)
+        mStickyLiveDataMap[tag]?.forEach {
+            if (inUiThread) {
+                it.liveData.value = result
+            } else {
+                it.liveData.postValue(result)
             }
         }
     }
