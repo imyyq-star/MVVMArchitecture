@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
@@ -20,8 +21,9 @@ import com.kingja.loadsir.core.LoadSir
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
-    Fragment(),
+abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>>(
+    private val sharedViewModel: Boolean = false
+) : Fragment(),
     IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected lateinit var mBinding: V
@@ -55,7 +57,11 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     @CallSuper
     override fun initViewAndViewModel() {
-        mViewModel = initViewModel(this)
+        mViewModel = if (sharedViewModel) {
+            initViewModel(requireActivity())
+        } else {
+            initViewModel(this)
+        }
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -65,34 +71,66 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
 
             // vm 可以结束界面
-            mViewModel.mUiChangeLiveData.finishEvent?.observe(this, Observer { activity?.finish() })
+            LiveDataBus.observe(
+                this,
+                mViewModel.mUiChangeLiveData.finishEvent!!,
+                Observer { activity?.finish() },
+                true
+            )
             // vm 可以启动界面
-            mViewModel.mUiChangeLiveData.startActivityEvent?.observe(this, Observer {
-                startActivity(it)
-            })
-            mViewModel.mUiChangeLiveData.startActivityWithMapEvent?.observe(this, Observer {
-                startActivity(it?.first, it?.second)
-            })
+            LiveDataBus.observe<Class<out Activity>>(
+                this,
+                mViewModel.mUiChangeLiveData.startActivityEvent!!,
+                Observer {
+                    startActivity(it)
+                },
+                true
+            )
+            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(this,
+                mViewModel.mUiChangeLiveData.startActivityWithMapEvent!!,
+                Observer {
+                    startActivity(it?.first, it?.second)
+                },
+                true
+            )
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
-            // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
-            mViewModel.mUiChangeLiveData.startActivityEventWithBundle?.observe(this, Observer {
-                startActivity(it?.first, bundle = it?.second)
-            })
+            LiveDataBus.observe<Pair<Class<out Activity>, Bundle?>>(this,
+                mViewModel.mUiChangeLiveData.startActivityEventWithBundle!!,
+                Observer {
+                    startActivity(it?.first, bundle = it?.second)
+                },
+                true
+            )
         }
         if (isViewModelNeedStartForResult()) {
             mViewModel.mUiChangeLiveData.initStartActivityForResultEvent()
 
             // vm 可以启动界面
-            mViewModel.mUiChangeLiveData.startActivityForResultEvent?.observe(this, Observer {
-                startActivityForResult(it)
-            })
+            LiveDataBus.observe<Class<out Activity>>(
+                this,
+                mViewModel.mUiChangeLiveData.startActivityForResultEvent!!,
+                Observer {
+                    startActivityForResult(it)
+                },
+                true
+            )
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
-            mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle?.observe(this, Observer {
-                startActivityForResult(it?.first, bundle = it?.second)
-            })
-            mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap?.observe(this, Observer {
-                startActivityForResult(it?.first, it?.second)
-            })
+            LiveDataBus.observe<Pair<Class<out Activity>, Bundle?>>(
+                this,
+                mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle!!,
+                Observer {
+                    startActivityForResult(it?.first, bundle = it?.second)
+                },
+                true
+            )
+            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(
+                this,
+                mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap!!,
+                Observer {
+                    startActivityForResult(it?.first, it?.second)
+                },
+                true
+            )
         }
 
         if (isNeedLoadingDialog()) {

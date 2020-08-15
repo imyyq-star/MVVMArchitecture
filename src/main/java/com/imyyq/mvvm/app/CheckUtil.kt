@@ -1,11 +1,10 @@
 package com.imyyq.mvvm.app
 
-import androidx.lifecycle.LiveData
 import com.imyyq.mvvm.R
 
 internal object CheckUtil {
 
-    fun checkStartAndFinishEvent(event: LiveData<*>?) {
+    fun checkStartAndFinishEvent(event: Any?) {
         if (event == null) {
             throw RuntimeException(
                 BaseApp.getInstance().getString(R.string.start_activity_finish_tips)
@@ -13,7 +12,7 @@ internal object CheckUtil {
         }
     }
 
-    fun checkStartForResultEvent(event: LiveData<*>?) {
+    fun checkStartForResultEvent(event: Any?) {
         if (event == null) {
             throw RuntimeException(
                 BaseApp.getInstance().getString(R.string.start_activity_for_result_tips)
@@ -21,13 +20,13 @@ internal object CheckUtil {
         }
     }
 
-    fun checkLoadSirEvent(event: LiveData<*>?) {
+    fun checkLoadSirEvent(event: Any?) {
         if (event == null) {
             throw RuntimeException(BaseApp.getInstance().getString(R.string.load_sir_tips))
         }
     }
 
-    fun checkLoadingDialogEvent(event: LiveData<*>?) {
+    fun checkLoadingDialogEvent(event: Any?) {
         if (event == null) {
             throw RuntimeException(BaseApp.getInstance().getString(R.string.loadingDialogTips))
         }

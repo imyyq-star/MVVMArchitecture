@@ -14,7 +14,7 @@ object SystemUIUtil {
     fun lowProfile(window: Window, isShow: Boolean = false) {
         if (isShow) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LOW_PROFILE.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_LOW_PROFILE)
             return
         }
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -26,7 +26,7 @@ object SystemUIUtil {
     fun hideStatusBar(window: Window, isShow: Boolean = false) {
         if (isShow) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
             return
         }
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -38,9 +38,9 @@ object SystemUIUtil {
     fun hideStatusBarImmersiveSticky(window: Window, isShow: Boolean = false) {
         if (isShow) {
             val visibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
             window.decorView.systemUiVisibility =
-                visibility and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY.inv()
+                visibility.removeFlag(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             return
         }
         window.decorView.systemUiVisibility =
@@ -53,7 +53,7 @@ object SystemUIUtil {
     fun hideNavBar(window: Window, isShow: Boolean = false) {
         if (isShow) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
             return
         }
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -65,8 +65,8 @@ object SystemUIUtil {
     fun hideNavBarImmersive(window: Window, isShow: Boolean = false) {
         if (isShow) {
             val visibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
-            window.decorView.systemUiVisibility = visibility and View.SYSTEM_UI_FLAG_IMMERSIVE.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            window.decorView.systemUiVisibility = visibility.removeFlag(View.SYSTEM_UI_FLAG_IMMERSIVE)
             return
         }
 
@@ -80,9 +80,9 @@ object SystemUIUtil {
     fun hideNavBarImmersiveStick(window: Window, isShow: Boolean = false) {
         if (isShow) {
             val visibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
             window.decorView.systemUiVisibility =
-                visibility and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY.inv()
+                visibility.removeFlag(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             return
         }
 
@@ -96,11 +96,11 @@ object SystemUIUtil {
     fun hideStatusNavBarImmersiveStick(window: Window, isShow: Boolean = false) {
         if (isShow) {
             var visibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
             visibility =
-                visibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
+                visibility.removeFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
             window.decorView.systemUiVisibility =
-                visibility and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY.inv()
+                visibility.removeFlag(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             return
         }
 
@@ -114,8 +114,8 @@ object SystemUIUtil {
     fun hideStatusNavBar(window: Window, isShow: Boolean = false) {
         if (isShow) {
             var visibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
-            visibility = visibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            visibility = visibility.removeFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
             window.decorView.systemUiVisibility = visibility
             return
         }
@@ -132,7 +132,7 @@ object SystemUIUtil {
     fun dartStatusBarIcon(window: Window, isLight: Boolean = false) {
         if (isLight) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
             return
         }
 
@@ -147,7 +147,7 @@ object SystemUIUtil {
     fun dartNavBarIcon(window: Window, isLight: Boolean = false) {
         if (isLight) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
             return
         }
 
@@ -161,7 +161,7 @@ object SystemUIUtil {
     fun stableLayout(window: Window, unstable: Boolean = false) {
         if (unstable) {
             window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LAYOUT_STABLE.inv()
+                window.decorView.systemUiVisibility.removeFlag(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
             return
         }
 
