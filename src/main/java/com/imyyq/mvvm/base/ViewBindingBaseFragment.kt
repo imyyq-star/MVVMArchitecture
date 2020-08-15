@@ -21,8 +21,9 @@ import com.kingja.loadsir.core.LoadSir
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
-    Fragment(),
+abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>>(
+    private val sharedViewModel: Boolean = false
+) : Fragment(),
     IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected lateinit var mBinding: V
@@ -56,7 +57,11 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     @CallSuper
     override fun initViewAndViewModel() {
-        mViewModel = initViewModel(this)
+        mViewModel = if (sharedViewModel) {
+            initViewModel(requireActivity())
+        } else {
+            initViewModel(this)
+        }
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }

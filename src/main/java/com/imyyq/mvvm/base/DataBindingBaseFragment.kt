@@ -8,8 +8,9 @@ import androidx.databinding.ViewDataBinding
 
 abstract class DataBindingBaseFragment<V : ViewDataBinding, VM : BaseViewModel<out BaseModel>>(
     @LayoutRes private val layoutId: Int,
-    private val varViewModelId: Int? = null
-) : ViewBindingBaseFragment<V, VM>() {
+    private val varViewModelId: Int? = null,
+    sharedViewModel: Boolean = false
+) : ViewBindingBaseFragment<V, VM>(sharedViewModel) {
 
     final override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
         DataBindingUtil.inflate(inflater, layoutId, container, false)
