@@ -60,11 +60,31 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         if (isViewModelNeedStartAndFinish()) {
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
 
+            fun setResult(pair: Pair<Int?, Intent?>) {
+                pair.first?.let { resultCode ->
+                    val intent = pair.second
+                    if (intent == null) {
+                        setResult(resultCode)
+                    } else {
+                        setResult(resultCode, intent)
+                    }
+                }
+            }
+
             // vm 可以结束界面
-            LiveDataBus.observe(
+            LiveDataBus.observe<Pair<Int?, Intent?>>(
                 this,
                 mViewModel.mUiChangeLiveData.finishEvent!!,
-                Observer { finish() },
+                Observer {
+                    setResult(it)
+                    finish()
+                },
+                true
+            )
+            LiveDataBus.observe<Pair<Int?, Intent?>>(
+                this,
+                mViewModel.mUiChangeLiveData.setResultEvent!!,
+                Observer { setResult(it) },
                 true
             )
             // vm 可以启动界面
