@@ -88,12 +88,17 @@ object Utils {
      * 创建 Intent 实例，并把参数 [map] [bundle] 放进去
      */
     fun getIntentByMapOrBundle(
-        context: Context?,
-        clz: Class<out Activity>?,
+        context: Context? = null,
+        clz: Class<out Activity>? = null,
         map: Map<String, *>? = null,
         bundle: Bundle? = null
     ): Intent {
-        val intent = Intent(context, clz)
+        val intent =
+            if (context != null && clz != null)
+                Intent(context, clz)
+            else
+                Intent()
+
         map?.forEach { entry ->
             @Suppress("UNCHECKED_CAST")
             when (val value = entry.value) {

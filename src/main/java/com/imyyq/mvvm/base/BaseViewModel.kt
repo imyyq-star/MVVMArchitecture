@@ -14,6 +14,7 @@ import com.imyyq.mvvm.app.RepositoryManager
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.http.HttpHandler
 import com.imyyq.mvvm.utils.SingleLiveEvent
+import com.imyyq.mvvm.utils.Utils
 import com.kingja.loadsir.callback.Callback
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -173,18 +174,18 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     // 以下是加载中对话框相关的 =========================================================
 
     @MainThread
-    protected fun showLoadingDialog() {
+    fun showLoadingDialog() {
         showLoadingDialog(getApplication<Application>().getString(R.string.please_wait))
     }
 
     @MainThread
-    protected fun showLoadingDialog(msg: String?) {
+    fun showLoadingDialog(msg: String?) {
         CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.showLoadingDialogEvent)
         mUiChangeLiveData.showLoadingDialogEvent?.value = msg
     }
 
     @MainThread
-    protected fun dismissLoadingDialog() {
+    fun dismissLoadingDialog() {
         CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.dismissLoadingDialogEvent)
         mUiChangeLiveData.dismissLoadingDialogEvent?.call()
     }
@@ -192,57 +193,79 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
     // 以下是内嵌加载中布局相关的 =========================================================
 
     @MainThread
-    protected fun showLoadSirSuccess() {
+    fun showLoadSirSuccess() {
         CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
         mUiChangeLiveData.loadSirEvent?.value = null
     }
 
     @MainThread
-    protected fun showLoadSir(clz: Class<out Callback>) {
+    fun showLoadSir(clz: Class<out Callback>) {
         CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
         mUiChangeLiveData.loadSirEvent?.value = clz
     }
 
     // 以下是界面开启和结束相关的 =========================================================
 
-    @MainThread
-    protected fun finish() {
-        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
-        LiveDataBus.send(mUiChangeLiveData.finishEvent!!, "")
+    fun setResult(
+        resultCode: Int,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        setResult(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
+    }
+
+    fun setResult(resultCode: Int, data: Intent? = null) {
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.setResultEvent)
+        LiveDataBus.send(mUiChangeLiveData.setResultEvent!!, Pair(resultCode, data))
     }
 
     @MainThread
-    protected fun startActivity(clazz: Class<out Activity>) {
+    fun finish(
+        resultCode: Int? = null,
+        map: Map<String, *>? = null,
+        bundle: Bundle? = null
+    ) {
+        finish(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
+    }
+
+    @MainThread
+    fun finish(resultCode: Int? = null, data: Intent? = null) {
+        CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
+        LiveDataBus.send(mUiChangeLiveData.finishEvent!!, Pair(resultCode, data))
+    }
+
+    @MainThread
+    fun startActivity(clazz: Class<out Activity>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityEvent!!, clazz)
     }
 
     @MainThread
-    protected fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
+    fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityWithMapEvent!!, Pair(clazz, map))
     }
 
     @MainThread
-    protected fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
+    fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEventWithBundle)
         LiveDataBus.send(mUiChangeLiveData.startActivityEventWithBundle!!, Pair(clazz, bundle))
     }
 
     @MainThread
-    protected fun startActivityForResult(clazz: Class<out Activity>) {
+    fun startActivityForResult(clazz: Class<out Activity>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEvent!!, clazz)
     }
 
     @MainThread
-    protected fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
+    fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithBundle)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithBundle!!, Pair(clazz, bundle))
     }
 
     @MainThread
-    protected fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
+    fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithMap)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithMap!!, Pair(clazz, map))
     }
@@ -266,6 +289,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         var startActivityForResultEventWithBundle: String? = null
 
         var finishEvent: String? = null
+        var setResultEvent: String? = null
 
         var loadSirEvent: SingleLiveEvent<Class<out Callback>?>? = null
 
@@ -289,6 +313,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             startActivityWithMapEvent = UUID.randomUUID().toString()
             startActivityEventWithBundle = UUID.randomUUID().toString()
             finishEvent = UUID.randomUUID().toString()
+            setResultEvent = UUID.randomUUID().toString()
         }
     }
 
