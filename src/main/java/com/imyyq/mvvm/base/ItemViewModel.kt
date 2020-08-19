@@ -5,7 +5,7 @@ package com.imyyq.mvvm.base
  * 如果有必要，可以持有当前数据对应的列表索引
  */
 open class ItemViewModel<VM : BaseViewModel<out BaseModel>>(
-    protected var mViewModel: VM,
+    var mViewModel: VM,
     // 有需要的话，可以设置当前实例对应的 position
-    protected var mPosition: Int? = null
+    var mPosition: Int? = null
 )

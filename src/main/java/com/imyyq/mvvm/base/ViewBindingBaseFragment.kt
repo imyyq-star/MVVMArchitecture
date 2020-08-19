@@ -31,7 +31,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
 
-    private val mLoadingDialog by lazy { CustomLayoutDialog(requireActivity(), loadingDialogLayout()) }
+    private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(requireActivity(), loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
 

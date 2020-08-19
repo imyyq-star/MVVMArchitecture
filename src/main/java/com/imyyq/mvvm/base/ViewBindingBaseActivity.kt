@@ -29,7 +29,8 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
 
-    private val mLoadingDialog by lazy { CustomLayoutDialog(this, loadingDialogLayout()) }
+    // 保证只有主线程访问这个变量，所以 lazy 不需要同步机制
+    private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(this, loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
 

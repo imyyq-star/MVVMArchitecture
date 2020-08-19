@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
-import androidx.annotation.MainThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.R
@@ -15,6 +14,7 @@ import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.http.HttpHandler
 import com.imyyq.mvvm.utils.SingleLiveEvent
 import com.imyyq.mvvm.utils.Utils
+import com.imyyq.mvvm.utils.isInUIThread
 import com.kingja.loadsir.callback.Callback
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -38,16 +38,16 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      * 可能存在没有仓库的 vm，但我们这里也不要是可 null 的。
      * 如果 vm 没有提供仓库，说明此变量不可用，还去使用的话自然就报错。
      */
-    protected lateinit var mModel: M
+    lateinit var mModel: M
 
     private lateinit var mCompositeDisposable: Any
     private lateinit var mCallList: MutableList<Call<*>>
     private lateinit var mCoroutineScope: CoroutineScope
 
-    val mUiChangeLiveData by lazy { UiChangeLiveData() }
+    internal val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
-    var mBundle: Bundle? = null
-    var mIntent: Intent? = null
+    internal var mBundle: Bundle? = null
+    internal var mIntent: Intent? = null
 
     /**
      * 是否自动创建仓库，默认是 true，
@@ -173,35 +173,46 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     // 以下是加载中对话框相关的 =========================================================
 
-    @MainThread
     fun showLoadingDialog() {
         showLoadingDialog(getApplication<Application>().getString(R.string.please_wait))
     }
 
-    @MainThread
     fun showLoadingDialog(msg: String?) {
         CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.showLoadingDialogEvent)
-        mUiChangeLiveData.showLoadingDialogEvent?.value = msg
+        if (isInUIThread()) {
+            mUiChangeLiveData.showLoadingDialogEvent?.value = msg
+        } else {
+            mUiChangeLiveData.showLoadingDialogEvent?.postValue(msg)
+        }
     }
 
-    @MainThread
     fun dismissLoadingDialog() {
         CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.dismissLoadingDialogEvent)
-        mUiChangeLiveData.dismissLoadingDialogEvent?.call()
+        if (isInUIThread()) {
+            mUiChangeLiveData.dismissLoadingDialogEvent?.call()
+        } else {
+            mUiChangeLiveData.dismissLoadingDialogEvent?.postValue(null)
+        }
     }
 
     // 以下是内嵌加载中布局相关的 =========================================================
 
-    @MainThread
     fun showLoadSirSuccess() {
         CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
-        mUiChangeLiveData.loadSirEvent?.value = null
+        if (isInUIThread()) {
+            mUiChangeLiveData.loadSirEvent?.value = null
+        } else {
+            mUiChangeLiveData.loadSirEvent?.postValue(null)
+        }
     }
 
-    @MainThread
     fun showLoadSir(clz: Class<out Callback>) {
         CheckUtil.checkLoadSirEvent(mUiChangeLiveData.loadSirEvent)
-        mUiChangeLiveData.loadSirEvent?.value = clz
+        if (isInUIThread()) {
+            mUiChangeLiveData.loadSirEvent?.value = clz
+        } else {
+            mUiChangeLiveData.loadSirEvent?.postValue(clz)
+        }
     }
 
     // 以下是界面开启和结束相关的 =========================================================
@@ -219,7 +230,6 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         LiveDataBus.send(mUiChangeLiveData.setResultEvent!!, Pair(resultCode, data))
     }
 
-    @MainThread
     fun finish(
         resultCode: Int? = null,
         map: Map<String, *>? = null,
@@ -228,43 +238,36 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         finish(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
     }
 
-    @MainThread
     fun finish(resultCode: Int? = null, data: Intent? = null) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
         LiveDataBus.send(mUiChangeLiveData.finishEvent!!, Pair(resultCode, data))
     }
 
-    @MainThread
     fun startActivity(clazz: Class<out Activity>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityEvent!!, clazz)
     }
 
-    @MainThread
     fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityWithMapEvent!!, Pair(clazz, map))
     }
 
-    @MainThread
     fun startActivity(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityEventWithBundle)
         LiveDataBus.send(mUiChangeLiveData.startActivityEventWithBundle!!, Pair(clazz, bundle))
     }
 
-    @MainThread
     fun startActivityForResult(clazz: Class<out Activity>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEvent!!, clazz)
     }
 
-    @MainThread
     fun startActivityForResult(clazz: Class<out Activity>, bundle: Bundle?) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithBundle)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithBundle!!, Pair(clazz, bundle))
     }
 
-    @MainThread
     fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithMap)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithMap!!, Pair(clazz, map))

@@ -5,10 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.os.Parcelable
 import android.view.View
 import com.imyyq.mvvm.R
 import java.io.Serializable
+
+fun Any.isInUIThread() = Looper.getMainLooper().thread == Thread.currentThread()
 
 object Utils {
     val isNeedCheckPermission: Boolean
