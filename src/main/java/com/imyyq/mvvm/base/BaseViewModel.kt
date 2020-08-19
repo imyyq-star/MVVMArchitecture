@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
+import androidx.collection.ArrayMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import com.imyyq.mvvm.R
@@ -219,7 +220,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     fun setResult(
         resultCode: Int,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         setResult(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
@@ -232,7 +233,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     fun finish(
         resultCode: Int? = null,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         finish(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
@@ -248,7 +249,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         LiveDataBus.send(mUiChangeLiveData.startActivityEvent!!, clazz)
     }
 
-    fun startActivity(clazz: Class<out Activity>, map: Map<String, *>) {
+    fun startActivity(clazz: Class<out Activity>, map: ArrayMap<String, *>) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.startActivityWithMapEvent)
         LiveDataBus.send(mUiChangeLiveData.startActivityWithMapEvent!!, Pair(clazz, map))
     }
@@ -268,7 +269,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithBundle!!, Pair(clazz, bundle))
     }
 
-    fun startActivityForResult(clazz: Class<out Activity>, map: Map<String, *>) {
+    fun startActivityForResult(clazz: Class<out Activity>, map: ArrayMap<String, *>) {
         CheckUtil.checkStartForResultEvent(mUiChangeLiveData.startActivityForResultEventWithMap)
         LiveDataBus.send(mUiChangeLiveData.startActivityForResultEventWithMap!!, Pair(clazz, map))
     }

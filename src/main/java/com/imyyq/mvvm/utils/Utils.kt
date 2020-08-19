@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.os.Parcelable
 import android.view.View
+import androidx.collection.ArrayMap
 import com.imyyq.mvvm.R
 import java.io.Serializable
 
@@ -93,7 +94,7 @@ object Utils {
     fun getIntentByMapOrBundle(
         context: Context? = null,
         clz: Class<out Activity>? = null,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ): Intent {
         val intent =

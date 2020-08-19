@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
+import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
@@ -97,7 +98,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 },
                 true
             )
-            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(this,
+            LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(this,
                 mViewModel.mUiChangeLiveData.startActivityWithMapEvent!!,
                 Observer {
                     startActivity(it?.first, it?.second)
@@ -134,7 +135,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 },
                 true
             )
-            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(
+            LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap!!,
                 Observer {
@@ -180,7 +181,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     fun startActivity(
         clz: Class<out Activity>?,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         startActivity(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
@@ -188,7 +189,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     fun startActivityForResult(
         clz: Class<out Activity>?,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         initStartActivityForResult()
