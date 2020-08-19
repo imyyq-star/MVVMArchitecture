@@ -67,7 +67,8 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         lifecycle.addObserver(mViewModel)
     }
 
-    final override fun initUiChangeLiveData() {
+    @CallSuper
+    override fun initUiChangeLiveData() {
         if (isViewModelNeedStartAndFinish()) {
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
 
@@ -148,7 +149,8 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         }
     }
 
-    final override fun initLoadSir() {
+    @CallSuper
+    override fun initLoadSir() {
         // 只有目标不为空的情况才有实例化的必要
         if (getLoadSirTarget() != null) {
             mLoadService = LoadSir.getDefault().register(
@@ -193,15 +195,21 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
                     when (it.resultCode) {
                         Activity.RESULT_OK -> {
                             onActivityResultOk(data)
-                            mViewModel.onActivityResultOk(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultOk(data)
+                            }
                         }
                         Activity.RESULT_CANCELED -> {
                             onActivityResultCanceled(data)
-                            mViewModel.onActivityResultCanceled(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultCanceled(data)
+                            }
                         }
                         else -> {
                             onActivityResult(it.resultCode, data)
-                            mViewModel.onActivityResult(it.resultCode, data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResult(it.resultCode, data)
+                            }
                         }
                     }
                 }
@@ -262,7 +270,9 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         super.onDestroy()
 
         // 界面销毁时移除 vm 的生命周期感知
-        lifecycle.removeObserver(mViewModel)
+        if (this::mViewModel.isInitialized) {
+            lifecycle.removeObserver(mViewModel)
+        }
         removeLiveDataBus(this)
     }
 }
