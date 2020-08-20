@@ -1,9 +1,9 @@
 package com.imyyq.mvvm.http
 
-import android.util.ArrayMap
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.collection.ArrayMap
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.base.IBaseResponse

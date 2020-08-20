@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
+import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
@@ -29,7 +30,8 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
 
-    private val mLoadingDialog by lazy { CustomLayoutDialog(this, loadingDialogLayout()) }
+    // 保证只有主线程访问这个变量，所以 lazy 不需要同步机制
+    private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(this, loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
 
@@ -56,7 +58,8 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         lifecycle.addObserver(mViewModel)
     }
 
-    final override fun initUiChangeLiveData() {
+    @CallSuper
+    override fun initUiChangeLiveData() {
         if (isViewModelNeedStartAndFinish()) {
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
 
@@ -96,7 +99,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 },
                 true
             )
-            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(this,
+            LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(this,
                 mViewModel.mUiChangeLiveData.startActivityWithMapEvent!!,
                 Observer {
                     startActivity(it?.first, it?.second)
@@ -133,7 +136,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                 },
                 true
             )
-            LiveDataBus.observe<Pair<Class<out Activity>, Map<String, *>>>(
+            LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap!!,
                 Observer {
@@ -157,7 +160,8 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         }
     }
 
-    final override fun initLoadSir() {
+    @CallSuper
+    override fun initLoadSir() {
         // 只有目标不为空的情况才有实例化的必要
         if (getLoadSirTarget() != null) {
             mLoadService = LoadSir.getDefault().register(
@@ -179,7 +183,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     fun startActivity(
         clz: Class<out Activity>?,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         startActivity(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
@@ -187,7 +191,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     fun startActivityForResult(
         clz: Class<out Activity>?,
-        map: Map<String, *>? = null,
+        map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
         initStartActivityForResult()
@@ -202,15 +206,21 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                     when (it.resultCode) {
                         Activity.RESULT_OK -> {
                             onActivityResultOk(data)
-                            mViewModel.onActivityResultOk(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultOk(data)
+                            }
                         }
                         Activity.RESULT_CANCELED -> {
                             onActivityResultCanceled(data)
-                            mViewModel.onActivityResultCanceled(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultCanceled(data)
+                            }
                         }
                         else -> {
                             onActivityResult(it.resultCode, data)
-                            mViewModel.onActivityResult(it.resultCode, data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResult(it.resultCode, data)
+                            }
                         }
                     }
                 }
@@ -254,7 +264,9 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         super.onDestroy()
 
         // 界面销毁时移除 vm 的生命周期感知
-        lifecycle.removeObserver(mViewModel)
+        if (this::mViewModel.isInitialized) {
+            lifecycle.removeObserver(mViewModel)
+        }
         removeLiveDataBus(this)
     }
 }

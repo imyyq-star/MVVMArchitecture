@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
 
 import com.imyyq.mvvm.app.BaseApp;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public final class SPUtils {
 
-    private static final Map<String, SPUtils> sSPMap = new HashMap<>();
+    private static final ArrayMap<String, SPUtils> sSPMap = new ArrayMap<>();
     private final SharedPreferences sp;
 
     /**
