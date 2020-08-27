@@ -8,17 +8,17 @@ import com.imyyq.mvvm.binding.command.BindingFunction
 @BindingAdapter("lineManager")
 fun setLineManager(
     recyclerView: RecyclerView,
-    function: BindingFunction<RecyclerView, RecyclerView.ItemDecoration>
+    function: BindingFunction<RecyclerView, RecyclerView.ItemDecoration>?
 ) {
-    recyclerView.addItemDecoration(function.apply(recyclerView))
+    function?.apply(recyclerView)?.let { recyclerView.addItemDecoration(it) }
 }
 
 @BindingAdapter("layoutManager")
 fun setLayoutManager(
     recyclerView: RecyclerView,
-    function: BindingFunction<RecyclerView, RecyclerView.LayoutManager>
+    function: BindingFunction<RecyclerView, RecyclerView.LayoutManager>?
 ) {
-    recyclerView.layoutManager = function.apply(recyclerView)
+    recyclerView.layoutManager = function?.apply(recyclerView)
 }
 
 @BindingAdapter(
