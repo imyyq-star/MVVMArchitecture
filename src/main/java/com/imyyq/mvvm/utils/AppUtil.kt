@@ -2,6 +2,7 @@ package com.imyyq.mvvm.utils
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -66,6 +67,14 @@ object AppUtil {
             intent.addCategory(Intent.CATEGORY_LAUNCHER)
             return BaseApp.getInstance().packageManager.queryIntentActivities(intent, 0)
         }
+
+    fun launcherResolveInfo(packageName: String): List<ResolveInfo> {
+        val intent = Intent()
+        intent.action = Intent.ACTION_MAIN
+        intent.`package` = packageName
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        return BaseApp.getInstance().packageManager.queryIntentActivities(intent, 0)
+    }
 
     /**
      * 取得版本名称
@@ -151,6 +160,29 @@ object AppUtil {
         if (null != intent) {
             context.startActivity(intent)
             return true
+        }
+        return false
+    }
+
+    fun startActivity(packageName: String, activityName: String?): Boolean {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+
+        if (activityName == null) {
+            val info = launcherResolveInfo(packageName)
+            if (!Utils.isEmpty(info)) {
+                intent.component = ComponentName(packageName, info[0].activityInfo.name)
+            } else {
+                return false
+            }
+        } else {
+            intent.component = ComponentName(packageName, activityName)
+        }
+        try {
+            BaseApp.getInstance().startActivity(intent)
+            return true
+        } catch (e: Exception) {
         }
         return false
     }

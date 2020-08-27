@@ -1,5 +1,6 @@
 package com.imyyq.mvvm.utils
 
+import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -8,22 +9,30 @@ import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.imyyq.mvvm.app.BaseApp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * 吐司提示类，可设置位置，偏移量，默认是系统自带的位置和偏移量。
  * 可设置自定义布局和消息id。
  */
 object ToastUtil {
-    private var mDefToast: Toast? = Toast.makeText(BaseApp.getInstance(), "", Toast.LENGTH_SHORT)
 
     private var mCustomLayout = -1
     private var mCustomMsgId = -1
-    private var mGravity = mDefToast?.gravity
-    private var xOffset = mDefToast?.xOffset
-    private var yOffset = mDefToast?.yOffset
+    private var mGravity = 0
+    private var xOffset = 0
+    private var yOffset = 0
 
     init {
-        mDefToast = null
+        GlobalScope.launch(Dispatchers.Main) {
+            @SuppressLint("ShowToast")
+            val toast = Toast.makeText(BaseApp.getInstance(), "", Toast.LENGTH_SHORT)
+            mGravity = toast.gravity
+            xOffset = toast.xOffset
+            yOffset = toast.yOffset
+        }
     }
 
     /**
@@ -74,9 +83,11 @@ object ToastUtil {
     }
 
     private fun showToast(msg: String, duration: Int) {
-        val toast = Toast.makeText(BaseApp.getInstance(), msg, duration)
-        toast.setGravity(mGravity!!, xOffset!!, yOffset!!)
-        toast.show()
+        GlobalScope.launch(Dispatchers.Main) {
+            val toast = Toast.makeText(BaseApp.getInstance(), msg, duration)
+            toast.setGravity(mGravity, xOffset, yOffset)
+            toast.show()
+        }
     }
 
     fun setCustomLayout(mCustomLayout: Int) {
@@ -110,7 +121,7 @@ object ToastUtil {
         }
         showCustomToast(
             msg, mCustomLayout, mCustomMsgId, length,
-            mGravity!!, xOffset!!, yOffset!!
+            mGravity, xOffset, yOffset
         )
     }
 
@@ -142,15 +153,17 @@ object ToastUtil {
                         @IdRes
                         msgId: Int, duration: Int, gravity: Int, xOffset: Int,
                         yOffset: Int) {
-        val toast = Toast(BaseApp.getInstance())
-        val view = LayoutInflater.from(BaseApp.getInstance()).inflate(layout, null)
-        if (msgId != 0) {
-            val tv = view.findViewById<TextView>(msgId)
-            tv.text = msg
+        GlobalScope.launch(Dispatchers.Main) {
+            val toast = Toast(BaseApp.getInstance())
+            val view = LayoutInflater.from(BaseApp.getInstance()).inflate(layout, null)
+            if (msgId != 0) {
+                val tv = view.findViewById<TextView>(msgId)
+                tv.text = msg
+            }
+            toast.view = view
+            toast.duration = duration
+            toast.setGravity(gravity, xOffset, yOffset)
+            toast.show()
         }
-        toast.view = view
-        toast.duration = duration
-        toast.setGravity(gravity, xOffset, yOffset)
-        toast.show()
     }
 }
