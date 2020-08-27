@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
+import androidx.annotation.MainThread
 import androidx.collection.ArrayMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
@@ -218,6 +219,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     // 以下是界面开启和结束相关的 =========================================================
 
+    @MainThread
     fun setResult(
         resultCode: Int,
         map: ArrayMap<String, *>? = null,
@@ -226,11 +228,13 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         setResult(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
     }
 
+    @MainThread
     fun setResult(resultCode: Int, data: Intent? = null) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.setResultEvent)
         LiveDataBus.send(mUiChangeLiveData.setResultEvent!!, Pair(resultCode, data))
     }
 
+    @MainThread
     fun finish(
         resultCode: Int? = null,
         map: ArrayMap<String, *>? = null,
@@ -239,6 +243,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         finish(resultCode, Utils.getIntentByMapOrBundle(map = map, bundle = bundle))
     }
 
+    @MainThread
     fun finish(resultCode: Int? = null, data: Intent? = null) {
         CheckUtil.checkStartAndFinishEvent(mUiChangeLiveData.finishEvent)
         LiveDataBus.send(mUiChangeLiveData.finishEvent!!, Pair(resultCode, data))
