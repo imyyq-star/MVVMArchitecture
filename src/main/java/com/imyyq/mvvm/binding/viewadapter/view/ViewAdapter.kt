@@ -12,14 +12,22 @@ import com.imyyq.mvvm.utils.LogUtil
 )
 fun onClickCommand(
     view: View,
-    clickCommand: View.OnClickListener,
-    // xml中没有配置，那么使用全局的配置
-    isInterval: Boolean = GlobalConfig.Click.gIsClickInterval,
-    // 没有配置时间，使用全局配置
-    intervalMilliseconds: Int = GlobalConfig.Click.gClickIntervalMilliseconds
+    clickCommand: View.OnClickListener?,
+    isInterval: Boolean?,
+    intervalMilliseconds: Int?
 ) {
-    if (isInterval) {
-        view.clickWithTrigger(intervalMilliseconds.toLong(), clickCommand)
+    var interval = isInterval
+    // xml中没有配置，那么使用全局的配置
+    if (interval == null) {
+        interval = GlobalConfig.Click.gIsClickInterval
+    }
+    // 没有配置时间，使用全局配置
+    var milliseconds = intervalMilliseconds
+    if (milliseconds == null) {
+        milliseconds = GlobalConfig.Click.gClickIntervalMilliseconds
+    }
+    if (interval) {
+        clickCommand?.let { view.clickWithTrigger(milliseconds.toLong(), it) }
     } else {
         view.setOnClickListener(clickCommand)
     }
@@ -30,9 +38,9 @@ fun onClickCommand(
 )
 fun multiClickToOpenLog(
     view: View,
-    frequency: Int
+    frequency: Int?
 ) {
-    LogUtil.multiClickToOpenLog(view, frequency)
+    frequency?.let { LogUtil.multiClickToOpenLog(view, it) }
 }
 
 @BindingAdapter(
@@ -40,7 +48,7 @@ fun multiClickToOpenLog(
 )
 fun multiClickToChangeBaseUrl(
     view: View,
-    frequency: Int
+    frequency: Int?
 ) {
-    HttpRequest.multiClickToChangeBaseUrl(view, frequency)
+    frequency?.let { HttpRequest.multiClickToChangeBaseUrl(view, it) }
 }
