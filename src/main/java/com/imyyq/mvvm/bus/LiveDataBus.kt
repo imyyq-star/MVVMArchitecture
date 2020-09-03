@@ -50,10 +50,9 @@ object LiveDataBus {
             objMap = arrayMapOf()
             mLiveDataMap[registrants] = objMap
         }
-        // TODO 有重复的 tag 怎么办？
 
         if (objMap[tag] != null) {
-            throw RuntimeException("同一个注册者下，不可以重复注册一个 tag")
+            return
         }
 
         objMap[tag] = Pair(liveData as MutableLiveData<Any>, observer as Observer<Any>)

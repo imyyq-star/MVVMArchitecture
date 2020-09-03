@@ -9,6 +9,7 @@ import androidx.annotation.MainThread
 import androidx.collection.ArrayMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.CheckUtil
 import com.imyyq.mvvm.app.RepositoryManager
@@ -20,9 +21,11 @@ import com.imyyq.mvvm.utils.isInUIThread
 import com.kingja.loadsir.callback.Callback
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -44,7 +47,6 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     private lateinit var mCompositeDisposable: Any
     private lateinit var mCallList: MutableList<Call<*>>
-    private lateinit var mCoroutineScope: CoroutineScope
 
     internal val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
@@ -71,8 +73,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         onFailed: ((code: Int, msg: String?) -> Unit)? = null,
         onComplete: (() -> Unit)? = null
     ) {
-        initCoroutineScope()
-        mCoroutineScope.launch {
+        viewModelScope.launch {
             try {
                 HttpHandler.handleResult(block(), onSuccess, onResult, onFailed)
             } catch (e: Exception) {
@@ -83,18 +84,11 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         }
     }
 
-    private fun initCoroutineScope() {
-        if (!this::mCoroutineScope.isInitialized) {
-            mCoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
-        }
-    }
-
     /**
      * 发起协程，让协程和 UI 相关
      */
     fun launchUI(block: suspend CoroutineScope.() -> Unit) {
-        initCoroutineScope()
-        mCoroutineScope.launch { block() }
+        viewModelScope.launch { block() }
     }
 
     /**
@@ -147,9 +141,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
             mCallList.forEach { it.cancel() }
             mCallList.clear()
         }
-        if (this::mCoroutineScope.isInitialized) {
-            mCoroutineScope.cancel()
-        }
+        viewModelScope.cancel()
     }
 
     /**
