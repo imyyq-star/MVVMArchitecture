@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,7 +40,8 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         super.onCreate(savedInstanceState)
 
         mBinding = initBinding(layoutInflater, null)
-        initViewAndViewModel()
+        initContentView(mBinding.root)
+        initViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
@@ -49,9 +51,12 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
 
     abstract override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V
 
+    open fun initContentView(contentView: View) {
+        setContentView(contentView)
+    }
+
     @CallSuper
-    override fun initViewAndViewModel() {
-        setContentView(mBinding.root)
+    override fun initViewModel() {
         mViewModel = initViewModel(this)
         mViewModel.mIntent = getArgumentsIntent()
         // 让 vm 可以感知 v 的生命周期

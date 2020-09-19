@@ -15,8 +15,7 @@ abstract class NoViewModelBaseActivity<V : ViewBinding> :
     ViewBindingBaseActivity<V, BaseViewModel<BaseModel>>() {
 
     @SuppressLint("MissingSuperCall")
-    final override fun initViewAndViewModel() {
-        setContentView(mBinding.root)
+    final override fun initViewModel() {
     }
 
     final override fun isViewModelNeedStartAndFinish() = false

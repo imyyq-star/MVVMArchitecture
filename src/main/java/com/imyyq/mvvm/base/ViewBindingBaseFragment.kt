@@ -48,7 +48,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViewAndViewModel()
+        initViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
@@ -57,7 +57,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     }
 
     @CallSuper
-    override fun initViewAndViewModel() {
+    override fun initViewModel() {
         mViewModel = if (sharedViewModel) {
             initViewModel(requireActivity())
         } else {

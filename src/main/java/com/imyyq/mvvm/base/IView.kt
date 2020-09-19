@@ -42,7 +42,7 @@ interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsF
     /**
      * 初始化视图和 VM
      */
-    fun initViewAndViewModel()
+    fun initViewModel()
 
     /**
      * 初始化通用的 UI 改变事件，基类应该在初始化后设为 final

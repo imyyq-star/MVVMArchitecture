@@ -15,8 +15,8 @@ abstract class DataBindingBaseFragment<V : ViewDataBinding, VM : BaseViewModel<o
     final override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
         DataBindingUtil.inflate(inflater, layoutId, container, false)
 
-    final override fun initViewAndViewModel() {
-        super.initViewAndViewModel()
+    override fun initViewModel() {
+        super.initViewModel()
         // 绑定 v 和 vm
         if (varViewModelId != null) {
             mBinding.setVariable(varViewModelId, mViewModel)

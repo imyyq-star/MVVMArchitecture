@@ -2,6 +2,7 @@ package com.imyyq.mvvm.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -14,8 +15,9 @@ abstract class DataBindingBaseActivity<V : ViewDataBinding, VM : BaseViewModel<o
     final override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
         DataBindingUtil.inflate(inflater, layoutId, container, false)
 
-    final override fun initViewAndViewModel() {
-        super.initViewAndViewModel()
+    @CallSuper
+    override fun initViewModel() {
+        super.initViewModel()
         // 绑定 v 和 vm
         if (varViewModelId != null) {
             mBinding.setVariable(varViewModelId, mViewModel)
