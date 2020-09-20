@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.databinding.ViewDataBinding
+import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.GlobalConfig
 
 abstract class AppBarDataBindingBaseActivity<V : ViewDataBinding, VM : AppBarBaseViewModel<out BaseModel, out IAppBarProcessor>,
@@ -18,30 +19,26 @@ abstract class AppBarDataBindingBaseActivity<V : ViewDataBinding, VM : AppBarBas
     protected lateinit var mAppBarProcessor: AppBarP
 
     override fun initContentView(contentView: View) {
-        appBarLayoutId?.let {
-            val pair: Pair<AppBarV, LinearLayout> = IAppBar.inflateRootLayout(this, contentView, it)
-            mAppBarBinding = pair.first
-            super.initContentView(pair.second)
+        if (appBarLayoutId == null) {
+            throw RuntimeException(getString(R.string.app_bar_layout_id_not_null))
         }
+        val pair: Pair<AppBarV, LinearLayout> = IAppBar.inflateRootLayout(this, contentView, appBarLayoutId)
+        mAppBarBinding = pair.first
+        super.initContentView(pair.second)
     }
 
     override fun initViewModel() {
         super.initViewModel()
         // 让 vm 层也可以访问到标题栏处理者
-        if (appBarLayoutId != null) {
-            // 实例化标题栏的处理者
-            mAppBarProcessor = initAppBarProcessor()
-            mAppBarBinding.setVariable(varAppBarProcessorId, mAppBarProcessor)
-            mAppBarBinding.lifecycleOwner = this
+        mAppBarProcessor = initAppBarProcessor()
+        mAppBarBinding.setVariable(varAppBarProcessorId, mAppBarProcessor)
+        mAppBarBinding.lifecycleOwner = this
 
-            mViewModel.setProcessor(mAppBarProcessor)
-        }
+        mViewModel.setProcessor(mAppBarProcessor)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (this::mAppBarBinding.isInitialized) {
-            mAppBarBinding.unbind()
-        }
+        mAppBarBinding.unbind()
     }
 }

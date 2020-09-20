@@ -14,4 +14,5 @@
     <string name="wrong_pwd">密码错误</string>
     <string name="effective_next_time">下次启动时生效</string>
     <string name="restore">恢复</string>
+    <string name="app_bar_layout_id_not_null">appBarLayoutId 不可以是 null，必须通过 GlobalConfig.AppBar.gAppBarLayoutId 或构造参数设置</string>
 </resources>
