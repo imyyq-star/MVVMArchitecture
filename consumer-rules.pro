@@ -89,3 +89,9 @@
 -keepclassmembers class com.imyyq.mvvm.base.ViewBindingBaseFragment {
      protected * mBinding;
 }
+-keepclassmembers class com.imyyq.mvvm.base.AppBarDataBindingBaseFragment {
+     protected * mAppBarBinding;
+}
+-keepclassmembers class com.imyyq.mvvm.base.AppBarViewBindingBaseFragment {
+     protected * mAppBarBinding;
+}

@@ -126,4 +126,11 @@ object GlobalConfig {
          */
         var gClickIntervalMilliseconds = 800
     }
+
+    object AppBar {
+        /**
+         * 全局标题栏布局配置
+         */
+        @LayoutRes var gAppBarLayoutId: Int? = null
+    }
 }
