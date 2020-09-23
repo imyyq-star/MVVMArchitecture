@@ -7,12 +7,10 @@ import androidx.viewbinding.ViewBinding
 import com.kingja.loadsir.callback.Callback
 
 /**
- * 如果你的界面足够简单，不需要 ViewModel，那么可以继承自此类。
- * 此类不可以使用 [mViewModel] 变量，不可使用 vm 相关的方法，
- * 不可使用 LoadingDialog，不可使用 LoadSir
+ * 详见 [NoViewModelBaseActivity] 的注释，一样的
  */
-abstract class NoViewModelBaseActivity<V : ViewBinding> :
-    ViewBindingBaseActivity<V, BaseViewModel<BaseModel>>() {
+abstract class AppBarNoViewModelBaseFragment<V : ViewBinding, AppBarV : ViewBinding> :
+    AppBarViewBindingBaseFragment<V, BaseViewModel<BaseModel>, AppBarV>() {
 
     @SuppressLint("MissingSuperCall")
     final override fun initViewModel() {

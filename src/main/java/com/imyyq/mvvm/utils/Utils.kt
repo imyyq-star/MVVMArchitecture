@@ -10,6 +10,8 @@ import android.os.Parcelable
 import android.view.View
 import androidx.collection.ArrayMap
 import com.imyyq.mvvm.R
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.Serializable
 
 fun Any.isInUIThread() = Looper.getMainLooper().thread == Thread.currentThread()
@@ -217,5 +219,24 @@ object Utils {
         }
         bundle?.let { intent.putExtras(bundle) }
         return intent
+    }
+
+    fun releaseBinding(startClz: Class<*>?, targetClz: Class<*>?, obj: Any, filed: String) {
+        // 通过反射，解决内存泄露问题
+        GlobalScope.launch {
+            var clz = startClz
+            while (clz != null) {
+                // 找到 mBinding 所在的类
+                if (clz == targetClz) {
+                    try {
+                        val field = clz.getDeclaredField(filed)
+                        field.isAccessible = true
+                        field.set(obj, null)
+                    } catch (ignore: Exception) {
+                    }
+                }
+                clz = clz.superclass
+            }
+        }
     }
 }

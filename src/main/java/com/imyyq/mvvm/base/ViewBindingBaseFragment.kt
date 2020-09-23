@@ -19,8 +19,6 @@ import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>>(
     private val sharedViewModel: Boolean = false
@@ -48,7 +46,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViewAndViewModel()
+        initViewModel()
         initParam()
         initUiChangeLiveData()
         initViewObservable()
@@ -57,7 +55,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     }
 
     @CallSuper
-    override fun initViewAndViewModel() {
+    override fun initViewModel() {
         mViewModel = if (sharedViewModel) {
             initViewModel(requireActivity())
         } else {
@@ -247,23 +245,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     override fun onDestroyView() {
         super.onDestroyView()
-
-        // 通过反射，解决内存泄露问题
-        GlobalScope.launch {
-            var clz: Class<*>? = this@ViewBindingBaseFragment.javaClass
-            while (clz != null) {
-                // 找到 mBinding 所在的类
-                if (clz == ViewBindingBaseFragment::class.java) {
-                    try {
-                        val field = clz.getDeclaredField("mBinding")
-                        field.isAccessible = true
-                        field.set(this@ViewBindingBaseFragment, null)
-                    } catch (ignore: Exception) {
-                    }
-                }
-                clz = clz.superclass
-            }
-        }
+        Utils.releaseBinding(this.javaClass, ViewBindingBaseFragment::class.java, this, "mBinding")
     }
 
     override fun onDestroy() {

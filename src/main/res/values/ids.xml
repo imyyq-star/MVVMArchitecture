@@ -5,4 +5,7 @@
 
     <item name="multiClickFrequency" type="id"/>
     <item name="multiClickLastTime" type="id"/>
+
+    <!-- 标题栏的返回按钮 id -->
+    <item name="commonAppBarBackBtnId" type="id"/>
 </resources>

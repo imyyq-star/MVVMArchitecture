@@ -13,7 +13,7 @@ abstract class NoViewModelBaseFragment<V : ViewBinding> :
     ViewBindingBaseFragment<V, BaseViewModel<BaseModel>>() {
 
     @SuppressLint("MissingSuperCall")
-    final override fun initViewAndViewModel() {
+    final override fun initViewModel() {
     }
 
     final override fun isViewModelNeedStartAndFinish() = false
