@@ -6,6 +6,9 @@
 也可以不通过远程仓库，直接引入源码，**如需引入源码，请参照 [Wiki - 通过 submodule 引入框架](https://github.com/imyyq-star/MVVMArchitecture/wiki/1%E3%80%81%E9%80%9A%E8%BF%87%20submodule%20%E5%BC%95%E5%85%A5%E6%A1%86%E6%9E%B6)**
 
 
+以 MVVMArchitecture 作为公共基础模块，搭建组件化架构，参见 [MVVMArchModularization](https://github.com/imyyq-star/MVVMArchModularization) 示例，相关文章参见 [一种更好的组件化方式](https://juejin.im/post/6886635469464698887/)
+
+
 # 简介
 
 ![图1](https://imyyq.coding.net/p/MyMarkdownImg/d/MyMarkdownImg/git/raw/master/eda038cc59438bb9582f6d0dbe21cc14efa514b567d429a9bfbeb2b89ba9f9e6.png)  
