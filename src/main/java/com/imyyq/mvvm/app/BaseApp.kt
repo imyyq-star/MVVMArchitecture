@@ -6,6 +6,9 @@ import android.os.Bundle
 import com.imyyq.mvvm.utils.AppUtil
 import com.imyyq.mvvm.utils.LogUtil
 
+/**
+ * Application 的基类
+ */
 open class BaseApp : Application() {
 
     override fun onCreate() {
@@ -41,6 +44,9 @@ open class BaseApp : Application() {
     companion object {
         private lateinit var app: Application
 
+        /**
+         * 不继承 [BaseApp]，需在自己的 Application 实现类中调用此方法
+         */
         @JvmStatic
         fun initApp(app: Application) {
             Companion.app = app

@@ -25,11 +25,14 @@ object GlobalConfig {
      * <item name="android:windowIsTranslucent">true</item>
      *
      * 并且框架会自动把 windowBackground 设置为透明
+     *
+     * 可通过 [com.imyyq.mvvm.base.ParallaxSwipeBackActivity.isSupportSwipe] 方法局部关闭或开启
      */
     var gIsSupportSwipe = false
 
     /**
-     * 是否需要管理 Activity 堆栈
+     * 是否需要管理 Activity 堆栈。
+     * 开启后 [com.imyyq.mvvm.app.AppActivityManager] 可使用
      */
     var gIsNeedActivityManager = false
 
@@ -117,19 +120,24 @@ object GlobalConfig {
          *
          * 这里可全局设置是否开启防止点击事件过快的功能，局部可单独开启或关闭。
          *
-         * 如果关闭，那么和 setOnClickListener 没啥区别
+         * 如果关闭，那么和 setOnClickListener 没啥区别。
+         *
+         * onClickCommand 属性可局部配置。
          */
         var gIsClickInterval = false
 
         /**
-         * 点击事件时间间隔
+         * 点击事件时间间隔。
+         *
+         * onClickCommand 属性可局部配置。
          */
         var gClickIntervalMilliseconds = 800
     }
 
     object AppBar {
         /**
-         * 全局标题栏布局配置
+         * 全局标题栏布局配置。
+         * 可在 Fragment 或 Activity 的构造方法中局部设置
          */
         @LayoutRes var gAppBarLayoutId: Int? = null
     }
