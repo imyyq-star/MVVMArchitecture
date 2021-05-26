@@ -14,6 +14,11 @@ import java.util.*
 
 object FileUtil {
 
+    /**
+     * 缓存目录。
+     * 存在 SD 卡，则是 /sdcard/Android/data/package name/cache
+     * 否则是 /data/data/package name/cache
+     */
     val cacheDir: File
         get() {
             return BaseApp.getInstance().externalCacheDir ?: return BaseApp.getInstance().cacheDir

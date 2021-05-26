@@ -90,6 +90,8 @@ object ToastUtil {
         }
     }
 
+    // 设定 Toast 的相关参数
+
     fun setCustomLayout(mCustomLayout: Int) {
         ToastUtil.mCustomLayout = mCustomLayout
     }
@@ -109,6 +111,8 @@ object ToastUtil {
     fun setXOffset(xOffset: Int) {
         ToastUtil.xOffset = xOffset
     }
+
+    // 以下是显示自定义的 Toast ============================================
 
     fun showCustomLongToast(msg: String) {
         showCustomToast(msg, Toast.LENGTH_LONG)

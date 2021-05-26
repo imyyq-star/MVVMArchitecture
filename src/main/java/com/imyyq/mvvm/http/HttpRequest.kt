@@ -10,10 +10,7 @@ import com.imyyq.mvvm.base.IBaseResponse
 import com.imyyq.mvvm.http.interceptor.HeaderInterceptor
 import com.imyyq.mvvm.http.interceptor.logging.Level
 import com.imyyq.mvvm.http.interceptor.logging.LoggingInterceptor
-import com.imyyq.mvvm.utils.AppUtil
-import com.imyyq.mvvm.utils.LogUtil
-import com.imyyq.mvvm.utils.SPUtils
-import com.imyyq.mvvm.utils.Utils
+import com.imyyq.mvvm.utils.*
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -249,11 +246,11 @@ object HttpRequest {
         if (!GlobalConfig.gIsNeedChangeBaseUrl) {
             return
         }
-        Utils.multiClickListener(view, frequency) {
+        view.multiClickListener(frequency) {
             if (!this::mBaseUrlMap.isInitialized) {
                 return@multiClickListener
             }
-            AppUtil.getActivityByView(view)?.let { activity ->
+            view.getActivity()?.let { activity ->
                 val tvList = mutableListOf<TextView>()
                 val etList = mutableListOf<EditText>()
 

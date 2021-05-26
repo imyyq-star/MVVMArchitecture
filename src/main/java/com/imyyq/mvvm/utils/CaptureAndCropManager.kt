@@ -17,9 +17,8 @@ import java.io.File
 
 /**
  * 拍照或选择图片的类，选择图片后会调用系统裁剪功能，最终得到想要的裁剪后的图片
- *
- * 此类后期可能改成使用最新的 API 来完成
  */
+@Deprecated("建议使用最新的 androidx API 来获取")
 object CaptureAndCropManager {
     const val REQUEST_CODE_CAPTURE = 200
     const val REQUEST_CODE_CROP = 300
@@ -161,7 +160,7 @@ object CaptureAndCropManager {
                         ToastUtil.showLongToast("授权失败，无法使用相机")
                     }
                     is PermissionResult.Deny -> {   //权限拒绝，且勾选了不再询问
-                        AppUtil.gotoAppDetailsSettings(BaseApp.getInstance(), 0)
+                        BaseApp.getInstance().gotoAppDetailsSettings(0, BaseApp.getInstance().packageName)
                         ToastUtil.showLongToast("检测到您多次拒绝授权，请手动打开相机权限")
                     }
                 }

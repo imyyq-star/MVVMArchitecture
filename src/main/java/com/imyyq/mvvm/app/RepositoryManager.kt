@@ -7,6 +7,7 @@ import com.imyyq.mvvm.base.BaseModel
 /**
  * 仓库管理类
  */
+@Suppress("UNCHECKED_CAST")
 object RepositoryManager {
     private lateinit var mRepoMap: ArrayMap<Class<out BaseModel>, BaseModel>
 

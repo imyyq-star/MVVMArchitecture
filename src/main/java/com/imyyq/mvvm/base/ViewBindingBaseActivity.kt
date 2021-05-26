@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.utils.Utils
@@ -83,7 +82,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             LiveDataBus.observe<Pair<Int?, Intent?>>(
                 this,
                 mViewModel.mUiChangeLiveData.finishEvent!!,
-                Observer {
+                {
                     setResult(it)
                     finish()
                 },
@@ -92,21 +91,21 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             LiveDataBus.observe<Pair<Int?, Intent?>>(
                 this,
                 mViewModel.mUiChangeLiveData.setResultEvent!!,
-                Observer { setResult(it) },
+                { setResult(it) },
                 true
             )
             // vm 可以启动界面
             LiveDataBus.observe<Class<out Activity>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityEvent!!,
-                Observer {
+                {
                     startActivity(it)
                 },
                 true
             )
             LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(this,
                 mViewModel.mUiChangeLiveData.startActivityWithMapEvent!!,
-                Observer {
+                {
                     startActivity(it?.first, it?.second)
                 },
                 true
@@ -114,7 +113,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             LiveDataBus.observe<Pair<Class<out Activity>, Bundle?>>(this,
                 mViewModel.mUiChangeLiveData.startActivityEventWithBundle!!,
-                Observer {
+                {
                     startActivity(it?.first, bundle = it?.second)
                 },
                 true
@@ -127,16 +126,14 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             LiveDataBus.observe<Class<out Activity>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEvent!!,
-                Observer {
-                    startActivityForResult(it)
-                },
+                { startActivityForResult(it) },
                 true
             )
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
             LiveDataBus.observe<Pair<Class<out Activity>, Bundle?>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEventWithBundle!!,
-                Observer {
+                {
                     startActivityForResult(it?.first, bundle = it?.second)
                 },
                 true
@@ -144,7 +141,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             LiveDataBus.observe<Pair<Class<out Activity>, ArrayMap<String, *>>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEventWithMap!!,
-                Observer {
+                {
                     startActivityForResult(it?.first, it?.second)
                 },
                 true
@@ -155,13 +152,13 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.initLoadingDialogEvent()
 
             // 显示对话框
-            mViewModel.mUiChangeLiveData.showLoadingDialogEvent?.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.showLoadingDialogEvent?.observe(this) {
                 showLoadingDialog(mLoadingDialog, it)
-            })
+            }
             // 隐藏对话框
-            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent?.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent?.observe(this) {
                 dismissLoadingDialog(mLoadingDialog)
-            })
+            }
         }
     }
 
@@ -174,7 +171,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             ) { onLoadSirReload() }
 
             mViewModel.mUiChangeLiveData.initLoadSirEvent()
-            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, Observer {
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this) {
                 if (it == null) {
                     mLoadService.showSuccess()
                     onLoadSirSuccess()
@@ -182,7 +179,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                     mLoadService.showCallback(it)
                     onLoadSirShowed(it)
                 }
-            })
+            }
         }
     }
 
@@ -257,7 +254,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      * </pre>
      */
     fun <T> observe(liveData: LiveData<T>, onChanged: ((t: T) -> Unit)) =
-        liveData.observe(this, Observer { onChanged(it) })
+        liveData.observe(this) { onChanged(it) }
 
     /**
      * 如果加载中对话框可手动取消，并且开启了取消耗时任务的功能，则在取消对话框后调用取消耗时任务

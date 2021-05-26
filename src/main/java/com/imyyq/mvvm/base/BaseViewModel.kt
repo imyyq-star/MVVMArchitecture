@@ -182,11 +182,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
 
     fun dismissLoadingDialog() {
         CheckUtil.checkLoadingDialogEvent(mUiChangeLiveData.dismissLoadingDialogEvent)
-        if (isInUIThread()) {
-            mUiChangeLiveData.dismissLoadingDialogEvent?.call()
-        } else {
-            mUiChangeLiveData.dismissLoadingDialogEvent?.postValue(null)
-        }
+        mUiChangeLiveData.dismissLoadingDialogEvent?.call()
     }
 
     // 以下是内嵌加载中布局相关的 =========================================================

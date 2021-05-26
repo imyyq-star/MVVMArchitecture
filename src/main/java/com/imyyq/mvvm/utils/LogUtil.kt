@@ -42,13 +42,6 @@ object LogUtil {
     // 只有 debug 和 beta 才默认输出 log
     private val mIsLog: Boolean = BuildConfig.DEBUG || GlobalConfig.gIsSaveLog
 
-    private const val V = 0x1
-    private const val D = 0x2
-    private const val I = 0x3
-    private const val W = 0x4
-    private const val E = 0x5
-    private const val A = 0x6
-
     @SuppressLint("HandlerLeak")
     private lateinit var mHandler: Handler
     private lateinit var mBufferWrite: BufferedWriter
@@ -68,6 +61,28 @@ object LogUtil {
         handlerThread.start()
 
         mCurDateTime = DateUtil.formatYMD_()
+        initWrite()
+
+        mHandler = object : Handler(handlerThread.looper) {
+            override fun handleMessage(msg: Message) {
+                val dateTime = DateUtil.formatYMD_()
+                if (dateTime != mCurDateTime) {
+                    mCurDateTime = dateTime
+                    initWrite()
+                }
+
+                mBufferWrite.write(DateUtil.formatYMDHMS_SSS() + "/" + msg.obj.toString())
+                mBufferWrite.newLine()
+                mBufferWrite.flush()
+            }
+        }
+    }
+
+    private fun initWrite() {
+        if (this@LogUtil::mBufferWrite.isInitialized) {
+            mBufferWrite.close()
+        }
+
         mBufferWrite = BufferedWriter(
             OutputStreamWriter(
                 FileOutputStream(
@@ -77,31 +92,6 @@ object LogUtil {
             )
         )
         mBufferWrite.write(getDeviceInfo())
-
-        mHandler = object : Handler(handlerThread.looper) {
-            override fun handleMessage(msg: Message) {
-                val dateTime = DateUtil.formatYMD_()
-                if (dateTime != mCurDateTime) {
-                    if (this@LogUtil::mBufferWrite.isInitialized) {
-                        mBufferWrite.close()
-                    }
-                    mCurDateTime = dateTime
-                    mBufferWrite = BufferedWriter(
-                        OutputStreamWriter(
-                            FileOutputStream(
-                                FileUtil.appLogDir + mCurDateTime + ".log",
-                                true
-                            )
-                        )
-                    )
-                    mBufferWrite.write(getDeviceInfo())
-                }
-
-                mBufferWrite.write(DateUtil.formatYMDHMS_SSS() + "/" + msg.obj.toString())
-                mBufferWrite.newLine()
-                mBufferWrite.flush()
-            }
-        }
     }
 
     private fun getDeviceInfo(): String {
@@ -126,62 +116,62 @@ object LogUtil {
 
     @JvmStatic
     fun v(msg: Any?) {
-        printLog(V, null, msg)
+        printLog(Log.VERBOSE, null, msg)
     }
 
     @JvmStatic
     fun v(tag: String?, msg: String?) {
-        printLog(V, tag, msg)
+        printLog(Log.VERBOSE, tag, msg)
     }
 
     @JvmStatic
     fun d(msg: Any?) {
-        printLog(D, null, msg)
+        printLog(Log.DEBUG, null, msg)
     }
 
     @JvmStatic
     fun d(tag: String?, msg: Any?) {
-        printLog(D, tag, msg)
+        printLog(Log.DEBUG, tag, msg)
     }
 
     @JvmStatic
     fun i(msg: Any?) {
-        printLog(I, null, msg)
+        printLog(Log.INFO, null, msg)
     }
 
     @JvmStatic
     fun i(tag: String?, msg: Any?) {
-        printLog(I, tag, msg)
+        printLog(Log.INFO, tag, msg)
     }
 
     @JvmStatic
     fun w(msg: Any?) {
-        printLog(W, null, msg)
+        printLog(Log.WARN, null, msg)
     }
 
     @JvmStatic
     fun w(tag: String?, msg: Any?) {
-        printLog(W, tag, msg)
+        printLog(Log.WARN, tag, msg)
     }
 
     @JvmStatic
     fun e(msg: Any?) {
-        printLog(E, null, msg)
+        printLog(Log.ERROR, null, msg)
     }
 
     @JvmStatic
     fun e(tag: String?, msg: Any?) {
-        printLog(E, tag, msg)
+        printLog(Log.ERROR, tag, msg)
     }
 
     @JvmStatic
     fun a(msg: Any?) {
-        printLog(A, null, msg)
+        printLog(Log.ASSERT, null, msg)
     }
 
     @JvmStatic
     fun a(tag: String?, msg: Any?) {
-        printLog(A, tag, msg)
+        printLog(Log.ASSERT, tag, msg)
     }
 
     fun isLog() = mIsForceLog || mIsLog
@@ -205,12 +195,12 @@ object LogUtil {
         stringBuilder.append(msg)
         val logStr = stringBuilder.toString()
         when (type) {
-            V -> Log.v(tag, logStr)
-            D -> Log.d(tag, logStr)
-            I -> Log.i(tag, logStr)
-            W -> Log.w(tag, logStr)
-            E -> Log.e(tag, logStr)
-            A -> Log.wtf(tag, logStr)
+            Log.VERBOSE -> Log.v(tag, logStr)
+            Log.DEBUG -> Log.d(tag, logStr)
+            Log.WARN -> Log.w(tag, logStr)
+            Log.ERROR -> Log.e(tag, logStr)
+            Log.ASSERT -> Log.wtf(tag, logStr)
+            else -> Log.i(tag, logStr)
         }
         // 是否保存到本地缓存目录
         if (!this::mHandler.isInitialized && GlobalConfig.gIsSaveLog) {
@@ -235,7 +225,7 @@ object LogUtil {
      */
     @JvmStatic
     fun multiClickToOpenLog(view: View, frequency: Int) {
-        Utils.multiClickListener(view, frequency) {
+        view.multiClickListener(frequency) {
             if (mIsForceLog && this::mHandler.isInitialized) {
                 ToastUtil.showLongToast(BaseApp.getInstance().getString(R.string.log_already_open))
                 return@multiClickListener

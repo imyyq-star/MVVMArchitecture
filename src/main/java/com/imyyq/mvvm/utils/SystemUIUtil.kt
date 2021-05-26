@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.RequiresApi
 
+/**
+ * 操作 SystemUI 的工具类
+ */
 object SystemUIUtil {
     /**
      * 开启状态栏的低分辨率模式，部分图标会模糊或隐藏

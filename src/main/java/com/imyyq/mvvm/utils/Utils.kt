@@ -7,76 +7,19 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.os.Parcelable
-import android.view.View
 import androidx.collection.ArrayMap
-import com.imyyq.mvvm.R
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.Serializable
 
-fun Any.isInUIThread() = Looper.getMainLooper().thread == Thread.currentThread()
+/**
+ * @return 调用者在 UI 线程，那么返回 true，否则 false
+ */
+fun isInUIThread() = Looper.getMainLooper().thread == Thread.currentThread()
 
 object Utils {
     val isNeedCheckPermission: Boolean
         get() = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
-
-    /**
-     * 测量 view 的大小，返回宽高
-     */
-    fun measureView(view: View): IntArray {
-        val arr = IntArray(2)
-        val spec = View.MeasureSpec.makeMeasureSpec(
-            View.MeasureSpec.UNSPECIFIED,
-            View.MeasureSpec.UNSPECIFIED
-        )
-        view.measure(spec, spec)
-        arr[0] = view.measuredWidth
-        arr[1] = view.measuredHeight
-        return arr
-    }
-
-    /**
-     * 判断集合是否为空
-     */
-    fun <E> isEmpty(e: Collection<E>?) = e == null || e.isEmpty()
-
-    /**
-     * 连续点击达到点击次数后回调监听
-     */
-    @JvmStatic
-    fun multiClickListener(view: View, frequency: Int, listener: (() -> Unit)? = null) {
-        val startIndex = 1
-        val interval = 400
-        view.setTag(R.id.multiClickFrequency, startIndex)
-        view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
-
-        view.setOnClickListener {
-            var f = view.getTag(R.id.multiClickFrequency) as Int
-
-            // 点击间隔超时，重置次数
-            if (System.currentTimeMillis() - (view.getTag(R.id.multiClickLastTime) as Long) > interval) {
-                view.setTag(R.id.multiClickFrequency, startIndex)
-                f = startIndex
-            }
-
-            // 第一次点击，重置时间
-            if (f == startIndex) {
-                view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
-            }
-
-            if (f == frequency) {
-                view.setTag(R.id.multiClickFrequency, startIndex)
-
-                listener?.invoke()
-            } else {
-                val lastTime = view.getTag(R.id.multiClickLastTime) as Long
-                if (System.currentTimeMillis() - lastTime < interval) {
-                    view.setTag(R.id.multiClickFrequency, f + 1)
-                }
-                view.setTag(R.id.multiClickLastTime, System.currentTimeMillis())
-            }
-        }
-    }
 
     /**
      * 系统分享文本的 Intent
@@ -221,6 +164,9 @@ object Utils {
         return intent
     }
 
+    /**
+     * 释放 binding 实例
+     */
     fun releaseBinding(startClz: Class<*>?, targetClz: Class<*>?, obj: Any, filed: String) {
         // 通过反射，解决内存泄露问题
         GlobalScope.launch {

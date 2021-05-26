@@ -43,6 +43,9 @@ object InputMethodUtil {
         }, 200)
     }
 
+    /**
+     * 聚焦到 [editText]
+     */
     fun focusable(editText: EditText) {
         editText.postDelayed({
             editText.isFocusable = true
