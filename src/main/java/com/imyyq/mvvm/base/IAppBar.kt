@@ -5,8 +5,10 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.R
+import com.imyyq.mvvm.utils.getViewBinding
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -29,17 +31,38 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
 
     companion object {
         /**
-         * [appBarLayoutId] 通过 [DataBindingUtil] 将 xml 实例化成 binding，再和 [contentView]
-         * 组合形成最终布局
+         * [appBarLayoutRes] 通过 [DataBindingUtil] 将 xml 实例化成 binding，再和 [contentView]
+         * 组合形成最终布局，如果为 null，那么将使用反射获取实例
          */
+        fun <AppBarV : ViewDataBinding> inflateRootLayout(
+            fragment: Fragment,
+            contentView: View,
+            appBarLayoutRes: Int?
+        ): Pair<AppBarV, LinearLayout> {
+            return inflateRootLayout(fragment, fragment.requireActivity(), contentView, appBarLayoutRes)
+        }
+
         fun <AppBarV : ViewDataBinding> inflateRootLayout(
             activity: Activity,
             contentView: View,
-            appBarLayoutId: Int
+            appBarLayoutRes: Int?
+        ): Pair<AppBarV, LinearLayout> {
+            return inflateRootLayout(activity, activity, contentView, appBarLayoutRes)
+        }
+
+        private fun <AppBarV : ViewDataBinding> inflateRootLayout(
+            obj: Any,
+            activity: Activity,
+            contentView: View,
+            appBarLayoutRes: Int?
         ): Pair<AppBarV, LinearLayout> {
             // 实例化标题栏布局
-            val appBarBinding: AppBarV =
-                DataBindingUtil.inflate(activity.layoutInflater, appBarLayoutId, null, false)
+            val appBarBinding: AppBarV = if (appBarLayoutRes != null) {
+                DataBindingUtil.inflate(activity.layoutInflater, appBarLayoutRes, null, false)
+            } else {
+                obj.getViewBinding(activity.layoutInflater, 2)
+            }
+
             val linear = generateRootLayout(activity, appBarBinding, contentView)
             return Pair(appBarBinding, linear)
         }

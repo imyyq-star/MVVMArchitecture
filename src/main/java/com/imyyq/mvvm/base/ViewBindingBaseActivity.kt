@@ -14,11 +14,14 @@ import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.utils.Utils
+import com.imyyq.mvvm.utils.getViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
 
 /**
+ * ViewBindingActivity 基类
+ *
  * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
  */
 abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
@@ -48,7 +51,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         initData()
     }
 
-    abstract override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V = getViewBinding(inflater)
 
     open fun initContentView(contentView: View) {
         setContentView(contentView)

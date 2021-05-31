@@ -31,6 +31,9 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
 
+/**
+ * ViewModel 层的基类
+ */
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel,
     IActivityResult, IArgumentsFromBundle, IArgumentsFromIntent {
 

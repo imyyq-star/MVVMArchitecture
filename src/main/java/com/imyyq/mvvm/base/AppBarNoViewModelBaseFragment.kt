@@ -2,8 +2,11 @@ package com.imyyq.mvvm.base
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.utils.getViewBinding
 import com.kingja.loadsir.callback.Callback
 
 /**
@@ -11,6 +14,9 @@ import com.kingja.loadsir.callback.Callback
  */
 abstract class AppBarNoViewModelBaseFragment<V : ViewBinding, AppBarV : ViewBinding> :
     AppBarViewBindingBaseFragment<V, BaseViewModel<BaseModel>, AppBarV>() {
+
+    override fun initAppBarBinding(inflater: LayoutInflater, container: ViewGroup?): AppBarV =
+        getViewBinding(inflater, 1)
 
     @SuppressLint("MissingSuperCall")
     final override fun initViewModel() {

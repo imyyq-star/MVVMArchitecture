@@ -7,18 +7,19 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.databinding.ViewDataBinding
-import com.imyyq.mvvm.R
-import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.utils.Utils
 
+/**
+ * 类似 [com.imyyq.mvvm.base.AppBarDataBindingBaseActivity]
+ */
 abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBaseViewModel<out BaseModel, out IAppBarProcessor>,
         AppBarV : ViewDataBinding, AppBarP : IAppBarProcessor>(
-    @LayoutRes layoutId: Int,
-    varViewModelId: Int? = null,
+    varViewModelId: Int,
     private val varAppBarProcessorId: Int, // 既然使用了 dataBinding，那么必须有个处理者去关联 xml
-    @LayoutRes private val appBarLayoutId: Int? = GlobalConfig.AppBar.gAppBarLayoutId, // 可以全局设置，也可以单独设置
+    @LayoutRes layoutRes: Int? = null,
+    @LayoutRes private val appBarLayoutRes: Int? = null,
     sharedViewModel: Boolean = false
-) : DataBindingBaseFragment<V, VM>(layoutId, varViewModelId, sharedViewModel), IAppBar<AppBarP> {
+) : DataBindingBaseFragment<V, VM>(varViewModelId, layoutRes, sharedViewModel), IAppBar<AppBarP> {
 
     protected lateinit var mAppBarBinding: AppBarV
     protected lateinit var mAppBarProcessor: AppBarP
@@ -30,12 +31,8 @@ abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBas
     ): View? {
         mBinding = initBinding(inflater, container)
 
-        if (appBarLayoutId == null) {
-            throw RuntimeException(getString(R.string.app_bar_layout_id_not_null))
-        }
-
         val pair: Pair<AppBarV, LinearLayout> =
-            IAppBar.inflateRootLayout(requireActivity(), mBinding.root, appBarLayoutId)
+            IAppBar.inflateRootLayout(this, mBinding.root, appBarLayoutRes)
         mAppBarBinding = pair.first
         return pair.second
     }

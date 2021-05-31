@@ -6,7 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.utils.Utils
+import com.imyyq.mvvm.utils.getViewBinding
 
+/**
+ * 类似 [com.imyyq.mvvm.base.AppBarViewBindingBaseActivity]
+ */
 abstract class AppBarViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>,
         AppBarV : ViewBinding> : ViewBindingBaseFragment<V, VM>() {
 
@@ -22,7 +26,8 @@ abstract class AppBarViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel
         return IAppBar.generateRootLayout(requireActivity(), mAppBarBinding, mBinding.root)
     }
 
-    abstract fun initAppBarBinding(inflater: LayoutInflater, container: ViewGroup?): AppBarV
+    open fun initAppBarBinding(inflater: LayoutInflater, container: ViewGroup?): AppBarV =
+        getViewBinding(inflater, container, 2)
 
     override fun onDestroyView() {
         super.onDestroyView()

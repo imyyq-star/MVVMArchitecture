@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.utils.Utils
+import com.imyyq.mvvm.utils.getViewBinding
 import com.imyyq.mvvm.widget.CustomLayoutDialog
 import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
@@ -53,6 +54,9 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         initLoadSir()
         initData()
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
+        getViewBinding(inflater, container)
 
     @CallSuper
     override fun initViewModel() {

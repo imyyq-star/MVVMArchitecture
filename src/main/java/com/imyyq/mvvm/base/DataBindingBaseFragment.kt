@@ -5,15 +5,23 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.imyyq.mvvm.utils.getViewBinding
 
+/**
+ * 和 [com.imyyq.mvvm.base.DataBindingBaseActivity] 类似
+ */
 abstract class DataBindingBaseFragment<V : ViewDataBinding, VM : BaseViewModel<out BaseModel>>(
-    @LayoutRes private val layoutId: Int,
-    private val varViewModelId: Int? = null,
+    private val varViewModelId: Int,
+    @LayoutRes private val layoutRes: Int? = null,
     sharedViewModel: Boolean = false
 ) : ViewBindingBaseFragment<V, VM>(sharedViewModel) {
 
-    final override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
-        DataBindingUtil.inflate(inflater, layoutId, container, false)
+    final override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V {
+        if (layoutRes != null) {
+            return DataBindingUtil.inflate(inflater, layoutRes, container, false)
+        }
+        return getViewBinding(inflater, container)
+    }
 
     override fun initViewModel() {
         super.initViewModel()

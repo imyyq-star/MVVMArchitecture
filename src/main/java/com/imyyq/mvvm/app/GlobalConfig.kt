@@ -133,12 +133,4 @@ object GlobalConfig {
          */
         var gClickIntervalMilliseconds = 800
     }
-
-    object AppBar {
-        /**
-         * 全局标题栏布局配置。
-         * 可在 Fragment 或 Activity 的构造方法中局部设置
-         */
-        @LayoutRes var gAppBarLayoutId: Int? = null
-    }
 }

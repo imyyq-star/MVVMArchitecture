@@ -3,7 +3,7 @@ package com.imyyq.mvvm.base
 import android.app.Application
 
 /**
- * 包含标题栏处理者的 ViewModel
+ * 包含标题栏处理者的 ViewModel 基类
  */
 open class AppBarBaseViewModel<M : BaseModel, P : IAppBarProcessor> : BaseViewModel<M> {
     constructor(app: Application) : super(app) {}
