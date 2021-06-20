@@ -38,7 +38,7 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
             fragment: Fragment,
             contentView: View,
             appBarLayoutRes: Int?
-        ): Pair<AppBarV, LinearLayout> {
+        ): Pair<AppBarV, View> {
             return inflateRootLayout(fragment, fragment.requireActivity(), contentView, appBarLayoutRes)
         }
 
@@ -46,7 +46,7 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
             activity: Activity,
             contentView: View,
             appBarLayoutRes: Int?
-        ): Pair<AppBarV, LinearLayout> {
+        ): Pair<AppBarV, View> {
             return inflateRootLayout(activity, activity, contentView, appBarLayoutRes)
         }
 
@@ -55,7 +55,7 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
             activity: Activity,
             contentView: View,
             appBarLayoutRes: Int?
-        ): Pair<AppBarV, LinearLayout> {
+        ): Pair<AppBarV, View> {
             // 实例化标题栏布局
             val appBarBinding: AppBarV = if (appBarLayoutRes != null) {
                 DataBindingUtil.inflate(activity.layoutInflater, appBarLayoutRes, null, false)
@@ -74,7 +74,7 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
             activity: Activity,
             appBarBinding: ViewBinding,
             contentView: View
-        ): LinearLayout {
+        ): View {
             val linear = LinearLayout(activity)
             linear.orientation = LinearLayout.VERTICAL
             linear.addView(appBarBinding.root)

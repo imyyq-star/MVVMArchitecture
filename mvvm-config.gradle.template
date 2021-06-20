@@ -14,10 +14,8 @@ ext {
             recyclerView      : false,
 
             room              : false,
-            roomRxJava2       : false,
 
             retrofit2         : false,
-            retrofit2RxJava2  : false,
 
             glide             : false,
 
@@ -26,8 +24,6 @@ ext {
 
             // 内嵌加载中
             loadSir           : false,
-
-            rxJava2           : false
     ]
 
     SDKVersion = [

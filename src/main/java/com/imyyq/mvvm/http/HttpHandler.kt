@@ -50,9 +50,6 @@ object HttpHandler {
         e: Exception,
         onFailed: (code: Int, msg: String?) -> Unit
     ) {
-        if (LogUtil.isLog()) {
-            e.printStackTrace()
-        }
         return if (e is HttpException) {
             onFailed(e.code(), e.message())
         } else {

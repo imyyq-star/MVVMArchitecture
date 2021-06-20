@@ -30,9 +30,7 @@ abstract class DataBindingBaseActivity<V : ViewDataBinding, VM : BaseViewModel<o
     override fun initViewModel() {
         super.initViewModel()
         // 绑定 v 和 vm
-        if (varViewModelId != null) {
-            mBinding.setVariable(varViewModelId, mViewModel)
-        }
+        mBinding.setVariable(varViewModelId, mViewModel)
 
         // 让 LiveData 和 xml 可以双向绑定
         mBinding.lifecycleOwner = this

@@ -1,6 +1,8 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
 
 android {
     compileSdkVersion SysConfig.compileSdkVersion
@@ -78,6 +80,8 @@ dependencies {
     api Deps.constraintLayout
     // 侧滑布局，是用来界面侧滑退出的，因为只有一个类，就不做可配置去除了
     api Deps.slidingPaneLayout
+    // MD 设计，新的应用推荐加入夜间模式，默认工程增加了这个库
+    api Deps.material
 
     // 以下三个是为了使用最新的特性
     api Deps.activity
@@ -154,37 +158,15 @@ dependencies {
         compileOnly Deps.livePermissions
     }
 
-    // rx 系列，Kotlin 最好使用 flow，不要使用 rx
-    checkMVVMConfigProperty(IncludeLib.roomRxJava2, "roomRxJava2")
-    checkMVVMConfigProperty(IncludeLib.retrofit2RxJava2, "retrofit2RxJava2")
-    checkMVVMConfigProperty(IncludeLib.rxJava2, "rxJava2")
-
-    if (IncludeLib.roomRxJava2 || IncludeLib.retrofit2RxJava2 || IncludeLib.rxJava2) {
-        // 上面三个任意一个开启了，都需要以下这两个
-        api Deps.rxAndroid2
-        api Deps.rxJava2
-
-        if (IncludeLib.roomRxJava2) {
-            api Deps.roomRxJava2
-        }
-        if (IncludeLib.retrofit2RxJava2) {
-            api Deps.retrofit2RxJava2
-        } else {
-            // 避免和上述的 api 引用冲突，需要去除相关库
-            compileOnly(Deps.retrofit2RxJava2) {
-                exclude group: 'io.reactivex.rxjava2'
-                exclude group: 'org.reactivestreams'
-            }
-        }
-    } else {
-        // 不使用 rx，以下是为了让封装的代码编译通过
-        compileOnly(Deps.retrofit2RxJava2)
-        compileOnly Deps.rxAndroid2
-    }
-
     // debug 阶段内存泄露检测
     checkMVVMConfigProperty(IncludeLib.leakCanary2, "leakCanary2")
     if (IncludeLib.leakCanary2) {
         debugImplementation Deps.leakCanary2
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force Deps.recyclerView
     }
 }

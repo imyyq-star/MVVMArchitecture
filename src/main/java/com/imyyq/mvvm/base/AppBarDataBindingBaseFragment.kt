@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.databinding.ViewDataBinding
 import com.imyyq.mvvm.utils.Utils
@@ -31,7 +30,7 @@ abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBas
     ): View? {
         mBinding = initBinding(inflater, container)
 
-        val pair: Pair<AppBarV, LinearLayout> =
+        val pair: Pair<AppBarV, View> =
             IAppBar.inflateRootLayout(this, mBinding.root, appBarLayoutRes)
         mAppBarBinding = pair.first
         return pair.second

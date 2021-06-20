@@ -1,7 +1,6 @@
 package com.imyyq.mvvm.base
 
 import android.view.View
-import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.databinding.ViewDataBinding
 
@@ -22,7 +21,7 @@ abstract class AppBarDataBindingBaseActivity<V : ViewDataBinding, VM : AppBarBas
     protected lateinit var mAppBarProcessor: AppBarP
 
     override fun initContentView(contentView: View) {
-        val pair: Pair<AppBarV, LinearLayout> = IAppBar.inflateRootLayout(this, contentView, appBarLayoutRes)
+        val pair: Pair<AppBarV, View> = IAppBar.inflateRootLayout(this, contentView, appBarLayoutRes)
         mAppBarBinding = pair.first
         super.initContentView(pair.second)
     }

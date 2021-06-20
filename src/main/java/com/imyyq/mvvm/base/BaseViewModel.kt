@@ -9,7 +9,7 @@ import androidx.annotation.MainThread
 import androidx.collection.ArrayMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.CheckUtil
 import com.imyyq.mvvm.app.RepositoryManager
@@ -19,14 +19,9 @@ import com.imyyq.mvvm.utils.SingleLiveEvent
 import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.utils.isInUIThread
 import com.kingja.loadsir.callback.Callback
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import retrofit2.Call
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
@@ -48,9 +43,7 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      */
     lateinit var mModel: M
 
-    private lateinit var mCompositeDisposable: Any
-    private lateinit var mCallList: MutableList<Call<*>>
-
+    private lateinit var mJobList: MutableList<Job>
     internal val mUiChangeLiveData by lazy { UiChangeLiveData() }
 
     internal var mBundle: Bundle? = null
@@ -76,22 +69,33 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
         onFailed: ((code: Int, msg: String?) -> Unit)? = null,
         onComplete: (() -> Unit)? = null
     ) {
-        viewModelScope.launch {
+        val job = GlobalScope.launch(Dispatchers.Main) {
             try {
                 HttpHandler.handleResult(block(), onSuccess, onResult, onFailed)
             } catch (e: Exception) {
+                e.printStackTrace()
                 onFailed?.let { HttpHandler.handleException(e, it) }
             } finally {
                 onComplete?.invoke()
             }
         }
+        addJob(job)
     }
 
     /**
      * 发起协程，让协程和 UI 相关
      */
     fun launchUI(block: suspend CoroutineScope.() -> Unit) {
-        viewModelScope.launch { block() }
+        val job = GlobalScope.launch(Dispatchers.Main) { block() }
+        addJob(job)
+    }
+
+    /**
+     * 发起协程，让协程在 IO 线程中执行
+     */
+    fun launchIO(block: suspend CoroutineScope.() -> Unit) {
+        val job = GlobalScope.launch(Dispatchers.IO) { block() }
+        addJob(job)
     }
 
     /**
@@ -137,35 +141,22 @@ open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app
      */
     fun cancelConsumingTask() {
         // ViewModel销毁时会执行，同时取消所有异步任务
-        if (this::mCompositeDisposable.isInitialized) {
-            (mCompositeDisposable as CompositeDisposable).clear()
+        if (this::mJobList.isInitialized) {
+            mJobList.forEach { it.cancel() }
+            mJobList.clear()
         }
-        if (this::mCallList.isInitialized) {
-            mCallList.forEach { it.cancel() }
-            mCallList.clear()
-        }
-        viewModelScope.cancel()
     }
 
     /**
-     * 给 Rx 使用的，如果项目中有使用到 Rx 异步相关的，在订阅时需要把订阅管理起来。
-     * 通常异步操作都是在 vm 中进行的，管理起来的目的是让异步操作在界面销毁时也一起销毁，避免造成内存泄露
+     * [ViewModel.viewModelScope] 是生命周期安全的，无需手动管理。
+     * 此方法用于存储多个 Job 实例，以便可以取消它们。
      */
-    fun addSubscribe(disposable: Any) {
-        if (!this::mCompositeDisposable.isInitialized) {
-            mCompositeDisposable = CompositeDisposable()
+    fun addJob(job: Job) {
+        if (!this::mJobList.isInitialized) {
+            mJobList = mutableListOf()
         }
-        (mCompositeDisposable as CompositeDisposable).add(disposable as Disposable)
-    }
 
-    /**
-     * 不使用 Rx，使用 Retrofit 原生的请求方式
-     */
-    fun addCall(call: Any) {
-        if (!this::mCallList.isInitialized) {
-            mCallList = mutableListOf()
-        }
-        mCallList.add(call as Call<*>)
+        mJobList.add(job)
     }
 
     // 以下是加载中对话框相关的 =========================================================
