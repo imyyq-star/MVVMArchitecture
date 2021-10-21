@@ -84,8 +84,8 @@ dependencies {
     api Deps.material
 
     // 以下三个是为了使用最新的特性
-    api Deps.activity
-    api Deps.activityKTX
+//    api Deps.activity
+//    api Deps.activityKTX
     api Deps.fragment
 
     // 在 Lifecycles 中使用协程，视图销毁则自动取消

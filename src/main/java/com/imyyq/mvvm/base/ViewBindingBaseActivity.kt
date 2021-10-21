@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
@@ -31,12 +29,11 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
 
-    private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
-
     // 保证只有主线程访问这个变量，所以 lazy 不需要同步机制
     private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(this, loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
+    private val mForResultRequestCode = 12345678
 
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,37 +196,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
-        initStartActivityForResult()
-        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
-    }
-
-    private fun initStartActivityForResult() {
-        if (!this::mStartActivityForResult.isInitialized) {
-            mStartActivityForResult =
-                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    val data = it.data ?: Intent()
-                    when (it.resultCode) {
-                        Activity.RESULT_OK -> {
-                            onActivityResultOk(data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResultOk(data)
-                            }
-                        }
-                        Activity.RESULT_CANCELED -> {
-                            onActivityResultCanceled(data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResultCanceled(data)
-                            }
-                        }
-                        else -> {
-                            onActivityResult(it.resultCode, data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResult(it.resultCode, data)
-                            }
-                        }
-                    }
-                }
-        }
+        startActivityForResult(Utils.getIntentByMapOrBundle(this, clz, map, bundle), mForResultRequestCode)
     }
 
     /**
@@ -264,6 +231,34 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      */
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, dataIntent: Intent?) {
+        super<ParallaxSwipeBackActivity>.onActivityResult(requestCode, resultCode, dataIntent)
+        if (requestCode != mForResultRequestCode) {
+            return
+        }
+        val data = dataIntent ?: Intent()
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                onActivityResultOk(data)
+                if (this::mViewModel.isInitialized) {
+                    mViewModel.onActivityResultOk(data)
+                }
+            }
+            Activity.RESULT_CANCELED -> {
+                onActivityResultCanceled(data)
+                if (this::mViewModel.isInitialized) {
+                    mViewModel.onActivityResultCanceled(data)
+                }
+            }
+            else -> {
+                onActivityResult(resultCode, data)
+                if (this::mViewModel.isInitialized) {
+                    mViewModel.onActivityResult(resultCode, data)
+                }
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
