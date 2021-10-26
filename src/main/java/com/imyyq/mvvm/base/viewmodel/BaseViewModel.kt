@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.viewmodel
 
 import android.app.Activity
 import android.app.Application
@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModel
 import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.CheckUtil
 import com.imyyq.mvvm.app.RepositoryManager
+import com.imyyq.mvvm.base.*
+import com.imyyq.mvvm.base.model.BaseModel
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.http.HttpHandler
 import com.imyyq.mvvm.utils.SingleLiveEvent
@@ -28,6 +30,8 @@ import java.util.*
 
 /**
  * ViewModel 层的基类
+ *
+ * @author imyyq.star@gmail.com
  */
 open class BaseViewModel<M : BaseModel>(app: Application) : AndroidViewModel(app), IViewModel,
     IActivityResult, IArgumentsFromBundle, IArgumentsFromIntent {

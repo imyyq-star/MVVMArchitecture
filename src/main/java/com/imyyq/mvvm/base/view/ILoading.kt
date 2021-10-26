@@ -1,9 +1,11 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.view
 
 import com.kingja.loadsir.callback.Callback
 
 /**
  * 加载中接口
+ *
+ * @author imyyq.star@gmail.com
  */
 interface ILoading {
     fun initLoadSir()

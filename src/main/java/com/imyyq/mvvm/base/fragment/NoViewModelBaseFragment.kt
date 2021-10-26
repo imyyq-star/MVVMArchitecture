@@ -1,18 +1,20 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.fragment
 
 import android.annotation.SuppressLint
 import android.app.Dialog
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.base.model.BaseModel
+import com.imyyq.mvvm.base.viewmodel.BaseViewModel
 import com.kingja.loadsir.callback.Callback
 
 /**
- * 如果你的界面足够简单，不需要 ViewModel，那么可以继承自此类。
- * 此类不可以使用 [mViewModel] 变量，不可使用 vm 相关的方法，
- * 不可使用 LoadingDialog，不可使用 LoadSir
+ * 详见 [NoViewModelBaseActivity] 的注释，一样的
+ *
+ * @author imyyq.star@gmail.com
  */
-abstract class NoViewModelBaseActivity<V : ViewBinding> :
-    ViewBindingBaseActivity<V, BaseViewModel<BaseModel>>() {
+abstract class NoViewModelBaseFragment<V : ViewBinding> :
+    ViewBindingBaseFragment<V, BaseViewModel<BaseModel>>() {
 
     @SuppressLint("MissingSuperCall")
     final override fun initViewModel() {

@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.activity
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.base.model.BaseModel
+import com.imyyq.mvvm.base.viewmodel.BaseViewModel
 import com.imyyq.mvvm.utils.getViewBinding
 import com.kingja.loadsir.callback.Callback
 
 /**
  * 详见 [NoViewModelBaseActivity] 的注释，一样的
+ *
+ * @author imyyq.star@gmail.com
  */
-abstract class AppBarNoViewModelBaseFragment<V : ViewBinding, AppBarV : ViewBinding> :
-    AppBarViewBindingBaseFragment<V, BaseViewModel<BaseModel>, AppBarV>() {
+abstract class AppBarNoViewModelBaseActivity<V : ViewBinding, AppBarV : ViewBinding> :
+    AppBarViewBindingBaseActivity<V, BaseViewModel<BaseModel>, AppBarV>() {
 
     override fun initAppBarBinding(inflater: LayoutInflater, container: ViewGroup?): AppBarV =
         getViewBinding(inflater, 1)

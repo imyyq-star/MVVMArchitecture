@@ -1,17 +1,17 @@
 package com.imyyq.mvvm.app
 
-import android.app.Activity
 import android.app.Application
-import android.os.Bundle
 import com.imyyq.mvvm.utils.AppUtil
 import com.imyyq.mvvm.utils.LogUtil
 
 /**
  * Application 的基类
+ *
+ * @author imyyq.star@gmail.com
  */
 open class BaseApp : Application() {
 
-    override fun onCreate() {
+    final override fun onCreate() {
         super.onCreate()
 
         initApp(this)
@@ -19,12 +19,13 @@ open class BaseApp : Application() {
         val processName = AppUtil.currentProcessName
         if (processName == packageName) {
             // 主进程初始化
-            initResource(this)
             onMainProcessInit()
         } else {
             // 其他进程初始化
-            processName?.let { onOtherProcessInit(it) }
+            onOtherProcessInit(processName!!)
         }
+
+        initResource(this)
     }
 
     /**
@@ -51,46 +52,18 @@ open class BaseApp : Application() {
         fun initApp(app: Application) {
             Companion.app = app
 
+            // 日志
             LogUtil.init()
         }
 
         private fun initResource(app: Application) {
             // 监听所有 Activity 的创建和销毁
             if (GlobalConfig.gIsNeedActivityManager) {
-                app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-                    override fun onActivityPaused(activity: Activity) {
-                    }
-
-                    override fun onActivityStarted(activity: Activity) {
-                    }
-
-                    override fun onActivityDestroyed(activity: Activity) {
-                        AppActivityManager.remove(activity)
-                    }
-
-                    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                    }
-
-                    override fun onActivityStopped(activity: Activity) {
-                    }
-
-                    override fun onActivityCreated(
-                        activity: Activity,
-                        savedInstanceState: Bundle?
-                    ) {
-                        AppActivityManager.add(activity)
-                    }
-
-                    override fun onActivityResumed(activity: Activity) {
-                    }
-
-                })
+                AppActivityManager.init()
             }
         }
 
         @JvmStatic
-        fun getInstance(): Application {
-            return app
-        }
+        fun getInstance() = app
     }
 }

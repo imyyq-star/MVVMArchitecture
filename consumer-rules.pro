@@ -86,12 +86,14 @@
 -keep class androidx.navigation.** {*;}
 
 # Fragment 的 mBinding 变量不要混淆，因为要手动反射设置为 null
--keepclassmembers class com.imyyq.mvvm.base.ViewBindingBaseFragment {
+-keepclassmembers class com.imyyq.mvvm.base.fragment.ViewBindingBaseFragment {
      protected * mBinding;
 }
--keepclassmembers class com.imyyq.mvvm.base.AppBarDataBindingBaseFragment {
+-keepclassmembers class com.imyyq.mvvm.base.fragment.AppBarDataBindingBaseFragment {
      protected * mAppBarBinding;
 }
--keepclassmembers class com.imyyq.mvvm.base.AppBarViewBindingBaseFragment {
+-keepclassmembers class com.imyyq.mvvm.base.fragment.AppBarViewBindingBaseFragment {
      protected * mAppBarBinding;
 }
+
+## TODO VB 的 inflate 方法不要混淆

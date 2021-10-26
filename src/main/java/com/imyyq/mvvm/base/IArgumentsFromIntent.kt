@@ -6,6 +6,9 @@ import android.os.Parcelable
 import java.io.Serializable
 import java.util.*
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 interface IArgumentsFromIntent {
 
     /**

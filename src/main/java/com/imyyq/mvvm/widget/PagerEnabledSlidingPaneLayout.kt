@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.widget
 
 import android.content.Context
 import android.util.AttributeSet
@@ -10,8 +10,10 @@ import kotlin.math.roundToInt
 
 /**
  * 界面的侧滑关键类，侧滑的效果就是用它实现的
+ *
+ * @author imyyq.star@gmail.com
  */
-class PagerEnabledSlidingPaneLayout constructor(
+internal class PagerEnabledSlidingPaneLayout constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0

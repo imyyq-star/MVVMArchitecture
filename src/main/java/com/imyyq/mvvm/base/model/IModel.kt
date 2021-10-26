@@ -1,7 +1,9 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.model
 
 /**
  * Model 层
+ *
+ * @author imyyq.star@gmail.com
  */
 interface IModel {
     /**

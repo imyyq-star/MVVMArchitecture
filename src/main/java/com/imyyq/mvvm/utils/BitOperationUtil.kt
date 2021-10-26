@@ -23,5 +23,5 @@ fun Int.removeFlag(flag: Int) = this and flag.inv()
  * @return 返回 byte
  */
 fun Int.getByte(@IntRange(from = 0, to = 3) byteIndex: Int): Byte {
-    return (this as Int shr byteIndex * 8).toByte()
+    return (this shr byteIndex * 8).toByte()
 }

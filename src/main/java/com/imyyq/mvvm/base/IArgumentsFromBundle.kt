@@ -9,6 +9,9 @@ import android.util.SparseArray
 import java.io.Serializable
 import java.util.*
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 interface IArgumentsFromBundle {
     /**
      * 传递 bundle，在这里可以获取

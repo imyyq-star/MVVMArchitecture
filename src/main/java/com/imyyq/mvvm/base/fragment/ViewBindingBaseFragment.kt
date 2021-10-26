@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.fragment
 
 import android.app.Activity
 import android.content.Intent
@@ -6,10 +6,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.collection.ArrayMap
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
+import com.imyyq.mvvm.base.*
+import com.imyyq.mvvm.base.model.BaseModel
+import com.imyyq.mvvm.base.view.ILoading
+import com.imyyq.mvvm.base.view.ILoadingDialog
+import com.imyyq.mvvm.base.view.IView
+import com.imyyq.mvvm.base.viewmodel.BaseViewModel
 import com.imyyq.mvvm.bus.LiveDataBus
 import com.imyyq.mvvm.utils.Utils
 import com.imyyq.mvvm.utils.getViewBinding
@@ -18,28 +28,34 @@ import com.kingja.loadsir.core.LoadService
 import com.kingja.loadsir.core.LoadSir
 
 /**
- * ViewBindingActivity 基类
- *
- * 通过构造函数和泛型，完成 view 的初始化和 vm 的初始化，并且将它们绑定，
+ * @author imyyq.star@gmail.com
  */
-abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out BaseModel>> :
-    ParallaxSwipeBackActivity(),
-    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult, IArgumentsFromIntent {
+abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out BaseModel>>(
+    private val sharedViewModel: Boolean = false
+) : Fragment(),
+    IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
     protected lateinit var mBinding: V
     protected lateinit var mViewModel: VM
 
-    // 保证只有主线程访问这个变量，所以 lazy 不需要同步机制
-    private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(this, loadingDialogLayout()) }
+    private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
+
+    private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(requireActivity(), loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
-    private val mForResultRequestCode = 12345678
 
-    final override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        mBinding = initBinding(inflater, container)
+        return mBinding.root
+    }
 
-        mBinding = initBinding(layoutInflater, null)
-        initContentView(mBinding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         initViewModel()
         initParam()
         initUiChangeLiveData()
@@ -48,16 +64,16 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         initData()
     }
 
-    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V = getViewBinding(inflater)
-
-    open fun initContentView(contentView: View) {
-        setContentView(contentView)
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): V =
+        getViewBinding(inflater, container)
 
     @CallSuper
     override fun initViewModel() {
-        mViewModel = initViewModel(this)
-        mViewModel.mIntent = getArgumentsIntent()
+        mViewModel = if (sharedViewModel) {
+            initViewModel(requireActivity())
+        } else {
+            initViewModel(this)
+        }
         // 让 vm 可以感知 v 的生命周期
         lifecycle.addObserver(mViewModel)
     }
@@ -67,31 +83,11 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         if (isViewModelNeedStartAndFinish()) {
             mViewModel.mUiChangeLiveData.initStartAndFinishEvent()
 
-            fun setResult(pair: Pair<Int?, Intent?>) {
-                pair.first?.let { resultCode ->
-                    val intent = pair.second
-                    if (intent == null) {
-                        setResult(resultCode)
-                    } else {
-                        setResult(resultCode, intent)
-                    }
-                }
-            }
-
             // vm 可以结束界面
-            LiveDataBus.observe<Pair<Int?, Intent?>>(
+            LiveDataBus.observe(
                 this,
                 mViewModel.mUiChangeLiveData.finishEvent!!,
-                {
-                    setResult(it)
-                    finish()
-                },
-                true
-            )
-            LiveDataBus.observe<Pair<Int?, Intent?>>(
-                this,
-                mViewModel.mUiChangeLiveData.setResultEvent!!,
-                { setResult(it) },
+                Observer { activity?.finish() },
                 true
             )
             // vm 可以启动界面
@@ -126,7 +122,9 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             LiveDataBus.observe<Class<out Activity>>(
                 this,
                 mViewModel.mUiChangeLiveData.startActivityForResultEvent!!,
-                { startActivityForResult(it) },
+                {
+                    startActivityForResult(it)
+                },
                 true
             )
             // vm 可以启动界面，并携带 Bundle，接收方可调用 getBundle 获取
@@ -152,13 +150,13 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             mViewModel.mUiChangeLiveData.initLoadingDialogEvent()
 
             // 显示对话框
-            mViewModel.mUiChangeLiveData.showLoadingDialogEvent?.observe(this) {
+            mViewModel.mUiChangeLiveData.showLoadingDialogEvent?.observe(this, {
                 showLoadingDialog(mLoadingDialog, it)
-            }
+            })
             // 隐藏对话框
-            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent?.observe(this) {
+            mViewModel.mUiChangeLiveData.dismissLoadingDialogEvent?.observe(this, {
                 dismissLoadingDialog(mLoadingDialog)
-            }
+            })
         }
     }
 
@@ -171,7 +169,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
             ) { onLoadSirReload() }
 
             mViewModel.mUiChangeLiveData.initLoadSirEvent()
-            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this) {
+            mViewModel.mUiChangeLiveData.loadSirEvent?.observe(this, {
                 if (it == null) {
                     mLoadService.showSuccess()
                     onLoadSirSuccess()
@@ -179,7 +177,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
                     mLoadService.showCallback(it)
                     onLoadSirShowed(it)
                 }
-            }
+            })
         }
     }
 
@@ -188,7 +186,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
-        startActivity(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
+        startActivity(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
     }
 
     fun startActivityForResult(
@@ -196,18 +194,44 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
-        startActivityForResult(Utils.getIntentByMapOrBundle(this, clz, map, bundle), mForResultRequestCode)
+        initStartActivityForResult()
+        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
+    }
+
+    private fun initStartActivityForResult() {
+        if (!this::mStartActivityForResult.isInitialized) {
+            mStartActivityForResult =
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    val data = it.data ?: Intent()
+                    when (it.resultCode) {
+                        Activity.RESULT_OK -> {
+                            onActivityResultOk(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultOk(data)
+                            }
+                        }
+                        Activity.RESULT_CANCELED -> {
+                            onActivityResultCanceled(data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResultCanceled(data)
+                            }
+                        }
+                        else -> {
+                            onActivityResult(it.resultCode, data)
+                            if (this::mViewModel.isInitialized) {
+                                mViewModel.onActivityResult(it.resultCode, data)
+                            }
+                        }
+                    }
+                }
+        }
     }
 
     /**
-     * 通过 [BaseViewModel.startActivity] 传递 bundle，在这里可以获取
+     * 通过 setArguments 传递 bundle，在这里可以获取
      */
-    final override fun getBundle(): Bundle? {
-        return intent.extras
-    }
-
-    final override fun getArgumentsIntent(): Intent? {
-        return intent
+    override fun getBundle(): Bundle? {
+        return arguments
     }
 
     /**
@@ -224,7 +248,7 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
      * </pre>
      */
     fun <T> observe(liveData: LiveData<T>, onChanged: ((t: T) -> Unit)) =
-        liveData.observe(this) { onChanged(it) }
+        liveData.observe(this, { onChanged(it) })
 
     /**
      * 如果加载中对话框可手动取消，并且开启了取消耗时任务的功能，则在取消对话框后调用取消耗时任务
@@ -232,32 +256,9 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, dataIntent: Intent?) {
-        super<ParallaxSwipeBackActivity>.onActivityResult(requestCode, resultCode, dataIntent)
-        if (requestCode != mForResultRequestCode) {
-            return
-        }
-        val data = dataIntent ?: Intent()
-        when (resultCode) {
-            Activity.RESULT_OK -> {
-                onActivityResultOk(data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResultOk(data)
-                }
-            }
-            Activity.RESULT_CANCELED -> {
-                onActivityResultCanceled(data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResultCanceled(data)
-                }
-            }
-            else -> {
-                onActivityResult(resultCode, data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResult(resultCode, data)
-                }
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Utils.releaseBinding(this.javaClass, ViewBindingBaseFragment::class.java, this, "mBinding")
     }
 
     override fun onDestroy() {

@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,12 +8,17 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewbinding.ViewBinding
 import com.imyyq.mvvm.app.BaseApp
 import com.imyyq.mvvm.app.GlobalConfig
+import com.imyyq.mvvm.base.IArgumentsFromBundle
+import com.imyyq.mvvm.base.model.BaseModel
+import com.imyyq.mvvm.base.viewmodel.BaseViewModel
 import com.imyyq.mvvm.bus.LiveDataBus
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
  * V 层，这里的视图都是 Activity 或 Fragment
+ *
+ * @author imyyq.star@gmail.com
  */
 interface IView<V : ViewBinding, VM : BaseViewModel<out BaseModel>>: IArgumentsFromBundle {
     /**

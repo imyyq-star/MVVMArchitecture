@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.view
 
 import android.app.Activity
 import android.view.View
@@ -12,6 +12,9 @@ import com.imyyq.mvvm.utils.getViewBinding
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 interface IAppBar<AppBarP : IAppBarProcessor> {
     /**
      * 初始化 AppBar 的处理者
@@ -37,31 +40,24 @@ interface IAppBar<AppBarP : IAppBarProcessor> {
         fun <AppBarV : ViewDataBinding> inflateRootLayout(
             fragment: Fragment,
             contentView: View,
-            appBarLayoutRes: Int?
         ): Pair<AppBarV, View> {
-            return inflateRootLayout(fragment, fragment.requireActivity(), contentView, appBarLayoutRes)
+            return inflateRootLayout(fragment, fragment.requireActivity(), contentView)
         }
 
         fun <AppBarV : ViewDataBinding> inflateRootLayout(
             activity: Activity,
             contentView: View,
-            appBarLayoutRes: Int?
         ): Pair<AppBarV, View> {
-            return inflateRootLayout(activity, activity, contentView, appBarLayoutRes)
+            return inflateRootLayout(activity, activity, contentView)
         }
 
         private fun <AppBarV : ViewDataBinding> inflateRootLayout(
             obj: Any,
             activity: Activity,
             contentView: View,
-            appBarLayoutRes: Int?
         ): Pair<AppBarV, View> {
             // 实例化标题栏布局
-            val appBarBinding: AppBarV = if (appBarLayoutRes != null) {
-                DataBindingUtil.inflate(activity.layoutInflater, appBarLayoutRes, null, false)
-            } else {
-                obj.getViewBinding(activity.layoutInflater, 2)
-            }
+            val appBarBinding: AppBarV = obj.getViewBinding(activity.layoutInflater, 2)
 
             val linear = generateRootLayout(activity, appBarBinding, contentView)
             return Pair(appBarBinding, linear)

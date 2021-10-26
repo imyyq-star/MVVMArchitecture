@@ -2,10 +2,12 @@ package com.imyyq.mvvm.app
 
 import androidx.collection.ArrayMap
 import androidx.collection.arrayMapOf
-import com.imyyq.mvvm.base.BaseModel
+import com.imyyq.mvvm.base.model.BaseModel
 
 /**
- * 仓库管理类
+ * 仓库实例管理类，根据仓库类的特性，缓存或创建实例
+ *
+ * @author imyyq.star@gmail.com
  */
 @Suppress("UNCHECKED_CAST")
 object RepositoryManager {

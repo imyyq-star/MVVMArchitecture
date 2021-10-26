@@ -1,4 +1,4 @@
-package com.imyyq.mvvm.base
+package com.imyyq.mvvm.base.activity
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -15,7 +15,11 @@ import com.imyyq.mvvm.R
 import com.imyyq.mvvm.app.GlobalConfig
 import com.imyyq.mvvm.utils.DensityUtil.dp2px
 import com.imyyq.mvvm.utils.ScreenUtils
+import com.imyyq.mvvm.widget.PagerEnabledSlidingPaneLayout
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 abstract class ParallaxSwipeBackActivity : AppCompatActivity() {
     // 父布局
     private var mSlidingPaneLayout: PagerEnabledSlidingPaneLayout? = null

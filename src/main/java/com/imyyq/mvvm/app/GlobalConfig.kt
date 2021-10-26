@@ -9,6 +9,8 @@ import com.kingja.loadsir.core.LoadSir
 
 /**
  * 全局配置
+ *
+ * @author imyyq.star@gmail.com
  */
 object GlobalConfig {
     /**
