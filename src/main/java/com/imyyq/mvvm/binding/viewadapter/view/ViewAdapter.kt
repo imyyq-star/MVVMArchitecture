@@ -7,12 +7,12 @@ import com.imyyq.mvvm.http.HttpRequest
 import com.imyyq.mvvm.utils.LogUtil
 
 @BindingAdapter(
-    value = ["onClickCommand", "isInterval", "intervalMilliseconds"],
+    value = ["clickListener", "isInterval", "intervalMilliseconds"],
     requireAll = false
 )
 fun onClickCommand(
     view: View,
-    clickCommand: View.OnClickListener?,
+    clickListener: View.OnClickListener?,
     isInterval: Boolean?,
     intervalMilliseconds: Int?
 ) {
@@ -27,9 +27,9 @@ fun onClickCommand(
         milliseconds = GlobalConfig.Click.gClickIntervalMilliseconds
     }
     if (interval) {
-        clickCommand?.let { view.clickWithTrigger(milliseconds.toLong(), it) }
+        clickListener?.let { view.clickWithTrigger(milliseconds.toLong(), it) }
     } else {
-        view.setOnClickListener(clickCommand)
+        view.setOnClickListener(clickListener)
     }
 }
 
