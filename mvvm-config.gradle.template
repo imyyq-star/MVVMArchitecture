@@ -8,8 +8,6 @@ ext {
     IncludeLib = [
             // 内存泄露
             leakCanary2       : true,
-            // 应用前后台监听
-            lifecycleProcess  : false,
 
             recyclerView      : false,
 
