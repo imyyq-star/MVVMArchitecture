@@ -163,26 +163,4 @@ object Utils {
         bundle?.let { intent.putExtras(bundle) }
         return intent
     }
-
-    /**
-     * 释放 binding 实例
-     */
-    fun releaseBinding(startClz: Class<*>?, targetClz: Class<*>?, obj: Any, filed: String) {
-        // 通过反射，解决内存泄露问题
-        GlobalScope.launch {
-            var clz = startClz
-            while (clz != null) {
-                // 找到 mBinding 所在的类
-                if (clz == targetClz) {
-                    try {
-                        val field = clz.getDeclaredField(filed)
-                        field.isAccessible = true
-                        field.set(obj, null)
-                    } catch (ignore: Exception) {
-                    }
-                }
-                clz = clz.superclass
-            }
-        }
-    }
 }

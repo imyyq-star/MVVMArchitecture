@@ -9,7 +9,6 @@ import com.imyyq.mvvm.base.model.BaseModel
 import com.imyyq.mvvm.base.view.IAppBar
 import com.imyyq.mvvm.base.view.IAppBarProcessor
 import com.imyyq.mvvm.base.viewmodel.AppBarBaseViewModel
-import com.imyyq.mvvm.utils.Utils
 
 /**
  * 类似 [com.imyyq.mvvm.base.AppBarDataBindingBaseActivity]
@@ -23,7 +22,8 @@ abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBas
     sharedViewModel: Boolean = false
 ) : DataBindingBaseFragment<V, VM>(varViewModelId, sharedViewModel), IAppBar<AppBarP> {
 
-    protected lateinit var mAppBarBinding: AppBarV
+    internal var appBarBinding: AppBarV? = null
+    protected val mAppBarBinding get() = appBarBinding!!
     protected lateinit var mAppBarProcessor: AppBarP
 
     override fun onCreateView(
@@ -31,11 +31,11 @@ abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBas
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mBinding = initBinding(inflater, container)
+        binding = initBinding(inflater, container)
 
         val pair: Pair<AppBarV, View> =
             IAppBar.inflateRootLayout(this, mBinding.root)
-        mAppBarBinding = pair.first
+        appBarBinding = pair.first
         return pair.second
     }
 
@@ -51,9 +51,7 @@ abstract class AppBarDataBindingBaseFragment<V : ViewDataBinding, VM : AppBarBas
 
     override fun onDestroyView() {
         mAppBarBinding.unbind()
-
+        appBarBinding = null
         super.onDestroyView()
-
-        Utils.releaseBinding(this.javaClass, AppBarDataBindingBaseFragment::class.java, this, "mAppBarBinding")
     }
 }

@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
-import com.imyyq.mvvm.base.*
+import com.imyyq.mvvm.base.IActivityResult
 import com.imyyq.mvvm.base.model.BaseModel
 import com.imyyq.mvvm.base.view.ILoading
 import com.imyyq.mvvm.base.view.ILoadingDialog
@@ -35,7 +35,8 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 ) : Fragment(),
     IView<V, VM>, ILoadingDialog, ILoading, IActivityResult {
 
-    protected lateinit var mBinding: V
+    internal var binding: V? = null
+    protected val mBinding get() = binding!!
     protected lateinit var mViewModel: VM
 
     private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
@@ -49,7 +50,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mBinding = initBinding(inflater, container)
+        binding = initBinding(inflater, container)
         return mBinding.root
     }
 
@@ -258,7 +259,7 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Utils.releaseBinding(this.javaClass, ViewBindingBaseFragment::class.java, this, "mBinding")
+        binding = null
     }
 
     override fun onDestroy() {
