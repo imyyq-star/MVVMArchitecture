@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.ArrayMap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -39,11 +40,30 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
     protected val mBinding get() = binding!!
     protected lateinit var mViewModel: VM
 
-    private lateinit var mStartActivityForResult: ActivityResultLauncher<Intent>
-
     private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(requireActivity(), loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
+
+    private val mStartActivityForResult: ActivityResultLauncher<Intent>?
+
+    init {
+        @Suppress("LeakingThis")
+        val ok = onActivityResultOk()
+        @Suppress("LeakingThis")
+        val cancel = onActivityResultCanceled()
+
+        mStartActivityForResult = if (ok != null || cancel != null) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == AppCompatActivity.RESULT_OK) {
+                    ok?.invoke(it.data)
+                } else {
+                    cancel?.invoke(it.data)
+                }
+            }
+        } else {
+            null
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -195,37 +215,10 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
         map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
-        initStartActivityForResult()
-        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
-    }
-
-    private fun initStartActivityForResult() {
-        if (!this::mStartActivityForResult.isInitialized) {
-            mStartActivityForResult =
-                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    val data = it.data ?: Intent()
-                    when (it.resultCode) {
-                        Activity.RESULT_OK -> {
-                            onActivityResultOk(data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResultOk(data)
-                            }
-                        }
-                        Activity.RESULT_CANCELED -> {
-                            onActivityResultCanceled(data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResultCanceled(data)
-                            }
-                        }
-                        else -> {
-                            onActivityResult(it.resultCode, data)
-                            if (this::mViewModel.isInitialized) {
-                                mViewModel.onActivityResult(it.resultCode, data)
-                            }
-                        }
-                    }
-                }
+        if (mStartActivityForResult == null) {
+            throw RuntimeException("请实现 onActivityResultCanceled 或 onActivityResultOk 方法")
         }
+        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(activity, clz, map, bundle))
     }
 
     /**
@@ -256,6 +249,13 @@ abstract class ViewBindingBaseFragment<V : ViewBinding, VM : BaseViewModel<out B
      */
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
+
+    /**
+     * 详见 [com.imyyq.mvvm.base.activity.ViewBindingBaseActivity.onActivityResult]
+     */
+    final override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

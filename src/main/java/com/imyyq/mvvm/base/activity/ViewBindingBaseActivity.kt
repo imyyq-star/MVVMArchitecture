@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
@@ -42,7 +44,27 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     private val mLoadingDialog by lazy(mode = LazyThreadSafetyMode.NONE) { CustomLayoutDialog(this, loadingDialogLayout()) }
 
     private lateinit var mLoadService: LoadService<*>
-    private val mForResultRequestCode = 12345678
+
+    private val mStartActivityForResult: ActivityResultLauncher<Intent>?
+
+    init {
+        @Suppress("LeakingThis")
+        val ok = onActivityResultOk()
+        @Suppress("LeakingThis")
+        val cancel = onActivityResultCanceled()
+
+        mStartActivityForResult = if (ok != null || cancel != null) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    ok?.invoke(it.data)
+                } else {
+                    cancel?.invoke(it.data)
+                }
+            }
+        } else {
+            null
+        }
+    }
 
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -205,7 +227,10 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
         map: ArrayMap<String, *>? = null,
         bundle: Bundle? = null
     ) {
-        startActivityForResult(Utils.getIntentByMapOrBundle(this, clz, map, bundle), mForResultRequestCode)
+        if (mStartActivityForResult == null) {
+            throw RuntimeException("请实现 onActivityResultCanceled 或 onActivityResultOk 方法")
+        }
+        mStartActivityForResult.launch(Utils.getIntentByMapOrBundle(this, clz, map, bundle))
     }
 
     /**
@@ -241,32 +266,12 @@ abstract class ViewBindingBaseActivity<V : ViewBinding, VM : BaseViewModel<out B
     @CallSuper
     override fun onCancelLoadingDialog() = mViewModel.cancelConsumingTask()
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, dataIntent: Intent?) {
-        super<ParallaxSwipeBackActivity>.onActivityResult(requestCode, resultCode, dataIntent)
-        if (requestCode != mForResultRequestCode) {
-            return
-        }
-        val data = dataIntent ?: Intent()
-        when (resultCode) {
-            Activity.RESULT_OK -> {
-                onActivityResultOk(data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResultOk(data)
-                }
-            }
-            Activity.RESULT_CANCELED -> {
-                onActivityResultCanceled(data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResultCanceled(data)
-                }
-            }
-            else -> {
-                onActivityResult(resultCode, data)
-                if (this::mViewModel.isInitialized) {
-                    mViewModel.onActivityResult(resultCode, data)
-                }
-            }
-        }
+    /**
+     * 不建议使用。
+     * 请查看 [IActivityResult] 接口的描述
+     */
+    final override fun onActivityResult(requestCode: Int, resultCode: Int, dataIntent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, dataIntent)
     }
 
     override fun onDestroy() {
