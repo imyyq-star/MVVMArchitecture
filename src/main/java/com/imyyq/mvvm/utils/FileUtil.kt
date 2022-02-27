@@ -12,6 +12,9 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 object FileUtil {
 
     /**

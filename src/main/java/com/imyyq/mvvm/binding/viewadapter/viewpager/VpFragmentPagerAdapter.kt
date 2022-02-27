@@ -5,6 +5,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.imyyq.mvvm.base.fragment.ViewBindingBaseFragment
 
+/**
+ *
+ * @author imyyq.star@gmail.com
+ */
 class VpFragmentPagerAdapter internal constructor(
     fm: FragmentManager,
     private val mPageList: List<ViewBindingBaseFragment<*, *>>

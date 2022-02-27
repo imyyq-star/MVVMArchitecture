@@ -9,6 +9,8 @@ import kotlin.system.exitProcess
 
 /**
  * 崩溃信息捕获，存储在 /sdcard/Android/data/xxx.xxx.xxx/cache/Log/crash/日期.log
+ *
+ * @author imyyq.star@gmail.com
  */
 internal object CrashHandlerUtil : UncaughtExceptionHandler {
     private val CRASH_LOG_PATH = FileUtil.appLogDir + "crash/"

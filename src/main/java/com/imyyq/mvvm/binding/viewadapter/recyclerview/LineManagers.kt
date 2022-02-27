@@ -5,6 +5,8 @@ import com.imyyq.mvvm.binding.command.BindingFunction
 
 /**
  * RecyclerView 分割线
+ *
+ * @author imyyq.star@gmail.com
  */
 object LineManagers {
     @JvmStatic

@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 /**
  * 吐司提示类，可设置位置，偏移量，默认是系统自带的位置和偏移量。
  * 可设置自定义布局和消息id。
+ *
+ * @author imyyq.star@gmail.com
  */
 object ToastUtil {
 

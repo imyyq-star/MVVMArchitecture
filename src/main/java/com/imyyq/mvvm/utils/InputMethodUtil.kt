@@ -6,6 +6,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.imyyq.mvvm.app.BaseApp
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 object InputMethodUtil {
 
     /**

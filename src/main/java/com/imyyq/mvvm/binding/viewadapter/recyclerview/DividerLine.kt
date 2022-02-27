@@ -11,6 +11,8 @@ import com.imyyq.mvvm.utils.DensityUtil.dp2px
 
 /**
  * 分隔线
+ *
+ * @author imyyq.star@gmail.com
  */
 class DividerLine(context: Context) : ItemDecoration() {
     //divider对应的drawable

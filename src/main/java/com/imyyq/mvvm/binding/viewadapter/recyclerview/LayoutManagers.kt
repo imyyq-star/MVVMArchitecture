@@ -10,6 +10,8 @@ import com.imyyq.mvvm.binding.command.BindingFunction
 
 /**
  * RecyclerView 的布局管理器类，提供便捷的方法
+ *
+ * @author imyyq.star@gmail.com
  */
 object LayoutManagers {
     /**

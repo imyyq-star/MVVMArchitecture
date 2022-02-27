@@ -2,6 +2,9 @@ package com.imyyq.mvvm.utils
 
 import com.imyyq.mvvm.app.BaseApp
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 object DensityUtil {
 
     /**

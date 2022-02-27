@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Created by 杨永青 on 16/9/14.
+ * @author imyyq.star@gmail.com
  */
 object DateUtil {
     private const val YMDHM_ = "yyyy-MM-dd HH:mm"

@@ -6,6 +6,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.imyyq.mvvm.app.BaseApp
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 object AppUtil {
     private const val TAG = "AppUtil"
 

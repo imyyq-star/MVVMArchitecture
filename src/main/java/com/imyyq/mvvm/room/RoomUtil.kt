@@ -9,6 +9,8 @@ import com.imyyq.mvvm.app.BaseApp
 
 /**
  * 便捷创建 room 实例的工具，通常来说只需要实例化一次即可，数据库也应该只有一个
+ *
+ * @author imyyq.star@gmail.com
  */
 object RoomUtil {
     private val mDBEntityMap = ArrayMap<String, RoomDatabase>()

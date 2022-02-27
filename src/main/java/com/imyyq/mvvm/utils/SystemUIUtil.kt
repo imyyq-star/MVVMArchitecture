@@ -9,6 +9,8 @@ import androidx.annotation.RequiresApi
 
 /**
  * 操作 SystemUI 的工具类
+ *
+ * @author imyyq.star@gmail.com
  */
 object SystemUIUtil {
     /**

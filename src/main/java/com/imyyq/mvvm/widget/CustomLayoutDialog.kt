@@ -8,6 +8,9 @@ import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import com.imyyq.mvvm.R
 
+/**
+ * @author imyyq.star@gmail.com
+ */
 class CustomLayoutDialog(
     context: Context,
     @LayoutRes private val mLayoutRes: Int

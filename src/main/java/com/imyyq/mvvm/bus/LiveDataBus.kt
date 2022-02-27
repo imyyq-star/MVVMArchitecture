@@ -14,6 +14,8 @@ import androidx.lifecycle.Observer
  * 事件总线类，支持生命周期相关和无关的事件，支持粘性事件。
  * 生命周期无关的事件和粘性事件，需要手动移除监听者，框架的 Activity/Fragment 和
  * ViewModel 已经实现了自动移除。所以在这两者中使用无需手动移除。在其他对象中使用就需要在不需要监听时手动移除。
+ *
+ * @author imyyq.star@gmail.com
  */
 object LiveDataBus {
     /**
